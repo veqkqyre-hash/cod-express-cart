@@ -1,0 +1,77 @@
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useI18n } from "@/lib/i18n";
+import { useCart, formatEur } from "@/lib/cart";
+import { toast } from "sonner";
+import { Minus, Plus, ShoppingBag } from "lucide-react";
+
+export const Route = createFileRoute("/product/$slug")({ component: ProductPage });
+
+function ProductPage() {
+  const { slug } = Route.useParams();
+  const { tr, lang } = useI18n();
+  const { add } = useCart();
+  const [qty, setQty] = useState(1);
+
+  const { data: product, isLoading } = useQuery({
+    queryKey: ["product", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("products").select("*").eq("slug", slug).eq("active", true).maybeSingle();
+      if (error) throw error;
+      if (!data) throw notFound();
+      return data;
+    },
+  });
+
+  if (isLoading) return <div className="container-app py-20 text-center text-muted-foreground">…</div>;
+  if (!product) return null;
+
+  const name = lang === "sq" ? product.name_sq : product.name_en;
+  const desc = lang === "sq" ? product.description_sq : product.description_en;
+
+  return (
+    <div className="container-app py-10">
+      <Link to="/shop" className="text-sm text-muted-foreground hover:text-primary">← {tr("shop")}</Link>
+      <div className="mt-6 grid gap-10 lg:grid-cols-2">
+        <div className="overflow-hidden rounded-2xl bg-muted aspect-square">
+          {product.image_url && <img src={product.image_url} alt={name} className="h-full w-full object-cover" />}
+        </div>
+        <div>
+          <h1 className="font-display text-3xl sm:text-4xl">{name}</h1>
+          <div className="mt-4 font-display text-3xl text-primary">{formatEur(Number(product.price))}</div>
+          {desc && <p className="mt-6 text-muted-foreground leading-relaxed">{desc}</p>}
+
+          <div className="mt-8 flex items-center gap-4">
+            <div className="flex items-center rounded-full border border-input">
+              <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-11 w-11 place-items-center hover:bg-muted rounded-l-full">
+                <Minus className="h-4 w-4" />
+              </button>
+              <span className="w-10 text-center font-medium">{qty}</span>
+              <button onClick={() => setQty((q) => q + 1)} className="grid h-11 w-11 place-items-center hover:bg-muted rounded-r-full">
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+            <button
+              disabled={product.stock === 0}
+              onClick={() => {
+                add({ id: product.id, slug: product.slug, name, price: Number(product.price), image: product.image_url }, qty);
+                toast.success(lang === "sq" ? "U shtua në shportë" : "Added to cart");
+              }}
+              className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              {tr("addToCart")}
+            </button>
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-border bg-accent/40 p-5">
+            <div className="font-medium">{tr("cod")}</div>
+            <div className="text-sm text-muted-foreground mt-1">{tr("codDesc")}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
