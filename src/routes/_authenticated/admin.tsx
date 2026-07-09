@@ -206,7 +206,7 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
           </div>
 
           <div className="hidden print:block mb-6">
-            <h1 className="font-display text-3xl">Bella Salon Supplies</h1>
+            <h1 className="font-display text-3xl">Dream Studio</h1>
             <div className="text-sm text-muted-foreground">{tr("invoice")} #{order.order_number}</div>
           </div>
 

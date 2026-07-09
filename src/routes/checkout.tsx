@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { useCart, formatEur } from "@/lib/cart";
 import { toast } from "sonner";
-import { Banknote } from "lucide-react";
+import { Banknote, LogIn } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({ component: Checkout });
 
@@ -24,6 +24,32 @@ function Checkout() {
   const { items, subtotal, clear } = useCart();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [userId, setUserId] = useState<string | null | undefined>(undefined);
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null);
+      setUserEmail(data.user?.email ?? "");
+    });
+  }, []);
+
+  if (userId === undefined) return <div className="container-app py-20 text-center text-muted-foreground">…</div>;
+
+  if (userId === null) {
+    return (
+      <div className="container-app py-16 max-w-md text-center">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent">
+          <LogIn className="h-6 w-6 text-primary" />
+        </div>
+        <h1 className="mt-6 font-display text-3xl">{tr("loginRequired")}</h1>
+        <p className="mt-3 text-sm text-muted-foreground">{tr("loginToCheckout")}</p>
+        <Link to="/auth" search={{ redirect: "/checkout" } as any} className="mt-6 inline-flex rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground">
+          {tr("login")} / {tr("signUp")}
+        </Link>
+      </div>
+    );
+  }
 
   if (items.length === 0 && !submitting) {
     return (
@@ -50,6 +76,7 @@ function Checkout() {
       const { data: order, error } = await supabase
         .from("orders")
         .insert({
+          user_id: userId,
           customer_name: parsed.data.customer_name,
           phone: parsed.data.phone,
           email: parsed.data.email || null,
@@ -94,7 +121,7 @@ function Checkout() {
             <Field label={tr("fullName")} name="customer_name" required />
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={tr("phone")} name="phone" required type="tel" />
-              <Field label={tr("email")} name="email" type="email" />
+              <Field label={tr("email")} name="email" type="email" defaultValue={userEmail} />
             </div>
             <Field label={tr("city")} name="city" required />
             <Field label={tr("address")} name="address" required />
@@ -148,11 +175,11 @@ function Checkout() {
   );
 }
 
-function Field({ label, name, required, type = "text" }: { label: string; name: string; required?: boolean; type?: string }) {
+function Field({ label, name, required, type = "text", defaultValue }: { label: string; name: string; required?: boolean; type?: string; defaultValue?: string }) {
   return (
     <div>
       <label className="mb-1.5 block text-sm font-medium">{label}{required && <span className="text-destructive"> *</span>}</label>
-      <input name={name} required={required} type={type} maxLength={300} className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+      <input name={name} required={required} type={type} defaultValue={defaultValue} maxLength={300} className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
     </div>
   );
 }
