@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
-import { LogOut, Printer, X, Package, Plus, Pencil, Trash2 } from "lucide-react";
+import { LogOut, Printer, X, Package } from "lucide-react";
+import { ProductsPanel } from "@/components/admin-products-panel";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: Admin });
 
