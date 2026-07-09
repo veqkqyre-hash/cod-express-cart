@@ -6,7 +6,7 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-border/60 bg-muted/40">
       <div className="container-app py-10 grid gap-6 sm:grid-cols-3 text-sm">
         <div>
-          <div className="font-display text-lg mb-2">Bella Salon Supplies</div>
+          <div className="font-display text-lg mb-2">Dream Studio</div>
           <p className="text-muted-foreground">{tr("tagline")}</p>
         </div>
         <div>
