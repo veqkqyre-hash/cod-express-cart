@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { LogOut, Printer, X, Package } from "lucide-react";
+import { ProductsPanel } from "@/components/admin-products-panel";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: Admin });
 
@@ -111,72 +112,91 @@ function Admin() {
   }
 
   const openOrder = filtered.find((o) => o.id === openId) ?? null;
+  const [tab, setTab] = useState<"orders" | "products">("orders");
 
   return (
     <div className="container-app py-8">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-display text-3xl">{tr("orders")}</h1>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="font-display text-3xl">Admin — Dream Studio</h1>
         <button onClick={signOut} className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted">
           <LogOut className="h-4 w-4" /> {tr("logout")}
         </button>
       </div>
 
-      <div className="mb-6 flex flex-wrap gap-3">
-        <input
-          type="search"
-          placeholder={tr("search")}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-48 rounded-full border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="rounded-full border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-        >
-          <option value="">{tr("allStatuses")}</option>
-          {STATUSES.map((s) => <option key={s} value={s}>{tr(s as any)}</option>)}
-        </select>
+      <div className="mb-6 flex gap-2 border-b border-border">
+        {(["orders", "products"] as const).map((k) => (
+          <button
+            key={k}
+            onClick={() => setTab(k)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition ${tab === k ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+          >
+            {tr(k)}
+          </button>
+        ))}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3">#</th>
-                <th className="px-4 py-3">{tr("customer")}</th>
-                <th className="px-4 py-3 hidden md:table-cell">{tr("city")}</th>
-                <th className="px-4 py-3 hidden sm:table-cell">{tr("date")}</th>
-                <th className="px-4 py-3">{tr("total")}</th>
-                <th className="px-4 py-3">{tr("status")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((o) => (
-                <tr key={o.id} onClick={() => setOpenId(o.id)} className="border-t border-border hover:bg-muted/40 cursor-pointer">
-                  <td className="px-4 py-3 font-mono text-xs">{o.order_number}</td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium">{o.customer_name}</div>
-                    <div className="text-xs text-muted-foreground">{o.phone}</div>
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell">{o.city}</td>
-                  <td className="px-4 py-3 hidden sm:table-cell text-muted-foreground">{new Date(o.created_at).toLocaleDateString()}</td>
-                  <td className="px-4 py-3 font-medium">{formatEur(Number(o.total))}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLOR[o.status]}`}>
-                      {tr(o.status as any)}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">{lang === "sq" ? "Asnjë porosi" : "No orders"}</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {tab === "orders" ? (
+        <>
+          <div className="mb-6 flex flex-wrap gap-3">
+            <input
+              type="search"
+              placeholder={tr("search")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-1 min-w-48 rounded-full border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="rounded-full border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="">{tr("allStatuses")}</option>
+              {STATUSES.map((s) => <option key={s} value={s}>{tr(s as any)}</option>)}
+            </select>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3">#</th>
+                    <th className="px-4 py-3">{tr("customer")}</th>
+                    <th className="px-4 py-3 hidden md:table-cell">{tr("city")}</th>
+                    <th className="px-4 py-3 hidden sm:table-cell">{tr("date")}</th>
+                    <th className="px-4 py-3">{tr("total")}</th>
+                    <th className="px-4 py-3">{tr("status")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((o) => (
+                    <tr key={o.id} onClick={() => setOpenId(o.id)} className="border-t border-border hover:bg-muted/40 cursor-pointer">
+                      <td className="px-4 py-3 font-mono text-xs">{o.order_number}</td>
+                      <td className="px-4 py-3">
+                        <div className="font-medium">{o.customer_name}</div>
+                        <div className="text-xs text-muted-foreground">{o.phone}</div>
+                      </td>
+                      <td className="px-4 py-3 hidden md:table-cell">{o.city}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-muted-foreground">{new Date(o.created_at).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 font-medium">{formatEur(Number(o.total))}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLOR[o.status]}`}>
+                          {tr(o.status as any)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {filtered.length === 0 && (
+                    <tr><td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">{lang === "sq" ? "Asnjë porosi" : "No orders"}</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      ) : (
+        <ProductsPanel />
+      )}
 
       {openOrder && <OrderModal order={openOrder} onClose={() => setOpenId(null)} onStatus={(s) => updateStatus(openOrder.id, s)} />}
     </div>
@@ -206,7 +226,7 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
           </div>
 
           <div className="hidden print:block mb-6">
-            <h1 className="font-display text-3xl">Bella Salon Supplies</h1>
+            <h1 className="font-display text-3xl">Dream Studio</h1>
             <div className="text-sm text-muted-foreground">{tr("invoice")} #{order.order_number}</div>
           </div>
 
