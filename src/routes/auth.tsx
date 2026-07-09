@@ -16,7 +16,7 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/admin" });
+      if (data.user) navigate({ to: "/account" });
     });
   }, [navigate]);
 
@@ -31,12 +31,12 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin + "/admin" },
+          options: { emailRedirectTo: window.location.origin + "/account" },
         });
         if (error) throw error;
-        toast.success(lang === "sq" ? "Llogaria u krijua. Kërkoni akses admin nga administratori." : "Account created. Ask an admin for access.");
+        toast.success(lang === "sq" ? "Llogaria u krijua!" : "Account created!");
       }
-      navigate({ to: "/admin" });
+      navigate({ to: "/account" });
     } catch (err: any) {
       toast.error(err.message);
     } finally {
