@@ -3,9 +3,27 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ProductCard, type Product } from "@/components/product-card";
-import heroImg from "@/assets/hero.jpg";
+import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram, Mail } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({ component: Home });
+
+// Category card visuals — soft pink illustrated tiles
+const CATEGORY_ART: Record<string, { hue: string; emoji: string }> = {
+  "hair-care": { hue: "from-pink-100 to-white", emoji: "💗" },
+  "hair-color": { hue: "from-rose-100 to-white", emoji: "🎨" },
+  barber: { hue: "from-neutral-100 to-white", emoji: "✂️" },
+  nails: { hue: "from-pink-50 to-white", emoji: "💅" },
+  makeup: { hue: "from-fuchsia-100 to-white", emoji: "💄" },
+  eyelashes: { hue: "from-rose-50 to-white", emoji: "👁️" },
+  waxing: { hue: "from-amber-50 to-white", emoji: "🕯️" },
+  equipment: { hue: "from-slate-100 to-white", emoji: "⚙️" },
+  "salon-equipment": { hue: "from-slate-100 to-white", emoji: "⚙️" },
+  furniture: { hue: "from-neutral-100 to-white", emoji: "🪑" },
+  accessories: { hue: "from-pink-100 to-white", emoji: "✨" },
+  "professional-accessories": { hue: "from-pink-100 to-white", emoji: "✨" },
+};
 
 function Home() {
   const { tr, lang } = useI18n();
@@ -13,85 +31,410 @@ function Home() {
   const categories = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("categories").select("*").order("sort_order");
-      if (error) throw error;
+      const { data } = await supabase.from("categories").select("*").order("sort_order");
       return data ?? [];
     },
   });
 
   const featured = useQuery({
-    queryKey: ["featured"],
+    queryKey: ["home-featured"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("products")
         .select("id,slug,name_sq,name_en,price,image_url,stock")
-        .eq("active", true)
-        .eq("featured", true)
-        .limit(8);
-      if (error) throw error;
+        .eq("active", true).eq("featured", true).limit(8);
+      return (data ?? []) as Product[];
+    },
+  });
+
+  const newArrivals = useQuery({
+    queryKey: ["home-new"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("products")
+        .select("id,slug,name_sq,name_en,price,image_url,stock")
+        .eq("active", true).order("created_at", { ascending: false }).limit(8);
       return (data ?? []) as Product[];
     },
   });
 
   return (
-    <div>
-      <section className="relative overflow-hidden">
-        <div className="container-app grid gap-10 py-12 md:py-20 lg:grid-cols-2 lg:items-center">
-          <div className="space-y-6">
-            <span className="inline-block rounded-full bg-accent px-4 py-1 text-xs font-medium text-accent-foreground">
-              {tr("cod")} — {tr("codDesc")}
-            </span>
-            <h1 className="font-display text-4xl leading-tight sm:text-5xl lg:text-6xl">
-              {tr("heroTitle")}
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-lg">{tr("heroSubtitle")}</p>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/shop" className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-elev hover:bg-primary/90 transition">
-                {tr("shopNow")}
-              </Link>
-              <a href="#categories" className="rounded-full border border-border px-6 py-3 text-sm font-medium hover:bg-muted transition">
-                {tr("categories")}
-              </a>
-            </div>
+    <div className="overflow-x-hidden">
+      <Hero />
+      <Marquee />
+      <FeaturedCategories categories={categories.data ?? []} lang={lang} />
+      <PromoDuo />
+      <ProductSection
+        eyebrow={tr("bestSellers")}
+        title={tr("bestSellersTitle")}
+        subtitle={tr("bestSellersSub")}
+        products={featured.data ?? []}
+      />
+      <PromoWide />
+      <ProductSection
+        eyebrow={tr("newArrivals")}
+        title={tr("newArrivalsTitle")}
+        subtitle={tr("newArrivalsSub")}
+        products={newArrivals.data ?? []}
+      />
+      <TopBrands />
+      <WhyChooseUs />
+      <Reviews />
+      <InstagramGallery />
+      <Newsletter />
+    </div>
+  );
+}
+
+/* ------------------------------ Sections ------------------------------ */
+
+function Hero() {
+  const { tr } = useI18n();
+  return (
+    <section className="relative overflow-hidden">
+      <div className="absolute inset-0 gradient-pink" />
+      <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[var(--pink)] opacity-30 blur-3xl animate-float" />
+      <div className="absolute -bottom-32 -left-24 h-96 w-96 rounded-full bg-[var(--pink-soft)] opacity-70 blur-3xl" />
+
+      <div className="container-app relative grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:items-center">
+        <div className="lg:col-span-6 space-y-6">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--pink-deep)]/20 bg-white/70 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--pink-deep)] backdrop-blur">
+            <Sparkles className="h-3 w-3" /> {tr("heroBadge")}
+          </span>
+          <h1 className="font-display text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
+            {tr("heroLine1")}
+            <br />
+            <span className="text-gradient-pink italic">{tr("heroLine2")}</span>
+          </h1>
+          <p className="max-w-lg text-base text-muted-foreground md:text-lg">{tr("heroSubtitle")}</p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              to="/shop"
+              className="group inline-flex items-center gap-2 rounded-full bg-black px-7 py-3.5 text-sm font-semibold uppercase tracking-widest text-white shadow-elev transition hover:bg-[var(--pink-deep)]"
+            >
+              {tr("shopNow")}
+              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+            </Link>
+            <a
+              href="#categories"
+              className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/60 px-7 py-3.5 text-sm font-semibold uppercase tracking-widest text-black backdrop-blur transition hover:bg-white"
+            >
+              {tr("exploreCategories")}
+            </a>
           </div>
-          <div className="relative">
-            <div className="absolute -inset-4 rounded-3xl bg-gradient-to-tr from-blush to-cream blur-2xl opacity-70" />
-            <img
-              src={heroImg}
-              alt="Beauty salon supplies"
-              width={1600}
-              height={1000}
-              className="relative rounded-3xl shadow-elev aspect-[4/3] object-cover"
-            />
+          <div className="flex flex-wrap gap-6 pt-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5"><Truck className="h-4 w-4 text-[var(--pink-deep)]" /> {tr("freeShippingBanner")}</div>
+            <div className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-[var(--pink-deep)]" /> {tr("codShort")}</div>
+            <div className="flex items-center gap-1.5"><Award className="h-4 w-4 text-[var(--pink-deep)]" /> {tr("qualityBadge")}</div>
           </div>
         </div>
-      </section>
 
-      <section id="categories" className="container-app py-12">
-        <h2 className="font-display text-3xl mb-8">{tr("categories")}</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
-          {categories.data?.map((c) => (
+        <div className="lg:col-span-6 relative">
+          <div className="relative mx-auto aspect-[4/5] max-w-md">
+            <div className="absolute inset-0 -rotate-3 rounded-[3rem] bg-[var(--pink)] opacity-30" />
+            <div className="absolute inset-0 rotate-3 rounded-[3rem] bg-black opacity-90" />
+            <div className="absolute inset-4 rounded-[2.5rem] bg-gradient-to-br from-[var(--pink-soft)] via-white to-[var(--pink)]/40 overflow-hidden shadow-elev">
+              <div className="absolute inset-0 grid place-items-center text-9xl opacity-90">💗</div>
+              <div className="absolute bottom-6 left-6 right-6 rounded-2xl bg-white/90 p-4 backdrop-blur shadow-soft">
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--pink-deep)]">{tr("limitedOffer")}</div>
+                <div className="mt-1 font-display text-xl leading-tight">{tr("heroCardTitle")}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{tr("heroCardSub")}</div>
+              </div>
+              <div className="absolute -top-4 right-6 rotate-6 rounded-full bg-[var(--pink-deep)] px-5 py-4 text-center text-white shadow-pink">
+                <div className="text-2xl font-display leading-none">−30%</div>
+                <div className="mt-0.5 text-[9px] uppercase tracking-widest">{tr("today")}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Marquee() {
+  const { tr } = useI18n();
+  const items = [tr("marq1"), tr("marq2"), tr("marq3"), tr("marq4"), tr("marq5")];
+  const line = [...items, ...items];
+  return (
+    <div className="border-y border-black/10 bg-black text-white overflow-hidden">
+      <div className="flex whitespace-nowrap animate-marquee py-3.5">
+        {line.map((t, i) => (
+          <span key={i} className="mx-8 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em]">
+            <Sparkles className="h-3 w-3 text-[var(--pink)]" /> {t}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FeaturedCategories({ categories, lang }: { categories: any[]; lang: "sq" | "en" }) {
+  const { tr } = useI18n();
+  return (
+    <section id="categories" className="container-app py-20">
+      <SectionHead eyebrow={tr("categories")} title={tr("shopByCategory")} subtitle={tr("shopByCategorySub")} />
+      <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        {categories.map((c) => {
+          const art = CATEGORY_ART[c.slug] ?? { hue: "from-pink-50 to-white", emoji: "✨" };
+          return (
             <Link
               key={c.id}
               to="/shop"
               search={{ category: c.slug }}
-              className="group rounded-2xl border border-border bg-card p-5 text-center shadow-soft transition hover:-translate-y-1 hover:shadow-elev"
+              className={`group relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border border-border bg-gradient-to-br ${art.hue} p-6 text-center aspect-square transition duration-300 hover:-translate-y-1 hover:shadow-elev hover:border-[var(--pink-deep)]/30`}
             >
-              <div className="text-sm font-medium">{lang === "sq" ? c.name_sq : c.name_en}</div>
+              <div className="absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-[var(--pink)]/25 blur-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              <div className="relative text-4xl md:text-5xl transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                {art.emoji}
+              </div>
+              <div className="relative mt-3 text-sm font-semibold">{lang === "sq" ? c.name_sq : c.name_en}</div>
+              <div className="relative mt-1 text-[10px] uppercase tracking-widest text-muted-foreground transition-colors group-hover:text-[var(--pink-deep)]">
+                {tr("explore")} →
+              </div>
             </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function PromoDuo() {
+  const { tr, lang } = useI18n();
+  return (
+    <section className="container-app grid gap-4 md:grid-cols-2">
+      <div className="relative overflow-hidden rounded-3xl bg-[var(--pink-soft)] p-8 md:p-10 min-h-[280px] group">
+        <div className="absolute -right-8 -bottom-8 text-[10rem] opacity-40 transition-transform duration-500 group-hover:scale-110">💄</div>
+        <div className="relative max-w-xs">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink-deep)]">{tr("summerCollection")}</div>
+          <h3 className="mt-2 font-display text-3xl md:text-4xl leading-tight">{tr("promoDuo1Title")}</h3>
+          <p className="mt-3 text-sm text-muted-foreground">{tr("promoDuo1Sub")}</p>
+          <Link to="/shop" search={{ category: "makeup" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-black px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink-deep)] transition">
+            {tr("discover")} <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
+      <div className="relative overflow-hidden rounded-3xl bg-black p-8 md:p-10 min-h-[280px] group text-white">
+        <div className="absolute -right-8 -bottom-8 text-[10rem] opacity-30 transition-transform duration-500 group-hover:scale-110">✂️</div>
+        <div className="relative max-w-xs">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink)]">{tr("proExclusive")}</div>
+          <h3 className="mt-2 font-display text-3xl md:text-4xl leading-tight">{tr("promoDuo2Title")}</h3>
+          <p className="mt-3 text-sm text-white/70">{tr("promoDuo2Sub")}</p>
+          <Link to="/shop" search={{ category: "barber" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-[var(--pink-deep)] px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink)] transition">
+            {tr("shopNow")} <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PromoWide() {
+  const { tr } = useI18n();
+  return (
+    <section className="container-app py-20">
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-[var(--pink-deep)] via-[var(--pink)] to-[var(--pink-deep)] p-10 md:p-16 text-white shadow-pink">
+        <div className="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-white/15 blur-3xl" />
+        <div className="absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-black/20 blur-3xl" />
+        <div className="relative grid gap-8 md:grid-cols-2 md:items-center">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/80">{tr("megaSale")}</div>
+            <h3 className="mt-3 font-display text-4xl md:text-5xl leading-tight">{tr("promoWideTitle")}</h3>
+            <p className="mt-3 max-w-md text-sm md:text-base text-white/85">{tr("promoWideSub")}</p>
+            <Link to="/shop" className="mt-6 inline-flex items-center gap-2 rounded-full bg-black px-7 py-3.5 text-sm font-semibold uppercase tracking-widest text-white hover:bg-white hover:text-black transition">
+              {tr("shopSale")} <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 gap-4 md:gap-6">
+            {[
+              { n: "72", l: tr("hours") },
+              { n: "40", l: "% OFF" },
+              { n: "500+", l: tr("productsCount") },
+            ].map((s, i) => (
+              <div key={i} className="rounded-2xl bg-white/15 backdrop-blur-md p-5 text-center border border-white/20">
+                <div className="font-display text-3xl md:text-4xl">{s.n}</div>
+                <div className="mt-1 text-[10px] uppercase tracking-widest">{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProductSection({ eyebrow, title, subtitle, products }: { eyebrow: string; title: string; subtitle: string; products: Product[] }) {
+  const { tr } = useI18n();
+  return (
+    <section className="container-app py-16">
+      <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+        <SectionHead eyebrow={eyebrow} title={title} subtitle={subtitle} align="left" />
+        <Link to="/shop" className="group inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-black hover:text-[var(--pink-deep)] transition">
+          {tr("viewAll")} <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
+        </Link>
+      </div>
+      {products.length === 0 ? (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="aspect-[3/4] rounded-2xl bg-[var(--pink-soft)]/60 animate-pulse" />
           ))}
         </div>
-      </section>
-
-      <section className="container-app py-12">
-        <div className="flex items-end justify-between mb-8">
-          <h2 className="font-display text-3xl">{tr("featured")}</h2>
-          <Link to="/shop" className="text-sm text-primary hover:underline">{tr("viewAll")} →</Link>
-        </div>
+      ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {featured.data?.map((p) => <ProductCard key={p.id} p={p} />)}
+          {products.map((p) => <ProductCard key={p.id} p={p} />)}
         </div>
-      </section>
+      )}
+    </section>
+  );
+}
+
+const BRANDS = ["L'ORÉAL", "WELLA", "SCHWARZKOPF", "OPI", "MAC", "REVLON", "OLAPLEX", "REDKEN"];
+function TopBrands() {
+  const { tr } = useI18n();
+  return (
+    <section id="brands" className="border-y border-border bg-[var(--pink-soft)]/40 py-16">
+      <div className="container-app">
+        <SectionHead eyebrow={tr("brands")} title={tr("topBrandsTitle")} subtitle={tr("topBrandsSub")} />
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+          {BRANDS.map((b) => (
+            <div key={b} className="group grid h-20 place-items-center rounded-2xl bg-white border border-border transition hover:-translate-y-1 hover:shadow-soft hover:border-[var(--pink-deep)]/40">
+              <span className="font-display text-sm tracking-[0.2em] text-black/70 transition group-hover:text-[var(--pink-deep)]">{b}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WhyChooseUs() {
+  const { tr } = useI18n();
+  const items = [
+    { icon: Award, title: tr("whyPremiumTitle"), sub: tr("whyPremiumSub") },
+    { icon: Truck, title: tr("whyShippingTitle"), sub: tr("whyShippingSub") },
+    { icon: ShieldCheck, title: tr("whyCodTitle"), sub: tr("whyCodSub") },
+    { icon: Heart, title: tr("whyCareTitle"), sub: tr("whyCareSub") },
+  ];
+  return (
+    <section className="container-app py-20">
+      <SectionHead eyebrow={tr("whyUs")} title={tr("whyUsTitle")} subtitle={tr("whyUsSub")} />
+      <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {items.map((it, i) => (
+          <div key={i} className="group relative overflow-hidden rounded-3xl border border-border bg-card p-7 transition duration-300 hover:-translate-y-1 hover:shadow-elev">
+            <div className="absolute -right-6 -bottom-6 h-24 w-24 rounded-full bg-[var(--pink-soft)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <span className="relative grid h-14 w-14 place-items-center rounded-2xl bg-black text-white transition group-hover:bg-[var(--pink-deep)]">
+              <it.icon className="h-6 w-6" />
+            </span>
+            <h4 className="relative mt-5 font-display text-xl">{it.title}</h4>
+            <p className="relative mt-2 text-sm text-muted-foreground">{it.sub}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+const TESTIMONIALS = [
+  { name: "Erblina K.", role: "Salon Owner, Prishtinë", text: { sq: "Cilësia më ka lënë pa fjalë. Porosia më erdhi shpejt dhe pagesa në derë ishte super komode.", en: "The quality left me speechless. My order arrived fast and paying at the door was so convenient." } },
+  { name: "Fatjona M.", role: "Makeup Artist", text: { sq: "Produktet janë të freskëta e origjinale, çmimet më të mira në treg. Klientët e mi janë shumë të kënaqur.", en: "Products are fresh and authentic, best prices around. My clients are thrilled." } },
+  { name: "Diellza R.", role: "Nail Technician", text: { sq: "Shërbimi i klientit është i shkëlqyer. Do të porosis prapë pa asnjë hezitim.", en: "Customer service is outstanding. I'll be ordering again without hesitation." } },
+];
+function Reviews() {
+  const { tr, lang } = useI18n();
+  return (
+    <section className="border-y border-border bg-[var(--pink-soft)]/40 py-20">
+      <div className="container-app">
+        <SectionHead eyebrow={tr("reviews")} title={tr("reviewsTitle")} subtitle={tr("reviewsSub")} />
+        <div className="mt-12 grid gap-5 md:grid-cols-3">
+          {TESTIMONIALS.map((t, i) => (
+            <div key={i} className="relative rounded-3xl bg-white p-8 shadow-soft border border-border">
+              <div className="absolute -top-4 left-6 font-display text-6xl text-[var(--pink-deep)] leading-none">"</div>
+              <div className="flex text-[var(--gold)] mb-4">
+                {[0,1,2,3,4].map((s) => <Star key={s} className="h-4 w-4 fill-current" strokeWidth={1.5} />)}
+              </div>
+              <p className="text-sm leading-relaxed text-foreground/85">{t.text[lang]}</p>
+              <div className="mt-6 flex items-center gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-full bg-[var(--pink-soft)] font-display text-sm text-[var(--pink-deep)]">
+                  {t.name.charAt(0)}
+                </span>
+                <div>
+                  <div className="text-sm font-semibold">{t.name}</div>
+                  <div className="text-[11px] text-muted-foreground">{t.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const INSTA = ["💄","💅","💇‍♀️","💗","✨","💋"];
+function InstagramGallery() {
+  const { tr, lang } = useI18n();
+  return (
+    <section className="container-app py-20">
+      <div className="text-center">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--pink-deep)]">@pink.salon</div>
+        <h2 className="mt-3 font-display text-4xl md:text-5xl">{tr("followUs")}</h2>
+        <p className="mt-3 text-sm text-muted-foreground">{lang === "sq" ? "Bashkohuni me komunitetin tonë të bukurisë." : "Join our beauty community."}</p>
+      </div>
+      <div className="mt-10 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        {INSTA.map((e, i) => (
+          <a key={i} href="#" className="group relative aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--pink-soft)] via-white to-[var(--pink)]/30 grid place-items-center">
+            <span className="text-5xl transition duration-500 group-hover:scale-110 group-hover:rotate-6">{e}</span>
+            <div className="absolute inset-0 grid place-items-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <Instagram className="h-6 w-6 text-white" />
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Newsletter() {
+  const { tr, lang } = useI18n();
+  const [email, setEmail] = useState("");
+  return (
+    <section className="container-app py-20">
+      <div className="relative overflow-hidden rounded-[2rem] bg-black p-10 md:p-16 text-white text-center shadow-elev">
+        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_0%,var(--pink-deep),transparent_60%)]" />
+        <div className="relative mx-auto max-w-xl">
+          <Mail className="mx-auto h-8 w-8 text-[var(--pink)]" />
+          <h2 className="mt-4 font-display text-4xl md:text-5xl leading-tight">{tr("newsletterTitle")}</h2>
+          <p className="mt-3 text-sm md:text-base text-white/70">{tr("newsletterSub")}</p>
+          <form
+            onSubmit={(e) => { e.preventDefault(); if (!email.includes("@")) return; toast.success(lang === "sq" ? "Faleminderit që u regjistruat!" : "Thanks for subscribing!"); setEmail(""); }}
+            className="mt-8 flex flex-col sm:flex-row gap-2 rounded-full bg-white/10 backdrop-blur border border-white/15 p-1.5"
+          >
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              required
+              placeholder={tr("emailPlaceholder")}
+              className="flex-1 rounded-full bg-transparent px-5 py-3 text-sm text-white placeholder:text-white/50 outline-none"
+            />
+            <button className="rounded-full bg-[var(--pink-deep)] px-7 py-3 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink)] transition">
+              {tr("subscribe")}
+            </button>
+          </form>
+          <p className="mt-4 text-[11px] text-white/50">{tr("newsletterFine")}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SectionHead({ eyebrow, title, subtitle, align = "center" }: { eyebrow: string; title: string; subtitle?: string; align?: "left" | "center" }) {
+  return (
+    <div className={align === "center" ? "text-center max-w-2xl mx-auto" : "max-w-2xl"}>
+      <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--pink-deep)]">{eyebrow}</div>
+      <h2 className="mt-3 font-display text-4xl md:text-5xl leading-tight">{title}</h2>
+      {subtitle && <p className="mt-3 text-sm md:text-base text-muted-foreground">{subtitle}</p>}
     </div>
   );
 }
