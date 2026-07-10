@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { useCart, formatEur } from "@/lib/cart";
 import { toast } from "sonner";
-import { Banknote, LogIn } from "lucide-react";
+import { Banknote } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({ component: Checkout });
 
