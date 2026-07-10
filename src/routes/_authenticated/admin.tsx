@@ -124,7 +124,7 @@ function Admin() {
       </div>
 
       <div className="mb-6 flex gap-2 border-b border-border">
-        {(["orders", "products"] as const).map((k) => (
+        {(["orders", "products", "admins"] as const).map((k) => (
           <button
             key={k}
             onClick={() => setTab(k)}
