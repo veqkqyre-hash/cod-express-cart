@@ -113,7 +113,6 @@ function Admin() {
   }
 
   const openOrder = filtered.find((o) => o.id === openId) ?? null;
-  const [tab, setTab] = useState<"orders" | "products">("orders");
 
   return (
     <div className="container-app py-8">
