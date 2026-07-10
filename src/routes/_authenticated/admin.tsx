@@ -194,8 +194,10 @@ function Admin() {
             </div>
           </div>
         </>
-      ) : (
+      ) : tab === "products" ? (
         <ProductsPanel />
+      ) : (
+        <AdminsPanel />
       )}
 
       {openOrder && <OrderModal order={openOrder} onClose={() => setOpenId(null)} onStatus={(s) => updateStatus(openOrder.id, s)} />}
