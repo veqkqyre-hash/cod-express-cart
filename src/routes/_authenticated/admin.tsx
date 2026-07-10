@@ -43,6 +43,7 @@ function Admin() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [tab, setTab] = useState<"orders" | "products" | "admins">("orders");
 
   useEffect(() => {
     (async () => {
