@@ -250,7 +250,7 @@ function PromoWide() {
             {[
               { n: "72", l: tr("hours") },
               { n: "40", l: "% OFF" },
-              { n: "500+", l: tr("products") },
+              { n: "500+", l: tr("productsCount") },
             ].map((s, i) => (
               <div key={i} className="rounded-2xl bg-white/15 backdrop-blur-md p-5 text-center border border-white/20">
                 <div className="font-display text-3xl md:text-4xl">{s.n}</div>

@@ -18,6 +18,7 @@ import "@fontsource/inter/600.css";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/lib/i18n";
 import { CartProvider } from "@/lib/cart";
+import { WishlistProvider } from "@/lib/wishlist";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
@@ -55,14 +56,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Dream Studio — Furnizim profesional për sallone" },
-      { name: "description", content: "Dream Studio: furnizim profesional për sallone bukurie. Paguani kur produkti vjen me postë." },
-      { property: "og:title", content: "Dream Studio — Furnizim profesional për sallone" },
-      { property: "og:description", content: "Dream Studio: furnizim profesional për sallone bukurie. Paguani kur produkti vjen me postë." },
+      { title: "PINK — Luxury Beauty Salon Supplies" },
+      { name: "description", content: "PINK: luxury beauty salon supplies — hair, nails, makeup, barber and more. Cash on Delivery across Kosovo." },
+      { property: "og:title", content: "PINK — Luxury Beauty Salon Supplies" },
+      { property: "og:description", content: "Premium beauty salon supplies delivered to your door. Pay on delivery." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Dream Studio" },
-      { name: "twitter:description", content: "Furnizim profesional për sallone bukurie. Pagesë në dorëzim me postë." },
+      { name: "twitter:title", content: "PINK" },
+      { name: "twitter:description", content: "Luxury beauty salon supplies. Cash on Delivery." },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -90,12 +91,14 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <CartProvider>
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <main className="flex-1"><Outlet /></main>
-            <SiteFooter />
-          </div>
-          <Toaster position="top-center" richColors />
+          <WishlistProvider>
+            <div className="flex min-h-screen flex-col">
+              <SiteHeader />
+              <main className="flex-1"><Outlet /></main>
+              <SiteFooter />
+            </div>
+            <Toaster position="top-center" richColors />
+          </WishlistProvider>
         </CartProvider>
       </I18nProvider>
     </QueryClientProvider>
