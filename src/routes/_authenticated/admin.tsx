@@ -7,6 +7,7 @@ import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { LogOut, Printer, X, Package } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
+import { AdminsPanel } from "@/components/admin-admins-panel";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: Admin });
 
@@ -43,6 +44,7 @@ function Admin() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [tab, setTab] = useState<"orders" | "products" | "admins">("orders");
 
   useEffect(() => {
     (async () => {
@@ -112,7 +114,6 @@ function Admin() {
   }
 
   const openOrder = filtered.find((o) => o.id === openId) ?? null;
-  const [tab, setTab] = useState<"orders" | "products">("orders");
 
   return (
     <div className="container-app py-8">
@@ -124,7 +125,7 @@ function Admin() {
       </div>
 
       <div className="mb-6 flex gap-2 border-b border-border">
-        {(["orders", "products"] as const).map((k) => (
+        {(["orders", "products", "admins"] as const).map((k) => (
           <button
             key={k}
             onClick={() => setTab(k)}
@@ -194,8 +195,10 @@ function Admin() {
             </div>
           </div>
         </>
-      ) : (
+      ) : tab === "products" ? (
         <ProductsPanel />
+      ) : (
+        <AdminsPanel />
       )}
 
       {openOrder && <OrderModal order={openOrder} onClose={() => setOpenId(null)} onStatus={(s) => updateStatus(openOrder.id, s)} />}

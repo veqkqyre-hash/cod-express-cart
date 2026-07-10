@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { useCart, formatEur } from "@/lib/cart";
 import { toast } from "sonner";
-import { Banknote, LogIn } from "lucide-react";
+import { Banknote } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({ component: Checkout });
 
@@ -29,26 +29,17 @@ function Checkout() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id ?? null);
-      setUserEmail(data.user?.email ?? "");
+      if (!data.user) {
+        navigate({ to: "/auth", search: { redirect: "/checkout" } as any });
+        return;
+      }
+      setUserId(data.user.id);
+      setUserEmail(data.user.email ?? "");
     });
-  }, []);
+  }, [navigate]);
 
-  if (userId === undefined) return <div className="container-app py-20 text-center text-muted-foreground">…</div>;
-
-  if (userId === null) {
-    return (
-      <div className="container-app py-16 max-w-md text-center">
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-accent">
-          <LogIn className="h-6 w-6 text-primary" />
-        </div>
-        <h1 className="mt-6 font-display text-3xl">{tr("loginRequired")}</h1>
-        <p className="mt-3 text-sm text-muted-foreground">{tr("loginToCheckout")}</p>
-        <Link to="/auth" search={{ redirect: "/checkout" } as any} className="mt-6 inline-flex rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground">
-          {tr("login")} / {tr("signUp")}
-        </Link>
-      </div>
-    );
+  if (userId === undefined || userId === null) {
+    return <div className="container-app py-20 text-center text-muted-foreground">{tr("redirecting")}</div>;
   }
 
   if (items.length === 0 && !submitting) {
