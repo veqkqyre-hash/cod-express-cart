@@ -88,6 +88,13 @@ export const t: Dict = {
   active: { sq: "Aktiv", en: "Active" },
   featuredLabel: { sq: "I Zgjedhur", en: "Featured" },
   noOrders: { sq: "Nuk keni porosi ende", en: "No orders yet" },
+  admins: { sq: "Adminët", en: "Admins" },
+  addAdmin: { sq: "Shto Admin", en: "Add Admin" },
+  adminEmail: { sq: "Email i adminit të ri", en: "New admin email" },
+  revoke: { sq: "Hiq", en: "Revoke" },
+  adminAdded: { sq: "Admini u shtua", en: "Admin added" },
+  adminRemoved: { sq: "Admini u hoq", en: "Admin removed" },
+  redirecting: { sq: "Duke ju ridrejtuar…", en: "Redirecting…" },
 };
 
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; tr: (k: keyof typeof t) => string };
