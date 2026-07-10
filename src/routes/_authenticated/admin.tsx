@@ -7,6 +7,7 @@ import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { LogOut, Printer, X, Package } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
+import { AdminsPanel } from "@/components/admin-admins-panel";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: Admin });
 
