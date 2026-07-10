@@ -5,8 +5,8 @@ export type Lang = "sq" | "en";
 type Dict = Record<string, { sq: string; en: string }>;
 
 export const t: Dict = {
-  brand: { sq: "Dream Studio", en: "Dream Studio" },
-  tagline: { sq: "Furnizim profesional për sallone bukurie", en: "Professional beauty salon supplies" },
+  brand: { sq: "PINK", en: "PINK" },
+  tagline: { sq: "Furnizim luksoz për sallone bukurie", en: "Luxury beauty salon supplies" },
   home: { sq: "Ballina", en: "Home" },
   shop: { sq: "Dyqani", en: "Shop" },
   cart: { sq: "Shporta", en: "Cart" },
