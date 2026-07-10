@@ -109,7 +109,7 @@ export const t: Dict = {
   heroBadge: { sq: "Bukuri Luksoze · Që nga 2020", en: "Luxury Beauty · Since 2020" },
   heroLine1: { sq: "Bukuria fillon", en: "Beauty begins" },
   heroLine2: { sq: "me PINK.", en: "with PINK." },
-  heroSubtitle: { sq: "Produkte premium për sallone bukurie — flokë, thonj, grim, barber e shumë më tepër. Dorëzim në derën tuaj me pagesë në cash.", en: "Premium supplies for beauty salons — hair, nails, makeup, barber and more. Delivered to your door with cash on payment." },
+  
   exploreCategories: { sq: "Zbulo Kategoritë", en: "Explore Categories" },
   freeShippingBanner: { sq: "Transport falas mbi 50€", en: "Free shipping over €50" },
   codShort: { sq: "Paguaj në derë", en: "Pay at the door" },
@@ -142,7 +142,7 @@ export const t: Dict = {
   promoWideSub: { sq: "Ofertë e kufizuar në kohë. Rinovoni inventarin e sallonit tuaj me çmimet më të mira.", en: "Limited-time offer. Refresh your salon inventory at the best prices." },
   shopSale: { sq: "Bli tani", en: "Shop the sale" },
   hours: { sq: "Orë", en: "Hours" },
-  products: { sq: "Produkte", en: "Products" },
+  productsCount: { sq: "Produkte", en: "Products" },
   topBrandsTitle: { sq: "Markat më të besuara", en: "The most trusted brands" },
   topBrandsSub: { sq: "Punojmë vetëm me markat lider në industri.", en: "We partner only with industry-leading brands." },
   whyUs: { sq: "Pse PINK", en: "Why PINK" },
