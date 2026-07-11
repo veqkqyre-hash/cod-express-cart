@@ -61,11 +61,11 @@ export function SiteHeader() {
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl">
         <div className="container-app flex h-16 md:h-20 items-center gap-3 md:gap-6">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
+          <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-black text-white font-display text-lg tracking-tight shadow-pink">
-              P
+              D
             </span>
-            <span className="font-display text-2xl tracking-[0.2em] font-semibold">PINK</span>
+            <span className="font-display text-xl md:text-2xl tracking-tight font-semibold">Dream Studio</span>
           </Link>
 
           {/* Nav */}
