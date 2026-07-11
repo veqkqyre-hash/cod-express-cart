@@ -6,6 +6,7 @@ import { ProductCard, type Product } from "@/components/product-card";
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram, Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import heroSalon from "@/assets/hero-salon.jpg";
 
 export const Route = createFileRoute("/")({ component: Home });
 
