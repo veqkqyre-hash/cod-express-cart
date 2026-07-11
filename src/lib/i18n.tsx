@@ -107,8 +107,10 @@ export const t: Dict = {
   megaPromoTitle: { sq: "Koleksioni i Ri Pranveror", en: "New Spring Collection" },
   megaPromoSub: { sq: "Zbulo produktet më të reja të stinës.", en: "Discover the season's newest arrivals." },
   heroBadge: { sq: "Bukuri Luksoze · Që nga 2020", en: "Luxury Beauty · Since 2020" },
-  heroLine1: { sq: "Bukuria fillon", en: "Beauty begins" },
-  heroLine2: { sq: "me PINK.", en: "with PINK." },
+  heroLine1: { sq: "Gjithçka që i nevojitet", en: "Everything your" },
+  heroLine2: { sq: "Sallonit tuaj", en: "Salon needs" },
+  heroSub2: { sq: "Produkte profesionale bukurie, pajisje salloni, mobilje dhe aksesorë. Pagesë në dorëzim.", en: "Professional beauty products, salon equipment, furniture and accessories. Cash on delivery." },
+  shopCategories: { sq: "Shiko Kategoritë", en: "Shop Categories" },
   
   exploreCategories: { sq: "Zbulo Kategoritë", en: "Explore Categories" },
   freeShippingBanner: { sq: "Transport falas mbi 50€", en: "Free shipping over €50" },
