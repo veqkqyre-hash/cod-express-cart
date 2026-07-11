@@ -128,7 +128,7 @@ export const t: Dict = {
   shopByCategory: { sq: "Bli sipas kategorisë", en: "Shop by Category" },
   shopByCategorySub: { sq: "Gjithçka që ju nevojitet për një sallon të përsosur.", en: "Everything you need for a perfect salon." },
   explore: { sq: "Zbulo", en: "Explore" },
-  bestSellersTitle: { sq: "Më të shiturat e javës", en: "This week's best sellers" },
+  bestSellersTitle: { sq: "Më të shiturat", en: "Best sellers" },
   bestSellersSub: { sq: "Të preferuarat e klientëve tanë profesionistë.", en: "Loved by our professional customers." },
   newArrivalsTitle: { sq: "Sapo mbërritën", en: "Just arrived" },
   newArrivalsSub: { sq: "Produktet më të reja në koleksionin tonë.", en: "The latest additions to our collection." },
