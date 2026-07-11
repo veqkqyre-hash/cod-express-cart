@@ -101,6 +101,7 @@ export function SiteHeader() {
             <div className="hidden sm:flex items-center gap-0.5 rounded-full border border-border px-1 py-0.5 text-[10px] mr-1">
               <button onClick={() => setLang("sq")} className={`px-2 py-1 rounded-full transition ${lang === "sq" ? "bg-black text-white" : "text-muted-foreground"}`}>SQ</button>
               <button onClick={() => setLang("en")} className={`px-2 py-1 rounded-full transition ${lang === "en" ? "bg-black text-white" : "text-muted-foreground"}`}>EN</button>
+              <button onClick={() => setLang("de")} className={`px-2 py-1 rounded-full transition ${lang === "de" ? "bg-black text-white" : "text-muted-foreground"}`}>DE</button>
             </div>
 
             <Link to={signedIn ? "/account" : "/auth"} className="hidden sm:grid h-10 w-10 place-items-center rounded-full hover:bg-[var(--pink-soft)] transition" aria-label={tr("account")}>
