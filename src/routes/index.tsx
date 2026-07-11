@@ -353,7 +353,7 @@ function Reviews() {
               <div className="flex text-[var(--gold)] mb-4">
                 {[0,1,2,3,4].map((s) => <Star key={s} className="h-4 w-4 fill-current" strokeWidth={1.5} />)}
               </div>
-              <p className="text-sm leading-relaxed text-foreground/85">{t.text[lang]}</p>
+              <p className="text-sm leading-relaxed text-foreground/85">{t.text[lang === "sq" ? "sq" : "en"]}</p>
               <div className="mt-6 flex items-center gap-3">
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-[var(--pink-soft)] font-display text-sm text-[var(--pink-deep)]">
                   {t.name.charAt(0)}
