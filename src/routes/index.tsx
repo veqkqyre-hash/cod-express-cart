@@ -6,6 +6,7 @@ import { ProductCard, type Product } from "@/components/product-card";
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram, Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import heroSalon from "@/assets/hero-salon.jpg";
 
 export const Route = createFileRoute("/")({ component: Home });
 
@@ -91,60 +92,53 @@ function Home() {
 function Hero() {
   const { tr } = useI18n();
   return (
-    <section className="relative overflow-hidden">
-      <div className="absolute inset-0 gradient-pink" />
-      <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[var(--pink)] opacity-30 blur-3xl animate-float" />
-      <div className="absolute -bottom-32 -left-24 h-96 w-96 rounded-full bg-[var(--pink-soft)] opacity-70 blur-3xl" />
+    <section className="relative overflow-hidden bg-black">
+      {/* Background image */}
+      <img
+        src={heroSalon}
+        alt="Dream Studio luxury salon interior"
+        width={1920}
+        height={1080}
+        className="absolute inset-0 h-full w-full object-cover opacity-70"
+      />
+      {/* Overlays for text legibility */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40" />
+      <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[var(--pink-deep)]/25 blur-3xl" />
 
-      <div className="container-app relative grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:items-center">
-        <div className="lg:col-span-6 space-y-6">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--pink-deep)]/20 bg-white/70 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--pink-deep)] backdrop-blur">
-            <Sparkles className="h-3 w-3" /> {tr("heroBadge")}
+      <div className="container-app relative py-24 md:py-32 lg:py-40 min-h-[600px] flex items-center">
+        <div className="max-w-2xl space-y-7 text-white">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-white backdrop-blur">
+            <Sparkles className="h-3 w-3 text-[var(--pink)]" /> {tr("heroBadge")}
           </span>
           <h1 className="font-display text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
             {tr("heroLine1")}
             <br />
-            <span className="text-gradient-pink italic">{tr("heroLine2")}</span>
+            <span className="relative inline-block mt-2">
+              <span className="absolute inset-0 -skew-y-2 rounded-2xl bg-[var(--pink-deep)] -z-0" aria-hidden />
+              <span className="relative italic px-4 py-1 text-white">{tr("heroLine2")}</span>
+            </span>
           </h1>
-          <p className="max-w-lg text-base text-muted-foreground md:text-lg">{tr("heroSubtitle")}</p>
+          <p className="max-w-lg text-base text-white/85 md:text-lg">{tr("heroSubtitle")}</p>
           <div className="flex flex-wrap gap-3">
             <Link
               to="/shop"
-              className="group inline-flex items-center gap-2 rounded-full bg-black px-7 py-3.5 text-sm font-semibold uppercase tracking-widest text-white shadow-elev transition hover:bg-[var(--pink-deep)]"
+              className="group inline-flex items-center gap-2 rounded-full bg-[var(--pink-deep)] px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white shadow-pink transition hover:bg-[var(--pink)]"
             >
               {tr("shopNow")}
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
             </Link>
             <a
               href="#categories"
-              className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/60 px-7 py-3.5 text-sm font-semibold uppercase tracking-widest text-black backdrop-blur transition hover:bg-white"
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/5 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-white/15"
             >
               {tr("exploreCategories")}
             </a>
           </div>
-          <div className="flex flex-wrap gap-6 pt-4 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1.5"><Truck className="h-4 w-4 text-[var(--pink-deep)]" /> {tr("freeShippingBanner")}</div>
-            <div className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-[var(--pink-deep)]" /> {tr("codShort")}</div>
-            <div className="flex items-center gap-1.5"><Award className="h-4 w-4 text-[var(--pink-deep)]" /> {tr("qualityBadge")}</div>
-          </div>
-        </div>
-
-        <div className="lg:col-span-6 relative">
-          <div className="relative mx-auto aspect-[4/5] max-w-md">
-            <div className="absolute inset-0 -rotate-3 rounded-[3rem] bg-[var(--pink)] opacity-30" />
-            <div className="absolute inset-0 rotate-3 rounded-[3rem] bg-black opacity-90" />
-            <div className="absolute inset-4 rounded-[2.5rem] bg-gradient-to-br from-[var(--pink-soft)] via-white to-[var(--pink)]/40 overflow-hidden shadow-elev">
-              <div className="absolute inset-0 grid place-items-center text-9xl opacity-90">💗</div>
-              <div className="absolute bottom-6 left-6 right-6 rounded-2xl bg-white/90 p-4 backdrop-blur shadow-soft">
-                <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--pink-deep)]">{tr("limitedOffer")}</div>
-                <div className="mt-1 font-display text-xl leading-tight">{tr("heroCardTitle")}</div>
-                <div className="mt-1 text-xs text-muted-foreground">{tr("heroCardSub")}</div>
-              </div>
-              <div className="absolute -top-4 right-6 rotate-6 rounded-full bg-[var(--pink-deep)] px-5 py-4 text-center text-white shadow-pink">
-                <div className="text-2xl font-display leading-none">−30%</div>
-                <div className="mt-0.5 text-[9px] uppercase tracking-widest">{tr("today")}</div>
-              </div>
-            </div>
+          <div className="flex flex-wrap gap-x-7 gap-y-3 pt-4 text-xs text-white/80">
+            <div className="flex items-center gap-2"><Truck className="h-4 w-4 text-[var(--pink)]" /> {tr("freeShippingBanner")}</div>
+            <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[var(--pink)]" /> {tr("codShort")}</div>
+            <div className="flex items-center gap-2"><Award className="h-4 w-4 text-[var(--pink)]" /> {tr("qualityBadge")}</div>
           </div>
         </div>
       </div>
@@ -169,7 +163,7 @@ function Marquee() {
   );
 }
 
-function FeaturedCategories({ categories, lang }: { categories: any[]; lang: "sq" | "en" }) {
+function FeaturedCategories({ categories, lang }: { categories: any[]; lang: "sq" | "en" | "de" }) {
   const { tr } = useI18n();
   return (
     <section id="categories" className="container-app py-20">
@@ -353,7 +347,7 @@ function Reviews() {
               <div className="flex text-[var(--gold)] mb-4">
                 {[0,1,2,3,4].map((s) => <Star key={s} className="h-4 w-4 fill-current" strokeWidth={1.5} />)}
               </div>
-              <p className="text-sm leading-relaxed text-foreground/85">{t.text[lang]}</p>
+              <p className="text-sm leading-relaxed text-foreground/85">{t.text[lang === "sq" ? "sq" : "en"]}</p>
               <div className="mt-6 flex items-center gap-3">
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-[var(--pink-soft)] font-display text-sm text-[var(--pink-deep)]">
                   {t.name.charAt(0)}

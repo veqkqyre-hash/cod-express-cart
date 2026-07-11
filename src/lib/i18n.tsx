@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
-export type Lang = "sq" | "en";
+export type Lang = "sq" | "en" | "de";
 
 type Dict = Record<string, { sq: string; en: string }>;
 
@@ -186,13 +186,19 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("sq");
   useEffect(() => {
     const saved = (typeof window !== "undefined" ? localStorage.getItem("lang") : null) as Lang | null;
-    if (saved === "sq" || saved === "en") setLangState(saved);
+    if (saved === "sq" || saved === "en" || saved === "de") setLangState(saved);
   }, []);
   const setLang = (l: Lang) => {
     setLangState(l);
     if (typeof window !== "undefined") localStorage.setItem("lang", l);
   };
-  const tr = (k: keyof typeof t) => t[k]?.[lang] ?? String(k);
+  const tr = (k: keyof typeof t) => {
+    const entry = t[k];
+    if (!entry) return String(k);
+    // German falls back to English until dedicated strings are added
+    const key: "sq" | "en" = lang === "sq" ? "sq" : "en";
+    return entry[key] ?? String(k);
+  };
   return <I18nCtx.Provider value={{ lang, setLang, tr }}>{children}</I18nCtx.Provider>;
 }
 
