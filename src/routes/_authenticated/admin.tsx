@@ -41,18 +41,23 @@ function Admin() {
   const { tr, lang } = useI18n();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [currentEmail, setCurrentEmail] = useState<string | null>(null);
+  const [claiming, setClaiming] = useState(false);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("");
   const [openId, setOpenId] = useState<string | null>(null);
   const [tab, setTab] = useState<"orders" | "products" | "admins">("orders");
 
+  async function checkAdmin() {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) return;
+    setCurrentEmail(userData.user.email ?? null);
+    const { data } = await supabase.from("user_roles").select("role").eq("user_id", userData.user.id).eq("role", "admin").maybeSingle();
+    setIsAdmin(!!data);
+  }
+
   useEffect(() => {
-    (async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return;
-      const { data } = await supabase.from("user_roles").select("role").eq("user_id", userData.user.id).eq("role", "admin").maybeSingle();
-      setIsAdmin(!!data);
-    })();
+    checkAdmin();
   }, []);
 
   const { data: orders, refetch } = useQuery({
@@ -87,6 +92,19 @@ function Admin() {
     }
   }
 
+  async function claimAdmin() {
+    setClaiming(true);
+    const { data, error } = await supabase.rpc("claim_admin_if_none");
+    setClaiming(false);
+    if (error) return toast.error(error.message);
+    if ((data as any)?.granted) {
+      toast.success(lang === "sq" ? "Ju jeni admini i parë!" : "You are now admin!");
+      checkAdmin();
+    } else {
+      toast.error(lang === "sq" ? "Ekziston tashmë një admin. Kërkoni t'ju shtojnë." : "An admin already exists. Ask them to add you.");
+    }
+  }
+
   async function signOut() {
     await supabase.auth.signOut();
     navigate({ to: "/auth" });
@@ -101,14 +119,28 @@ function Admin() {
           <Package className="h-6 w-6 text-muted-foreground" />
         </div>
         <h1 className="mt-6 font-display text-2xl">{lang === "sq" ? "Nuk keni akses admin" : "No admin access"}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        {currentEmail && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {lang === "sq" ? "Të kyçur si" : "Signed in as"}: <strong>{currentEmail}</strong>
+          </p>
+        )}
+        <p className="mt-3 text-sm text-muted-foreground">
           {lang === "sq"
-            ? "Kërkoni nga administratori t'ju shtojë rolin 'admin' në panelin e bazës së të dhënave."
-            : "Ask the administrator to grant you the 'admin' role in the database dashboard."}
+            ? "Nëse nuk ka ende asnjë admin, mund të bëheni ju i pari. Përndryshe kyçuni me llogarinë admin ose kërkoni t'ju shtojnë."
+            : "If no admin exists yet, you can claim it. Otherwise sign in with the admin account or ask to be added."}
         </p>
-        <button onClick={signOut} className="mt-6 rounded-full border border-border px-5 py-2 text-sm hover:bg-muted">
-          {tr("logout")}
-        </button>
+        <div className="mt-6 flex flex-col gap-2">
+          <button
+            onClick={claimAdmin}
+            disabled={claiming}
+            className="rounded-full bg-[var(--pink-deep)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[var(--pink)] disabled:opacity-50"
+          >
+            {claiming ? "…" : lang === "sq" ? "Bëhu admini i parë" : "Claim first admin"}
+          </button>
+          <button onClick={signOut} className="rounded-full border border-border px-5 py-2 text-sm hover:bg-muted">
+            {tr("logout")}
+          </button>
+        </div>
       </div>
     );
   }

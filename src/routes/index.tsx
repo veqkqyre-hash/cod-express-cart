@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ProductCard, type Product } from "@/components/product-card";
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram, Mail, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -89,98 +89,142 @@ function Home() {
 /* ------------------------------ Sections ------------------------------ */
 
 const HERO_SLIDES = [
-  "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?crop=entropy&cs=srgb&fm=jpg&w=1920&q=85",
-  "https://images.unsplash.com/photo-1639629509821-c54cdd984227?crop=entropy&cs=srgb&fm=jpg&w=1920&q=85",
-  "https://images.pexels.com/photos/9774854/pexels-photo-9774854.jpeg?auto=compress&cs=tinysrgb&w=1920",
-  "https://images.pexels.com/photos/3997379/pexels-photo-3997379.jpeg?auto=compress&cs=tinysrgb&w=1920",
+  {
+    src: "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?crop=entropy&cs=srgb&fm=jpg&w=1600&q=80",
+    mobile: "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?crop=entropy&cs=srgb&fm=jpg&w=800&q=70",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1639629509821-c54cdd984227?crop=entropy&cs=srgb&fm=jpg&w=1600&q=80",
+    mobile: "https://images.unsplash.com/photo-1639629509821-c54cdd984227?crop=entropy&cs=srgb&fm=jpg&w=800&q=70",
+  },
+  {
+    src: "https://images.pexels.com/photos/9774854/pexels-photo-9774854.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    mobile: "https://images.pexels.com/photos/9774854/pexels-photo-9774854.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
+  {
+    src: "https://images.pexels.com/photos/3997379/pexels-photo-3997379.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    mobile: "https://images.pexels.com/photos/3997379/pexels-photo-3997379.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
 ];
 
 function Hero() {
   const { tr } = useI18n();
   const [idx, setIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+  const touchDeltaX = useRef(0);
 
   useEffect(() => {
-    const id = setInterval(() => setIdx((i) => (i + 1) % HERO_SLIDES.length), 5500);
+    if (paused) return;
+    const id = setInterval(() => setIdx((i) => (i + 1) % HERO_SLIDES.length), 6000);
     return () => clearInterval(id);
-  }, []);
+  }, [paused]);
 
   const prev = () => setIdx((i) => (i - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
   const next = () => setIdx((i) => (i + 1) % HERO_SLIDES.length);
 
+  function onTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+    touchDeltaX.current = 0;
+    setPaused(true);
+  }
+  function onTouchMove(e: React.TouchEvent) {
+    if (touchStartX.current == null) return;
+    touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
+  }
+  function onTouchEnd() {
+    const dx = touchDeltaX.current;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) next(); else prev();
+    }
+    touchStartX.current = null;
+    touchDeltaX.current = 0;
+    setTimeout(() => setPaused(false), 2000);
+  }
+
   return (
-    <section className="relative overflow-hidden bg-black">
-      {/* Rotating background images */}
-      {HERO_SLIDES.map((src, i) => (
-        <img
-          key={src}
-          src={src}
-          alt=""
-          width={1920}
-          height={1080}
-          loading={i === 0 ? "eager" : "lazy"}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-in-out ${i === idx ? "opacity-70" : "opacity-0"}`}
-        />
+    <section
+      className="relative overflow-hidden bg-black select-none"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Rotating background images (responsive via <picture>) */}
+      {HERO_SLIDES.map((s, i) => (
+        <picture key={s.src}>
+          <source media="(max-width: 640px)" srcSet={s.mobile} />
+          <img
+            src={s.src}
+            alt=""
+            width={1600}
+            height={900}
+            fetchPriority={i === 0 ? "high" : "low"}
+            loading={i === 0 ? "eager" : "lazy"}
+            decoding={i === 0 ? "sync" : "async"}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-in-out ${i === idx ? "opacity-70" : "opacity-0"}`}
+          />
+        </picture>
       ))}
       {/* Overlays for text legibility */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
       <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[var(--pink-deep)]/25 blur-3xl" />
 
-      {/* Prev / next arrows */}
+      {/* Prev / next arrows — larger tap target on mobile */}
       <button
         onClick={prev}
         aria-label="Previous slide"
-        className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-10 grid h-11 w-11 md:h-12 md:w-12 place-items-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur transition hover:bg-white/25"
+        className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-10 grid h-12 w-12 md:h-12 md:w-12 place-items-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-md active:scale-95 transition hover:bg-white/25"
       >
-        <ChevronLeft className="h-5 w-5" />
+        <ChevronLeft className="h-6 w-6" />
       </button>
       <button
         onClick={next}
         aria-label="Next slide"
-        className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-10 grid h-11 w-11 md:h-12 md:w-12 place-items-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur transition hover:bg-white/25"
+        className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-10 grid h-12 w-12 md:h-12 md:w-12 place-items-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-md active:scale-95 transition hover:bg-white/25"
       >
-        <ChevronRight className="h-5 w-5" />
+        <ChevronRight className="h-6 w-6" />
       </button>
 
-      <div className="container-app relative py-24 md:py-32 lg:py-40 min-h-[620px] flex items-center">
-        <div className="max-w-2xl space-y-7 text-white">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-white backdrop-blur">
+      <div className="container-app relative py-16 sm:py-24 md:py-32 lg:py-40 min-h-[520px] sm:min-h-[600px] flex items-center">
+        <div className="max-w-2xl space-y-5 sm:space-y-7 text-white">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-white backdrop-blur">
             <Sparkles className="h-3 w-3 text-[var(--pink)]" /> {tr("heroBadge")}
           </span>
-          <h1 className="font-display text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
+          <h1 className="font-display text-4xl leading-[1.05] sm:text-6xl lg:text-7xl">
             {tr("heroLine1")}
             <br />
-            <span className="relative inline-block mt-3">
+            <span className="relative inline-block mt-2 sm:mt-3">
               <span className="absolute inset-0 -skew-y-2 rounded-2xl bg-[var(--pink-deep)] -z-0" aria-hidden />
-              <span className="relative italic px-5 py-1.5 text-white">{tr("heroLine2")}</span>
+              <span className="relative italic px-3 py-1 sm:px-5 sm:py-1.5 text-white">{tr("heroLine2")}</span>
             </span>
           </h1>
-          <p className="max-w-lg text-base text-white/85 md:text-lg">{tr("heroSub2")}</p>
-          <div className="flex flex-wrap gap-3">
+          <p className="max-w-lg text-sm sm:text-base md:text-lg text-white/85">{tr("heroSub2")}</p>
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <Link
               to="/shop"
-              className="group inline-flex items-center gap-2 rounded-full bg-[var(--pink-deep)] px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white shadow-pink transition hover:bg-[var(--pink)]"
+              className="group inline-flex items-center gap-2 rounded-full bg-[var(--pink-deep)] px-6 py-3 sm:px-8 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-white shadow-pink transition hover:bg-[var(--pink)]"
             >
               {tr("shopNow")}
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
             </Link>
             <a
               href="#categories"
-              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-white/20"
+              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 sm:px-8 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-white/20"
             >
               {tr("shopCategories")}
             </a>
           </div>
-          <div className="flex flex-wrap gap-x-7 gap-y-3 pt-4 text-xs text-white/80">
-            <div className="flex items-center gap-2"><Truck className="h-4 w-4 text-[var(--pink)]" /> {tr("freeShippingBanner")}</div>
-            <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[var(--pink)]" /> {tr("codShort")}</div>
-            <div className="flex items-center gap-2"><Award className="h-4 w-4 text-[var(--pink)]" /> {tr("qualityBadge")}</div>
+          <div className="flex flex-wrap gap-x-5 gap-y-2 sm:gap-x-7 sm:gap-y-3 pt-2 sm:pt-4 text-[11px] sm:text-xs text-white/80">
+            <div className="flex items-center gap-1.5 sm:gap-2"><Truck className="h-4 w-4 text-[var(--pink)]" /> {tr("freeShippingBanner")}</div>
+            <div className="flex items-center gap-1.5 sm:gap-2"><ShieldCheck className="h-4 w-4 text-[var(--pink)]" /> {tr("codShort")}</div>
+            <div className="flex items-center gap-1.5 sm:gap-2"><Award className="h-4 w-4 text-[var(--pink)]" /> {tr("qualityBadge")}</div>
           </div>
         </div>
       </div>
 
       {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+      <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
         {HERO_SLIDES.map((_, i) => (
           <button
             key={i}
