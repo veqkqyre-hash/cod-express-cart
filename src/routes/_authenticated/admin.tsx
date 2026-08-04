@@ -57,11 +57,13 @@ function Admin() {
 
   async function checkAdmin() {
     const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) return;
+    if (!userData.user) { setIsAdmin(false); return; }
     setCurrentEmail(userData.user.email ?? null);
-    const { data } = await supabase.from("user_roles").select("role").eq("user_id", userData.user.id).eq("role", "admin").maybeSingle();
-    setIsAdmin(!!data);
+    // Server-side role check (security definer) — cannot be spoofed client-side
+    const { data, error } = await supabase.rpc("has_role", { _user_id: userData.user.id, _role: "admin" });
+    setIsAdmin(!error && data === true);
   }
+
 
   useEffect(() => { checkAdmin(); }, []);
 
