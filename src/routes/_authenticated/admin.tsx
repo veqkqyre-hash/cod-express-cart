@@ -57,11 +57,13 @@ function Admin() {
 
   async function checkAdmin() {
     const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) return;
+    if (!userData.user) { setIsAdmin(false); return; }
     setCurrentEmail(userData.user.email ?? null);
-    const { data } = await supabase.from("user_roles").select("role").eq("user_id", userData.user.id).eq("role", "admin").maybeSingle();
-    setIsAdmin(!!data);
+    // Server-side role check (security definer) — cannot be spoofed client-side
+    const { data, error } = await supabase.rpc("has_role", { _user_id: userData.user.id, _role: "admin" });
+    setIsAdmin(!error && data === true);
   }
+
 
   useEffect(() => { checkAdmin(); }, []);
 
@@ -292,26 +294,48 @@ function Dashboard({ lang }: { lang: string }) {
 }
 
 function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
+  const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const [status, setStatus] = useState<string>("");
+  const [city, setCity] = useState<string>("");
   const [search, setSearch] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
 
-  const { data: orders, refetch } = useQuery({
-    queryKey: ["admin-orders", status],
+  const { data: orders, refetch, isLoading } = useQuery({
+    queryKey: ["admin-orders", status, city, from, to],
     queryFn: async () => {
       let q = supabase.from("orders").select("*").order("created_at", { ascending: false });
       if (status) q = q.eq("status", status as any);
+      if (city) q = q.eq("city", city);
+      if (from) q = q.gte("created_at", new Date(from).toISOString());
+      if (to) {
+        const end = new Date(to);
+        end.setHours(23, 59, 59, 999);
+        q = q.lte("created_at", end.toISOString());
+      }
       const { data, error } = await q;
       if (error) throw error;
       return (data ?? []) as Order[];
     },
   });
 
+  const cities = Array.from(new Set((orders ?? []).map((o) => o.city).filter(Boolean))).sort();
+
+  const s = search.trim().toLowerCase();
   const filtered = (orders ?? []).filter((o) => {
-    if (!search) return true;
-    const s = search.toLowerCase();
-    return o.order_number.toLowerCase().includes(s) || o.customer_name.toLowerCase().includes(s) || o.phone.toLowerCase().includes(s) || o.city.toLowerCase().includes(s);
+    if (!s) return true;
+    return (
+      o.order_number.toLowerCase().includes(s) ||
+      o.customer_name.toLowerCase().includes(s) ||
+      (o.email ?? "").toLowerCase().includes(s) ||
+      o.phone.replace(/\s/g, "").includes(s.replace(/\s/g, "")) ||
+      o.city.toLowerCase().includes(s)
+    );
   });
+
+  const hasFilters = !!(status || city || search || from || to);
+  function clearFilters() { setStatus(""); setCity(""); setSearch(""); setFrom(""); setTo(""); }
 
   async function updateStatus(id: string, newStatus: string) {
     const { error } = await supabase.from("orders").update({ status: newStatus as any }).eq("id", id);
@@ -320,15 +344,42 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
   }
 
   const openOrder = filtered.find((o) => o.id === openId) ?? null;
+  const inputCls = "rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-200";
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap gap-3">
-        <input type="search" placeholder={tr("search")} value={search} onChange={(e) => setSearch(e.target.value)} className="flex-1 min-w-48 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-200" />
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm">
-          <option value="">{tr("allStatuses")}</option>
-          {STATUSES.map((s) => <option key={s} value={s}>{tr(s as any)}</option>)}
-        </select>
+      <div className="mb-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap gap-3">
+          <input
+            type="search"
+            placeholder={L("Numri i porosisë, emri, email ose telefon…", "Order number, name, email or phone…")}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={`flex-1 min-w-56 ${inputCls}`}
+          />
+          <select value={status} onChange={(e) => setStatus(e.target.value)} className={inputCls}>
+            <option value="">{tr("allStatuses")}</option>
+            {STATUSES.map((st) => <option key={st} value={st}>{tr(st as any)}</option>)}
+          </select>
+          <select value={city} onChange={(e) => setCity(e.target.value)} className={inputCls}>
+            <option value="">{L("Të gjitha qytetet", "All cities")}</option>
+            {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <div className="flex items-center gap-2">
+            <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className={inputCls} aria-label={L("Nga", "From")} />
+            <span className="text-neutral-400">–</span>
+            <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className={inputCls} aria-label={L("Deri", "To")} />
+          </div>
+          {hasFilters && (
+            <button onClick={clearFilters} className="rounded-full border border-neutral-200 px-4 py-2 text-sm hover:bg-neutral-50">
+              {L("Pastro filtrat", "Clear filters")}
+            </button>
+          )}
+        </div>
+        <div className="mt-3 text-xs text-neutral-500">
+          {isLoading ? "…" : `${filtered.length} ${L("porosi", "orders")}`}
+          {filtered.length > 0 && ` · ${formatEur(filtered.reduce((a, o) => a + Number(o.total), 0))}`}
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
@@ -338,6 +389,7 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
               <tr>
                 <th className="px-4 py-3">#</th>
                 <th className="px-4 py-3">{tr("customer")}</th>
+                <th className="px-4 py-3 hidden lg:table-cell">Email</th>
                 <th className="px-4 py-3 hidden md:table-cell">{tr("city")}</th>
                 <th className="px-4 py-3 hidden sm:table-cell">{tr("date")}</th>
                 <th className="px-4 py-3">{tr("total")}</th>
@@ -352,6 +404,7 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
                     <div className="font-medium">{o.customer_name}</div>
                     <div className="text-xs text-neutral-500">{o.phone}</div>
                   </td>
+                  <td className="px-4 py-3 hidden lg:table-cell text-neutral-500">{o.email ?? "—"}</td>
                   <td className="px-4 py-3 hidden md:table-cell">{o.city}</td>
                   <td className="px-4 py-3 hidden sm:table-cell text-neutral-500">{new Date(o.created_at).toLocaleDateString()}</td>
                   <td className="px-4 py-3 font-medium">{formatEur(Number(o.total))}</td>
@@ -361,17 +414,18 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-12 text-center text-neutral-500">{lang === "sq" ? "Asnjë porosi" : "No orders"}</td></tr>
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-neutral-500">{lang === "sq" ? "Asnjë porosi" : "No orders"}</td></tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {openOrder && <OrderModal order={openOrder} onClose={() => setOpenId(null)} onStatus={(s) => updateStatus(openOrder.id, s)} />}
+      {openOrder && <OrderModal order={openOrder} onClose={() => setOpenId(null)} onStatus={(st) => updateStatus(openOrder.id, st)} />}
     </div>
   );
 }
+
 
 function SalesView({ lang }: { lang: string }) {
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
