@@ -13,6 +13,18 @@ const searchSchema = z.object({
 export const Route = createFileRoute("/shop")({
   validateSearch: (s) => searchSchema.parse(s),
   component: Shop,
+  head: () => ({
+    meta: [
+      { title: "Dyqani — Dream Studio" },
+      { name: "description", content: "Blej produkte profesionale për sallon në Dream Studio: floktari, ngjyra, barber, thonj, makeup dhe mobilje. Pagesa në dorëzim." },
+      { property: "og:title", content: "Dyqani — Dream Studio" },
+      { property: "og:description", content: "Blej produkte profesionale për sallon në Dream Studio: floktari, ngjyra, barber, thonj, makeup dhe mobilje. Pagesa në dorëzim." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://cod-express-cart.lovable.app/shop" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/shop" }],
+  }),
 });
 
 function Shop() {

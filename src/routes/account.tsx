@@ -6,7 +6,21 @@ import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { Package } from "lucide-react";
 
-export const Route = createFileRoute("/account")({ component: Account });
+export const Route = createFileRoute("/account")({
+  component: Account,
+  head: () => ({
+    meta: [
+      { title: "Llogaria juaj — Dream Studio" },
+      { name: "description", content: "Shiko porositë e tua dhe statusin e dërgesave në Dream Studio." },
+      { property: "og:title", content: "Llogaria juaj — Dream Studio" },
+      { property: "og:description", content: "Shiko porositë e tua dhe statusin e dërgesave në Dream Studio." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://cod-express-cart.lovable.app/account" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/account" }],
+  }),
+});
 
 const STATUS_COLOR: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-900",

@@ -3,7 +3,21 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useCart, formatEur } from "@/lib/cart";
 
-export const Route = createFileRoute("/cart")({ component: CartPage });
+export const Route = createFileRoute("/cart")({
+  component: CartPage,
+  head: () => ({
+    meta: [
+      { title: "Shporta — Dream Studio" },
+      { name: "description", content: "Shiko produktet në shportën tuaj në Dream Studio dhe vazhdo drejt porosisë me pagesë në dorëzim." },
+      { property: "og:title", content: "Shporta — Dream Studio" },
+      { property: "og:description", content: "Shiko produktet në shportën tuaj në Dream Studio dhe vazhdo drejt porosisë me pagesë në dorëzim." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://cod-express-cart.lovable.app/cart" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/cart" }],
+  }),
+});
 
 function CartPage() {
   const { tr } = useI18n();

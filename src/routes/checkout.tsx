@@ -7,7 +7,21 @@ import { useCart, formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { Banknote } from "lucide-react";
 
-export const Route = createFileRoute("/checkout")({ component: Checkout });
+export const Route = createFileRoute("/checkout")({
+  component: Checkout,
+  head: () => ({
+    meta: [
+      { title: "Përfundo porosinë — Dream Studio" },
+      { name: "description", content: "Plotëso të dhënat e dërgesës dhe porosit me pagesë në dorëzim (COD) në Dream Studio." },
+      { property: "og:title", content: "Përfundo porosinë — Dream Studio" },
+      { property: "og:description", content: "Plotëso të dhënat e dërgesës dhe porosit me pagesë në dorëzim (COD) në Dream Studio." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://cod-express-cart.lovable.app/checkout" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/checkout" }],
+  }),
+});
 
 const schema = z.object({
   customer_name: z.string().trim().min(2).max(100),
