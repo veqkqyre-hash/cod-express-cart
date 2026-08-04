@@ -7,7 +7,21 @@ import { useCart, formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 
-export const Route = createFileRoute("/product/$slug")({ component: ProductPage });
+export const Route = createFileRoute("/product/$slug")({
+  component: ProductPage,
+  head: ({ params }) => ({
+    meta: [
+      { title: `${params.slug.replace(/-/g, " ")} — Dream Studio` },
+      { name: "description", content: "Produkt profesional për sallone bukurie nga Dream Studio, me pagesë në dorëzim në tërë Kosovën." },
+      { property: "og:title", content: `${params.slug.replace(/-/g, " ")} — Dream Studio` },
+      { property: "og:description", content: "Produkt profesional për sallone bukurie nga Dream Studio, me pagesë në dorëzim." },
+      { property: "og:type", content: "product" },
+      { property: "og:url", content: `https://cod-express-cart.lovable.app/product/${params.slug}` },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: `https://cod-express-cart.lovable.app/product/${params.slug}` }],
+  }),
+});
 
 function ProductPage() {
   const { slug } = Route.useParams();

@@ -5,7 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 
-export const Route = createFileRoute("/order/$number")({ component: OrderConfirmation });
+export const Route = createFileRoute("/order/$number")({
+  component: OrderConfirmation,
+  head: ({ params }) => ({
+    meta: [
+      { title: `Porosia ${params.number} — Dream Studio` },
+      { name: "description", content: "Detajet dhe statusi i porosisë tuaj në Dream Studio, me pagesë në dorëzim." },
+      { property: "og:title", content: `Porosia ${params.number} — Dream Studio` },
+      { property: "og:description", content: "Detajet dhe statusi i porosisë tuaj në Dream Studio." },
+      { property: "og:type", content: "website" },
+      { name: "robots", content: "noindex" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+});
 
 function OrderConfirmation() {
   const { number } = Route.useParams();

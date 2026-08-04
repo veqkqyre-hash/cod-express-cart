@@ -7,7 +7,21 @@ import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+  component: Home,
+  head: () => ({
+    meta: [
+      { title: "Dream Studio — Furnizime Premium për Sallone Bukurie" },
+      { name: "description", content: "Dream Studio: produkte premium për sallone bukurie, floktari, barber, thonj dhe makeup. Pagesa në dorëzim (COD) në tërë Kosovën." },
+      { property: "og:title", content: "Dream Studio — Furnizime Premium për Sallone Bukurie" },
+      { property: "og:description", content: "Dream Studio: produkte premium për sallone bukurie, floktari, barber, thonj dhe makeup. Pagesa në dorëzim (COD) në tërë Kosovën." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://cod-express-cart.lovable.app/" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/" }],
+  }),
+});
 
 // Category card visuals — soft pink illustrated tiles
 const CATEGORY_ART: Record<string, { hue: string; emoji: string }> = {
