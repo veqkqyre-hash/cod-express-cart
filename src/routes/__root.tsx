@@ -56,13 +56,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "PINK — Luxury Beauty Salon Supplies" },
-      { name: "description", content: "PINK: luxury beauty salon supplies — hair, nails, makeup, barber and more. Cash on Delivery across Kosovo." },
-      { property: "og:title", content: "PINK — Luxury Beauty Salon Supplies" },
+      { title: "Dream Studio — Luxury Beauty Salon Supplies" },
+      { name: "description", content: "Dream Studio: luxury beauty salon supplies — hair, nails, makeup, barber and more. Cash on Delivery across Kosovo." },
+      { property: "og:title", content: "Dream Studio — Luxury Beauty Salon Supplies" },
       { property: "og:description", content: "Premium beauty salon supplies delivered to your door. Pay on delivery." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "PINK" },
+      { name: "twitter:title", content: "Dream Studio" },
       { name: "twitter:description", content: "Luxury beauty salon supplies. Cash on Delivery." },
     ],
     links: [

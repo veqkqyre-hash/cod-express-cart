@@ -33,7 +33,7 @@ export function SiteFooter() {
           <div className="md:col-span-4 space-y-5">
             <Link to="/" className="flex items-center gap-2">
               <span className="grid h-11 w-11 place-items-center rounded-full bg-[var(--pink-deep)] text-white font-display text-lg">P</span>
-              <span className="font-display text-3xl tracking-[0.25em]">PINK</span>
+              <span className="font-display text-3xl tracking-tight">Dream Studio</span>
             </Link>
             <p className="text-sm text-white/70 max-w-xs">
               {lang === "sq"
@@ -83,7 +83,7 @@ export function SiteFooter() {
 
         <div className="border-t border-white/10">
           <div className="container-app flex flex-col gap-3 py-5 text-xs text-white/50 md:flex-row md:items-center md:justify-between">
-            <div>© {new Date().getFullYear()} PINK. {lang === "sq" ? "Të gjitha të drejtat e rezervuara." : "All rights reserved."}</div>
+            <div>© {new Date().getFullYear()} Dream Studio. {lang === "sq" ? "Të gjitha të drejtat e rezervuara." : "All rights reserved."}</div>
             <div className="flex items-center gap-4">
               <a href="#" className="hover:text-white transition">{lang === "sq" ? "Privatësia" : "Privacy"}</a>
               <a href="#" className="hover:text-white transition">{lang === "sq" ? "Kushtet" : "Terms"}</a>
