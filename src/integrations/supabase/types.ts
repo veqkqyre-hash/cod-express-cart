@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_posts: {
+        Row: {
+          content_en: string | null
+          content_sq: string | null
+          cover_image: string | null
+          created_at: string
+          excerpt_en: string | null
+          excerpt_sq: string | null
+          id: string
+          published: boolean
+          slug: string
+          title_en: string
+          title_sq: string
+          updated_at: string
+        }
+        Insert: {
+          content_en?: string | null
+          content_sq?: string | null
+          cover_image?: string | null
+          created_at?: string
+          excerpt_en?: string | null
+          excerpt_sq?: string | null
+          id?: string
+          published?: boolean
+          slug: string
+          title_en: string
+          title_sq: string
+          updated_at?: string
+        }
+        Update: {
+          content_en?: string | null
+          content_sq?: string | null
+          cover_image?: string | null
+          created_at?: string
+          excerpt_en?: string | null
+          excerpt_sq?: string | null
+          id?: string
+          published?: boolean
+          slug?: string
+          title_en?: string
+          title_sq?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -41,6 +86,117 @@ export type Database = {
           name_sq?: string
           slug?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          min_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          min_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          min_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      homepage_slides: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          image_url: string | null
+          link_url: string | null
+          sort_order: number
+          subtitle_en: string | null
+          subtitle_sq: string | null
+          title_en: string
+          title_sq: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          link_url?: string | null
+          sort_order?: number
+          subtitle_en?: string | null
+          subtitle_sq?: string | null
+          title_en?: string
+          title_sq?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          link_url?: string | null
+          sort_order?: number
+          subtitle_en?: string | null
+          subtitle_sq?: string | null
+          title_en?: string
+          title_sq?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          read: boolean
+          subject: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          read?: boolean
+          subject?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          read?: boolean
+          subject?: string | null
         }
         Relationships: []
       }
@@ -210,6 +366,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shipping_rates: {
+        Row: {
+          active: boolean
+          created_at: string
+          fee: number
+          free_over: number | null
+          id: string
+          updated_at: string
+          zone: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          fee?: number
+          free_over?: number | null
+          id?: string
+          updated_at?: string
+          zone: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          fee?: number
+          free_over?: number | null
+          id?: string
+          updated_at?: string
+          zone?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

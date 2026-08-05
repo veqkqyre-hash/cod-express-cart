@@ -12,6 +12,11 @@ import {
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
+import { CustomersPanel } from "@/components/admin-customers-panel";
+import {
+  CatalogPanel, MarketingPanel, HomepagePanel, BlogPanel, MessagesPanel,
+  ShippingPanel, SettingsPanel,
+} from "@/components/admin-content-panels";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: Admin });
 
@@ -188,14 +193,14 @@ function Admin() {
           {nav === "stats" && <StatsView lang={lang} />}
           {nav === "products" && <ProductsPanel />}
           {nav === "inventory" && <InventoryView lang={lang} />}
-          {nav === "catalog" && <CatalogView lang={lang} />}
-          {nav === "customers" && <CustomersView lang={lang} />}
-          {nav === "shipping" && <ComingSoon label={L("Transporti", "Shipping")} />}
-          {nav === "marketing" && <ComingSoon label={L("Marketing", "Marketing")} />}
-          {nav === "homepage" && <ComingSoon label={L("Ballina", "Homepage")} />}
-          {nav === "blog" && <ComingSoon label={L("Blog", "Blog")} />}
-          {nav === "messages" && <ComingSoon label={L("Mesazhet", "Messages")} />}
-          {nav === "settings" && <ComingSoon label={L("Cilësimet", "Settings")} />}
+          {nav === "catalog" && <CatalogPanel />}
+          {nav === "customers" && <CustomersPanel />}
+          {nav === "shipping" && <ShippingPanel />}
+          {nav === "marketing" && <MarketingPanel />}
+          {nav === "homepage" && <HomepagePanel />}
+          {nav === "blog" && <BlogPanel />}
+          {nav === "messages" && <MessagesPanel />}
+          {nav === "settings" && <SettingsPanel />}
           {nav === "admins" && <AdminsPanel />}
         </main>
       </div>
@@ -517,84 +522,6 @@ function InventoryView({ lang }: { lang: string }) {
   );
 }
 
-function CatalogView({ lang }: { lang: string }) {
-  const { data: categories } = useQuery({
-    queryKey: ["admin-categories-list"],
-    queryFn: async () => {
-      const { data } = await supabase.from("categories").select("*").order("sort_order");
-      return data ?? [];
-    },
-  });
-  return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {(categories ?? []).map((c: any) => (
-        <div key={c.id} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-          <div className="font-display text-lg">{lang === "sq" ? c.name_sq : c.name_en}</div>
-          <div className="text-xs text-neutral-500 mt-1">/{c.slug}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function CustomersView({ lang }: { lang: string }) {
-  const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
-  const { data } = useQuery({
-    queryKey: ["admin-customers"],
-    queryFn: async () => {
-      const { data } = await supabase.from("orders").select("customer_name,phone,email,city,total");
-      const map = new Map<string, { name: string; phone: string; email: string | null; city: string; orders: number; total: number }>();
-      (data ?? []).forEach((o: any) => {
-        const key = o.phone;
-        const cur = map.get(key) ?? { name: o.customer_name, phone: o.phone, email: o.email, city: o.city, orders: 0, total: 0 };
-        cur.orders += 1; cur.total += Number(o.total || 0);
-        map.set(key, cur);
-      });
-      return Array.from(map.values()).sort((a, b) => b.total - a.total);
-    },
-  });
-  return (
-    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-      <table className="w-full text-sm">
-        <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
-          <tr>
-            <th className="px-4 py-3">{L("Klienti", "Customer")}</th>
-            <th className="px-4 py-3">{L("Telefoni", "Phone")}</th>
-            <th className="px-4 py-3 hidden md:table-cell">{L("Qyteti", "City")}</th>
-            <th className="px-4 py-3">{L("Porosi", "Orders")}</th>
-            <th className="px-4 py-3">{L("Totali", "Total")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {(data ?? []).map((c) => (
-            <tr key={c.phone} className="border-t border-neutral-100">
-              <td className="px-4 py-3 font-medium">{c.name}</td>
-              <td className="px-4 py-3">{c.phone}</td>
-              <td className="px-4 py-3 hidden md:table-cell">{c.city}</td>
-              <td className="px-4 py-3">{c.orders}</td>
-              <td className="px-4 py-3 font-medium">{formatEur(c.total)}</td>
-            </tr>
-          ))}
-          {data && data.length === 0 && (
-            <tr><td colSpan={5} className="px-4 py-12 text-center text-neutral-500">{L("Asnjë klient", "No customers")}</td></tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function ComingSoon({ label }: { label: string }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-16 text-center">
-      <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-neutral-100">
-        <Settings className="h-6 w-6 text-neutral-400" />
-      </div>
-      <h2 className="mt-4 font-display text-xl">{label}</h2>
-      <p className="mt-2 text-sm text-neutral-500">Së shpejti / Coming soon</p>
-    </div>
-  );
-}
 
 function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () => void; onStatus: (s: string) => void }) {
   const { tr, lang } = useI18n();
