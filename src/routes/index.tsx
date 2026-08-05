@@ -39,8 +39,8 @@ export const Route = createFileRoute("/")({
           address: {
             "@type": "PostalAddress",
             streetAddress: "Rr. Nëna Terezë",
-            addressLocality: "Prishtinë",
-            postalCode: "10000",
+            addressLocality: "Fushë Kosovë",
+            postalCode: "12000",
             addressCountry: "XK",
           },
         }),

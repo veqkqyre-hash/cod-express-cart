@@ -620,7 +620,7 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
 
           <div className="hidden print:block mb-6 border-b border-black/20 pb-4">
             <h1 className="print-brand font-display text-3xl tracking-tight">Dream Studio</h1>
-            <div className="print-brand text-xs">Rr. Nëna Terezë, Prishtinë 10000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com</div>
+            <div className="print-brand text-xs">Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com</div>
             <div className="mt-2 text-sm font-medium">{tr("invoice")} #{order.order_number}</div>
             <div className="text-xs">{new Date(order.created_at).toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB")}</div>
           </div>
