@@ -20,6 +20,32 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Store",
+          name: "Dream Studio",
+          description:
+            "Furnizime premium për sallone bukurie: floktari, barber, thonj, makeup dhe pajisje. Pagesa në dorëzim (COD) në tërë Kosovën.",
+          url: "https://cod-express-cart.lovable.app/",
+          telephone: "+383 44 123 456",
+          email: "hello@dreamstudio-ks.com",
+          priceRange: "€€",
+          currenciesAccepted: "EUR",
+          paymentAccepted: "Cash on Delivery",
+          areaServed: "Kosovë",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Rr. Nëna Terezë",
+            addressLocality: "Prishtinë",
+            postalCode: "10000",
+            addressCountry: "XK",
+          },
+        }),
+      },
+    ],
   }),
 });
 
@@ -258,10 +284,13 @@ function Marquee() {
   const line = [...items, ...items];
   return (
     <div className="border-y border-black/10 bg-black text-white overflow-hidden">
-      <div className="flex whitespace-nowrap animate-marquee py-3.5">
+      <div className="flex w-max animate-marquee py-3.5">
         {line.map((t, i) => (
-          <span key={i} className="mx-8 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em]">
-            <Sparkles className="h-3 w-3 text-[var(--pink)]" /> {t}
+          <span
+            key={i}
+            className="mx-5 inline-flex shrink-0 items-center gap-2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.22em] sm:mx-8 sm:gap-3 sm:text-xs sm:tracking-[0.3em]"
+          >
+            <Sparkles className="h-3 w-3 shrink-0 text-[var(--pink)]" /> {t}
           </span>
         ))}
       </div>
