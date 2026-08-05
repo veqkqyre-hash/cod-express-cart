@@ -258,10 +258,13 @@ function Marquee() {
   const line = [...items, ...items];
   return (
     <div className="border-y border-black/10 bg-black text-white overflow-hidden">
-      <div className="flex whitespace-nowrap animate-marquee py-3.5">
+      <div className="flex w-max animate-marquee py-3.5">
         {line.map((t, i) => (
-          <span key={i} className="mx-8 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em]">
-            <Sparkles className="h-3 w-3 text-[var(--pink)]" /> {t}
+          <span
+            key={i}
+            className="mx-5 inline-flex shrink-0 items-center gap-2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.22em] sm:mx-8 sm:gap-3 sm:text-xs sm:tracking-[0.3em]"
+          >
+            <Sparkles className="h-3 w-3 shrink-0 text-[var(--pink)]" /> {t}
           </span>
         ))}
       </div>
