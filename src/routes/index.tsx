@@ -20,6 +20,32 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Store",
+          name: "Dream Studio",
+          description:
+            "Furnizime premium për sallone bukurie: floktari, barber, thonj, makeup dhe pajisje. Pagesa në dorëzim (COD) në tërë Kosovën.",
+          url: "https://cod-express-cart.lovable.app/",
+          telephone: "+383 44 123 456",
+          email: "hello@dreamstudio-ks.com",
+          priceRange: "€€",
+          currenciesAccepted: "EUR",
+          paymentAccepted: "Cash on Delivery",
+          areaServed: "Kosovë",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Rr. Nëna Terezë",
+            addressLocality: "Prishtinë",
+            postalCode: "10000",
+            addressCountry: "XK",
+          },
+        }),
+      },
+    ],
   }),
 });
 

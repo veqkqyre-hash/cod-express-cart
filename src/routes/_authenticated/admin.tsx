@@ -607,8 +607,8 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
   });
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 no-print" onClick={onClose}>
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-auto rounded-2xl bg-background shadow-elev" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 print:static print:block print:bg-transparent print:p-0" onClick={onClose}>
+      <div className="w-full max-w-2xl max-h-[90vh] overflow-auto rounded-2xl bg-background shadow-elev print:max-w-none print:rounded-none print:shadow-none" onClick={(e) => e.stopPropagation()}>
         <div className="print-area p-8">
           <div className="flex items-start justify-between gap-4 no-print">
             <div>
@@ -618,9 +618,11 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
             <button onClick={onClose} className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted"><X className="h-4 w-4" /></button>
           </div>
 
-          <div className="hidden print:block mb-6">
-            <h1 className="font-display text-3xl">Dream Studio</h1>
-            <div className="text-sm text-muted-foreground">{tr("invoice")} #{order.order_number}</div>
+          <div className="hidden print:block mb-6 border-b border-black/20 pb-4">
+            <h1 className="print-brand font-display text-3xl tracking-tight">Dream Studio</h1>
+            <div className="print-brand text-xs">Rr. Nëna Terezë, Prishtinë 10000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com</div>
+            <div className="mt-2 text-sm font-medium">{tr("invoice")} #{order.order_number}</div>
+            <div className="text-xs">{new Date(order.created_at).toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB")}</div>
           </div>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2 text-sm">
