@@ -2,13 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function assertAdmin(supabase: any) {
-  const { data, error } = await supabase.rpc("has_role", {
-    _user_id: (await supabase.auth.getUser()).data.user?.id ?? null,
-    _role: "admin",
-  });
-  if (error || data !== true) throw new Error("Not authorized");
-}
 
 export const listRegisteredUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
