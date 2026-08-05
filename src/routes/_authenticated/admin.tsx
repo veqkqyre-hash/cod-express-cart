@@ -12,6 +12,11 @@ import {
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
+import { CustomersPanel } from "@/components/admin-customers-panel";
+import {
+  CatalogPanel, MarketingPanel, HomepagePanel, BlogPanel, MessagesPanel,
+  ShippingPanel, SettingsPanel,
+} from "@/components/admin-content-panels";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: Admin });
 
@@ -188,14 +193,14 @@ function Admin() {
           {nav === "stats" && <StatsView lang={lang} />}
           {nav === "products" && <ProductsPanel />}
           {nav === "inventory" && <InventoryView lang={lang} />}
-          {nav === "catalog" && <CatalogView lang={lang} />}
-          {nav === "customers" && <CustomersView lang={lang} />}
-          {nav === "shipping" && <ComingSoon label={L("Transporti", "Shipping")} />}
-          {nav === "marketing" && <ComingSoon label={L("Marketing", "Marketing")} />}
-          {nav === "homepage" && <ComingSoon label={L("Ballina", "Homepage")} />}
-          {nav === "blog" && <ComingSoon label={L("Blog", "Blog")} />}
-          {nav === "messages" && <ComingSoon label={L("Mesazhet", "Messages")} />}
-          {nav === "settings" && <ComingSoon label={L("Cilësimet", "Settings")} />}
+          {nav === "catalog" && <CatalogPanel />}
+          {nav === "customers" && <CustomersPanel />}
+          {nav === "shipping" && <ShippingPanel />}
+          {nav === "marketing" && <MarketingPanel />}
+          {nav === "homepage" && <HomepagePanel />}
+          {nav === "blog" && <BlogPanel />}
+          {nav === "messages" && <MessagesPanel />}
+          {nav === "settings" && <SettingsPanel />}
           {nav === "admins" && <AdminsPanel />}
         </main>
       </div>
