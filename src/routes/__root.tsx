@@ -87,16 +87,23 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const pathname = router.state.location.pathname;
+  const isAdmin = pathname.startsWith("/admin");
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <CartProvider>
           <WishlistProvider>
-            <div className="flex min-h-screen flex-col">
-              <SiteHeader />
-              <main className="flex-1"><Outlet /></main>
-              <SiteFooter />
-            </div>
+            {isAdmin ? (
+              <Outlet />
+            ) : (
+              <div className="flex min-h-screen flex-col">
+                <SiteHeader />
+                <main className="flex-1"><Outlet /></main>
+                <SiteFooter />
+              </div>
+            )}
             <Toaster position="top-center" richColors />
           </WishlistProvider>
         </CartProvider>
@@ -104,3 +111,4 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
