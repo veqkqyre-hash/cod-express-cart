@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          details: Json
+          entity: string
+          entity_id: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity: string
+          entity_id?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity?: string
+          entity_id?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           content_en: string | null
@@ -199,6 +232,47 @@ export type Database = {
           subject?: string | null
         }
         Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          kind: string
+          order_id: string | null
+          order_number: string | null
+          read: boolean
+          title: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          order_id?: string | null
+          order_number?: string | null
+          read?: boolean
+          title: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          order_id?: string | null
+          order_number?: string | null
+          read?: boolean
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_items: {
         Row: {
@@ -444,6 +518,10 @@ export type Database = {
       claim_admin_if_none: { Args: never; Returns: Json }
       get_order_by_number: { Args: { _order_number: string }; Returns: Json }
       grant_admin_by_email: { Args: { _email: string }; Returns: Json }
+      grant_role_by_email: {
+        Args: { _email: string; _role: Database["public"]["Enums"]["app_role"] }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -459,10 +537,35 @@ export type Database = {
           user_id: string
         }[]
       }
+      list_staff: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }[]
+      }
+      log_action: {
+        Args: {
+          _action: string
+          _details?: Json
+          _entity: string
+          _entity_id: string
+        }
+        Returns: undefined
+      }
       revoke_admin: { Args: { _user_id: string }; Returns: undefined }
+      revoke_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "manager" | "editor"
       order_status:
         | "pending"
         | "confirmed"
@@ -597,7 +700,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "manager", "editor"],
       order_status: [
         "pending",
         "confirmed",

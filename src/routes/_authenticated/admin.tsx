@@ -8,11 +8,16 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
 import { CustomersPanel } from "@/components/admin-customers-panel";
+import { AuditPanel } from "@/components/admin-audit-panel";
+import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
+import { ExportButtons } from "@/components/admin-export";
+import type { Column } from "@/lib/export";
+import { logAction } from "@/lib/audit";
 import {
   CatalogPanel, MarketingPanel, HomepagePanel, BlogPanel, MessagesPanel,
   ShippingPanel, SettingsPanel,
@@ -49,12 +54,19 @@ const STATUS_COLOR: Record<string, string> = {
 type NavKey =
   | "dashboard" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
-  | "messages" | "settings" | "admins";
+  | "messages" | "notifications" | "audit" | "settings" | "admins";
+
+type Role = "admin" | "manager" | "editor";
+
+// Which sections each role can open (admin sees everything)
+const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats"];
+const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products"];
 
 function Admin() {
   const { tr, lang } = useI18n();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [role, setRole] = useState<Role | null>(null);
   const [currentEmail, setCurrentEmail] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
   const [nav, setNav] = useState<NavKey>("dashboard");
@@ -62,11 +74,20 @@ function Admin() {
 
   async function checkAdmin() {
     const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) { setIsAdmin(false); return; }
+    if (!userData.user) { setIsAdmin(false); setRole(null); return; }
     setCurrentEmail(userData.user.email ?? null);
-    // Server-side role check (security definer) — cannot be spoofed client-side
-    const { data, error } = await supabase.rpc("has_role", { _user_id: userData.user.id, _role: "admin" });
-    setIsAdmin(!error && data === true);
+    // Server-side role checks (security definer) — cannot be spoofed client-side
+    const uid = userData.user.id;
+    const [adminRes, managerRes, editorRes] = await Promise.all([
+      supabase.rpc("has_role", { _user_id: uid, _role: "admin" }),
+      supabase.rpc("has_role", { _user_id: uid, _role: "manager" }),
+      supabase.rpc("has_role", { _user_id: uid, _role: "editor" }),
+    ]);
+    const r: Role | null = adminRes.data === true ? "admin"
+      : managerRes.data === true ? "manager"
+      : editorRes.data === true ? "editor" : null;
+    setRole(r);
+    setIsAdmin(r !== null);
   }
 
 
@@ -114,7 +135,7 @@ function Admin() {
   }
 
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
-  const navItems: { key: NavKey; label: string; icon: any }[] = [
+  const allNav: { key: NavKey; label: string; icon: any }[] = [
     { key: "dashboard", label: L("Paneli", "Dashboard"), icon: LayoutGrid },
     { key: "sales", label: L("Shitjet", "Sales"), icon: TrendingUp },
     { key: "stats", label: L("Statistika", "Statistics"), icon: BarChart3 },
@@ -122,17 +143,25 @@ function Admin() {
     { key: "inventory", label: L("Inventari", "Inventory"), icon: Boxes },
     { key: "catalog", label: L("Katalogu", "Catalog"), icon: Tag },
     { key: "orders", label: L("Porositë", "Orders"), icon: ShoppingCart },
+    { key: "notifications", label: L("Njoftimet", "Notifications"), icon: Bell },
     { key: "shipping", label: L("Transporti", "Shipping"), icon: Truck },
     { key: "customers", label: L("Klientët", "Customers"), icon: Users },
     { key: "marketing", label: L("Marketing", "Marketing"), icon: Ticket },
     { key: "homepage", label: L("Ballina", "Homepage"), icon: Home },
     { key: "blog", label: L("Blog", "Blog"), icon: Newspaper },
     { key: "messages", label: L("Mesazhet", "Messages"), icon: Inbox },
+    { key: "audit", label: L("Regjistri i aktivitetit", "Activity log"), icon: ScrollText },
     { key: "settings", label: L("Cilësimet", "Settings"), icon: Settings },
-    { key: "admins", label: L("Adminët", "Admins"), icon: Users },
+    { key: "admins", label: L("Rolet & Adminët", "Roles & Admins"), icon: Users },
   ];
 
+  const allowed: NavKey[] | null =
+    role === "admin" ? null : role === "manager" ? MANAGER_NAV : EDITOR_NAV;
+  const navItems = allowed ? allNav.filter((n) => allowed.includes(n.key)) : allNav;
+  const canSee = (k: NavKey) => !allowed || allowed.includes(k);
+
   const currentLabel = navItems.find((n) => n.key === nav)?.label ?? "";
+  const roleBadge = role === "admin" ? L("Admin", "Admin") : role === "manager" ? L("Menaxher", "Manager") : L("Editor", "Editor");
 
   return (
     <div className="fixed inset-0 flex bg-neutral-100">
@@ -142,7 +171,10 @@ function Admin() {
       >
         <div className="flex items-center gap-3 px-6 py-5 border-b border-neutral-800">
           <div className="grid h-9 w-9 place-items-center rounded-full bg-white text-neutral-900 font-display text-sm font-semibold">D</div>
-          <div className="font-display text-xl text-white">Dream Studio</div>
+          <div className="min-w-0">
+            <div className="font-display text-xl text-white leading-none">Dream Studio</div>
+            <div className="mt-1 text-[11px] uppercase tracking-wide text-neutral-400">{roleBadge}</div>
+          </div>
         </div>
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
           {navItems.map((it) => {
@@ -181,27 +213,41 @@ function Admin() {
             </button>
             <h1 className="font-display text-xl lg:text-2xl truncate">{currentLabel}</h1>
           </div>
-          <a href="/" target="_blank" rel="noreferrer" className="grid h-9 w-9 place-items-center rounded-lg text-neutral-600 hover:bg-neutral-100" title={L("Shiko faqen", "View site")}>
-            <ExternalLink className="h-4 w-4" />
-          </a>
+          <div className="flex items-center gap-1">
+            {canSee("notifications") && <NotificationsBell onOpen={() => setNav("notifications")} />}
+            <a href="/" target="_blank" rel="noreferrer" className="grid h-9 w-9 place-items-center rounded-lg text-neutral-600 hover:bg-neutral-100" title={L("Shiko faqen", "View site")}>
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </div>
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 lg:p-8">
-          {nav === "dashboard" && <Dashboard lang={lang} />}
-          {nav === "orders" && <OrdersView lang={lang} tr={tr} />}
-          {nav === "sales" && <SalesView lang={lang} />}
-          {nav === "stats" && <StatsView lang={lang} />}
-          {nav === "products" && <ProductsPanel />}
-          {nav === "inventory" && <InventoryView lang={lang} />}
-          {nav === "catalog" && <CatalogPanel />}
-          {nav === "customers" && <CustomersPanel />}
-          {nav === "shipping" && <ShippingPanel />}
-          {nav === "marketing" && <MarketingPanel />}
-          {nav === "homepage" && <HomepagePanel />}
-          {nav === "blog" && <BlogPanel />}
-          {nav === "messages" && <MessagesPanel />}
-          {nav === "settings" && <SettingsPanel />}
-          {nav === "admins" && <AdminsPanel />}
+          {!canSee(nav) && (
+            <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center text-sm text-neutral-500">
+              {L("Roli i juaj nuk ka akses në këtë seksion.", "Your role has no access to this section.")}
+            </div>
+          )}
+          {canSee(nav) && (
+            <>
+              {nav === "dashboard" && <Dashboard lang={lang} />}
+              {nav === "orders" && <OrdersView lang={lang} tr={tr} />}
+              {nav === "sales" && <SalesView lang={lang} />}
+              {nav === "stats" && <StatsView lang={lang} />}
+              {nav === "products" && <ProductsPanel />}
+              {nav === "inventory" && <InventoryView lang={lang} />}
+              {nav === "catalog" && <CatalogPanel />}
+              {nav === "customers" && <CustomersPanel />}
+              {nav === "shipping" && <ShippingPanel />}
+              {nav === "marketing" && <MarketingPanel />}
+              {nav === "homepage" && <HomepagePanel />}
+              {nav === "blog" && <BlogPanel />}
+              {nav === "messages" && <MessagesPanel />}
+              {nav === "notifications" && <NotificationsPanel />}
+              {nav === "audit" && <AuditPanel />}
+              {nav === "settings" && <SettingsPanel />}
+              {nav === "admins" && <AdminsPanel />}
+            </>
+          )}
         </main>
       </div>
     </div>
@@ -343,10 +389,30 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
   function clearFilters() { setStatus(""); setCity(""); setSearch(""); setFrom(""); setTo(""); }
 
   async function updateStatus(id: string, newStatus: string) {
+    const prev = (orders ?? []).find((o) => o.id === id);
     const { error } = await supabase.from("orders").update({ status: newStatus as any }).eq("id", id);
     if (error) toast.error(error.message);
-    else { toast.success(lang === "sq" ? "Statusi u përditësua" : "Status updated"); refetch(); }
+    else {
+      toast.success(lang === "sq" ? "Statusi u përditësua" : "Status updated");
+      logAction("order.status_changed", "orders", id, {
+        order_number: prev?.order_number, from: prev?.status, to: newStatus,
+      });
+      refetch();
+    }
   }
+
+  const exportColumns: Column<Order>[] = [
+    { key: "order_number", label: L("Nr. porosisë", "Order #"), get: (o) => o.order_number },
+    { key: "created_at", label: L("Data", "Date"), get: (o) => new Date(o.created_at).toLocaleString() },
+    { key: "customer_name", label: L("Klienti", "Customer"), get: (o) => o.customer_name },
+    { key: "phone", label: L("Telefoni", "Phone"), get: (o) => o.phone },
+    { key: "email", label: "Email", get: (o) => o.email ?? "" },
+    { key: "city", label: L("Qyteti", "City"), get: (o) => o.city },
+    { key: "address", label: L("Adresa", "Address"), get: (o) => `${o.address}${o.postal_code ? ", " + o.postal_code : ""}` },
+    { key: "status", label: L("Statusi", "Status"), get: (o) => o.status },
+    { key: "subtotal", label: L("Nëntotali", "Subtotal"), get: (o) => Number(o.subtotal).toFixed(2) },
+    { key: "total", label: L("Totali", "Total"), get: (o) => Number(o.total).toFixed(2) },
+  ];
 
   const openOrder = filtered.find((o) => o.id === openId) ?? null;
   const inputCls = "rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-200";
@@ -381,9 +447,21 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
             </button>
           )}
         </div>
-        <div className="mt-3 text-xs text-neutral-500">
-          {isLoading ? "…" : `${filtered.length} ${L("porosi", "orders")}`}
-          {filtered.length > 0 && ` · ${formatEur(filtered.reduce((a, o) => a + Number(o.total), 0))}`}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs text-neutral-500">
+            {isLoading ? "…" : `${filtered.length} ${L("porosi", "orders")}`}
+            {filtered.length > 0 && ` · ${formatEur(filtered.reduce((a, o) => a + Number(o.total), 0))}`}
+          </div>
+          <ExportButtons
+            entity="orders"
+            filename={`dream-studio-porosite-${new Date().toISOString().slice(0, 10)}`}
+            title={L("Raport i porosive", "Orders report")}
+            subtitle={`${filtered.length} ${L("porosi", "orders")}`}
+            columns={exportColumns}
+            rows={filtered}
+            footer={`${L("Totali", "Total")}: ${formatEur(filtered.reduce((a, o) => a + Number(o.total), 0))}`}
+            labels={{ csv: L("Eksport CSV", "Export CSV"), pdf: L("Eksport PDF", "Export PDF"), empty: L("Nuk ka të dhëna", "Nothing to export") }}
+          />
         </div>
       </div>
 
@@ -454,70 +532,176 @@ function SalesView({ lang }: { lang: string }) {
   );
 }
 
+type StatRow = { label: string; orders: number; revenue: number; share: string };
+
 function StatsView({ lang }: { lang: string }) {
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const { data } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: async () => {
-      const { data } = await supabase.from("orders").select("status");
-      return data ?? [];
+      const { data } = await supabase.from("orders").select("status,total,created_at");
+      return (data ?? []) as { status: string; total: number; created_at: string }[];
     },
   });
+  const list = data ?? [];
   const counts: Record<string, number> = {};
-  (data ?? []).forEach((o: any) => { counts[o.status] = (counts[o.status] ?? 0) + 1; });
+  const revByStatus: Record<string, number> = {};
+  list.forEach((o) => {
+    counts[o.status] = (counts[o.status] ?? 0) + 1;
+    revByStatus[o.status] = (revByStatus[o.status] ?? 0) + Number(o.total || 0);
+  });
+  const total = list.length || 1;
+
+  const statusRows: StatRow[] = STATUSES.map((s) => ({
+    label: s,
+    orders: counts[s] ?? 0,
+    revenue: revByStatus[s] ?? 0,
+    share: `${Math.round(((counts[s] ?? 0) / total) * 100)}%`,
+  }));
+
+  const byMonth: Record<string, { orders: number; revenue: number }> = {};
+  list.forEach((o) => {
+    const k = new Date(o.created_at).toISOString().slice(0, 7);
+    byMonth[k] = byMonth[k] ?? { orders: 0, revenue: 0 };
+    byMonth[k].orders += 1;
+    byMonth[k].revenue += Number(o.total || 0);
+  });
+  const monthRows: StatRow[] = Object.entries(byMonth)
+    .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+    .map(([k, v]) => ({ label: k, orders: v.orders, revenue: v.revenue, share: "" }));
+
+  const cols: Column<StatRow>[] = [
+    { key: "label", label: L("Kategoria", "Group"), get: (r) => r.label },
+    { key: "orders", label: L("Porosi", "Orders"), get: (r) => r.orders },
+    { key: "revenue", label: L("Xhiro (EUR)", "Revenue (EUR)"), get: (r) => r.revenue.toFixed(2) },
+    { key: "share", label: L("Pjesa", "Share"), get: (r) => r.share },
+  ];
+
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-      <h2 className="font-display text-lg mb-4">{L("Porositë sipas statusit", "Orders by status")}</h2>
-      <div className="space-y-3">
-        {STATUSES.map((s) => {
-          const n = counts[s] ?? 0;
-          const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
-          const pct = Math.round((n / total) * 100);
-          return (
-            <div key={s}>
-              <div className="flex justify-between text-sm mb-1"><span className="capitalize">{s}</span><span className="text-neutral-500">{n}</span></div>
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-lg">{L("Porositë sipas statusit", "Orders by status")}</h2>
+          <ExportButtons
+            entity="stats"
+            filename={`dream-studio-statistika-status-${new Date().toISOString().slice(0, 10)}`}
+            title={L("Raport statistikor — sipas statusit", "Statistics report — by status")}
+            columns={cols}
+            rows={statusRows}
+            labels={{ csv: L("Eksport CSV", "Export CSV"), pdf: L("Eksport PDF", "Export PDF"), empty: L("Nuk ka të dhëna", "Nothing to export") }}
+          />
+        </div>
+        <div className="space-y-3">
+          {statusRows.map((r) => (
+            <div key={r.label}>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="capitalize">{r.label}</span>
+                <span className="text-neutral-500">{r.orders} · {formatEur(r.revenue)}</span>
+              </div>
               <div className="h-2 rounded-full bg-neutral-100 overflow-hidden">
-                <div className="h-full bg-[var(--pink-deep,#e91e63)]" style={{ width: `${pct}%` }} />
+                <div className="h-full bg-[var(--pink-deep,#e91e63)]" style={{ width: r.share || "0%" }} />
               </div>
             </div>
-          );
-        })}
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-lg">{L("Shitjet sipas mujore", "Sales by month")}</h2>
+          <ExportButtons
+            entity="stats"
+            filename={`dream-studio-statistika-mujore-${new Date().toISOString().slice(0, 10)}`}
+            title={L("Raport statistikor — sipas mujit", "Statistics report — by month")}
+            columns={cols}
+            rows={monthRows}
+            footer={`${L("Xhiro totale", "Total revenue")}: ${formatEur(monthRows.reduce((a, r) => a + r.revenue, 0))}`}
+            labels={{ csv: L("Eksport CSV", "Export CSV"), pdf: L("Eksport PDF", "Export PDF"), empty: L("Nuk ka të dhëna", "Nothing to export") }}
+          />
+        </div>
+        <table className="w-full text-sm">
+          <thead className="text-left text-xs uppercase text-neutral-500">
+            <tr><th className="py-2">{L("Muaji", "Month")}</th><th className="py-2 text-right">{L("Porosi", "Orders")}</th><th className="py-2 text-right">{L("Xhiro", "Revenue")}</th></tr>
+          </thead>
+          <tbody>
+            {monthRows.map((r) => (
+              <tr key={r.label} className="border-t border-neutral-100">
+                <td className="py-2">{r.label}</td>
+                <td className="py-2 text-right">{r.orders}</td>
+                <td className="py-2 text-right font-medium">{formatEur(r.revenue)}</td>
+              </tr>
+            ))}
+            {monthRows.length === 0 && <tr><td colSpan={3} className="py-8 text-center text-neutral-500">{L("Asnjë porosi", "No orders")}</td></tr>}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
+
+type InvRow = { id: string; name_sq: string; name_en: string; stock: number; active: boolean; price: number };
 
 function InventoryView({ lang }: { lang: string }) {
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const { data: products } = useQuery({
     queryKey: ["admin-inventory"],
     queryFn: async () => {
-      const { data } = await supabase.from("products").select("id,name_sq,name_en,stock,active").order("stock", { ascending: true });
-      return data ?? [];
+      const { data } = await supabase.from("products").select("id,name_sq,name_en,stock,active,price").order("stock", { ascending: true });
+      return (data ?? []) as InvRow[];
     },
   });
+  const rows = products ?? [];
+  const cols: Column<InvRow>[] = [
+    { key: "name", label: L("Produkti", "Product"), get: (p) => (lang === "sq" ? p.name_sq : p.name_en) },
+    { key: "stock", label: L("Stoku", "Stock"), get: (p) => p.stock },
+    { key: "price", label: L("Çmimi (EUR)", "Price (EUR)"), get: (p) => Number(p.price).toFixed(2) },
+    { key: "value", label: L("Vlera e stokut (EUR)", "Stock value (EUR)"), get: (p) => (Number(p.price) * p.stock).toFixed(2) },
+    { key: "state", label: L("Statusi", "Status"), get: (p) => (p.stock === 0 ? L("Pa stok", "Out") : p.stock < 5 ? L("Pak", "Low") : "OK") },
+    { key: "active", label: L("Aktiv", "Active"), get: (p) => (p.active ? "yes" : "no") },
+  ];
+  const stockValue = rows.reduce((a, p) => a + Number(p.price) * p.stock, 0);
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-      <table className="w-full text-sm">
-        <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
-          <tr><th className="px-4 py-3">{L("Produkti", "Product")}</th><th className="px-4 py-3">{L("Stoku", "Stock")}</th><th className="px-4 py-3">{L("Statusi", "Status")}</th></tr>
-        </thead>
-        <tbody>
-          {(products ?? []).map((p: any) => (
-            <tr key={p.id} className="border-t border-neutral-100">
-              <td className="px-4 py-3 font-medium">{lang === "sq" ? p.name_sq : p.name_en}</td>
-              <td className="px-4 py-3">
-                <span className={p.stock === 0 ? "text-red-600 font-medium" : p.stock < 5 ? "text-amber-600 font-medium" : ""}>{p.stock}</span>
-              </td>
-              <td className="px-4 py-3">
-                {p.stock === 0 ? <span className="rounded-full bg-red-50 text-red-700 px-2.5 py-0.5 text-xs">{L("Pa stok", "Out")}</span>
-                  : p.stock < 5 ? <span className="rounded-full bg-amber-50 text-amber-700 px-2.5 py-0.5 text-xs">{L("Pak", "Low")}</span>
-                  : <span className="rounded-full bg-green-50 text-green-700 px-2.5 py-0.5 text-xs">OK</span>}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+        <div className="text-xs text-neutral-500">
+          {rows.length} {L("produkte", "products")} · {L("vlera e stokut", "stock value")} {formatEur(stockValue)}
+        </div>
+        <ExportButtons
+          entity="inventory"
+          filename={`dream-studio-inventari-${new Date().toISOString().slice(0, 10)}`}
+          title={L("Raport i inventarit", "Inventory report")}
+          subtitle={`${rows.length} ${L("produkte", "products")}`}
+          columns={cols}
+          rows={rows}
+          footer={`${L("Vlera e stokut", "Stock value")}: ${formatEur(stockValue)}`}
+          labels={{ csv: L("Eksport CSV", "Export CSV"), pdf: L("Eksport PDF", "Export PDF"), empty: L("Nuk ka të dhëna", "Nothing to export") }}
+        />
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <table className="w-full text-sm">
+          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+            <tr><th className="px-4 py-3">{L("Produkti", "Product")}</th><th className="px-4 py-3">{L("Stoku", "Stock")}</th><th className="px-4 py-3 hidden sm:table-cell">{L("Vlera", "Value")}</th><th className="px-4 py-3">{L("Statusi", "Status")}</th></tr>
+          </thead>
+          <tbody>
+            {rows.map((p) => (
+              <tr key={p.id} className="border-t border-neutral-100">
+                <td className="px-4 py-3 font-medium">{lang === "sq" ? p.name_sq : p.name_en}</td>
+                <td className="px-4 py-3">
+                  <span className={p.stock === 0 ? "text-red-600 font-medium" : p.stock < 5 ? "text-amber-600 font-medium" : ""}>{p.stock}</span>
+                </td>
+                <td className="px-4 py-3 hidden sm:table-cell text-neutral-500">{formatEur(Number(p.price) * p.stock)}</td>
+                <td className="px-4 py-3">
+                  {p.stock === 0 ? <span className="rounded-full bg-red-50 text-red-700 px-2.5 py-0.5 text-xs">{L("Pa stok", "Out")}</span>
+                    : p.stock < 5 ? <span className="rounded-full bg-amber-50 text-amber-700 px-2.5 py-0.5 text-xs">{L("Pak", "Low")}</span>
+                    : <span className="rounded-full bg-green-50 text-green-700 px-2.5 py-0.5 text-xs">OK</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
