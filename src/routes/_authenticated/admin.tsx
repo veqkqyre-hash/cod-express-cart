@@ -8,11 +8,16 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
 import { CustomersPanel } from "@/components/admin-customers-panel";
+import { AuditPanel } from "@/components/admin-audit-panel";
+import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
+import { ExportButtons } from "@/components/admin-export";
+import type { Column } from "@/lib/export";
+import { logAction } from "@/lib/audit";
 import {
   CatalogPanel, MarketingPanel, HomepagePanel, BlogPanel, MessagesPanel,
   ShippingPanel, SettingsPanel,
@@ -49,12 +54,19 @@ const STATUS_COLOR: Record<string, string> = {
 type NavKey =
   | "dashboard" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
-  | "messages" | "settings" | "admins";
+  | "messages" | "notifications" | "audit" | "settings" | "admins";
+
+type Role = "admin" | "manager" | "editor";
+
+// Which sections each role can open (admin sees everything)
+const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats"];
+const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products"];
 
 function Admin() {
   const { tr, lang } = useI18n();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [role, setRole] = useState<Role | null>(null);
   const [currentEmail, setCurrentEmail] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
   const [nav, setNav] = useState<NavKey>("dashboard");
@@ -62,11 +74,20 @@ function Admin() {
 
   async function checkAdmin() {
     const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) { setIsAdmin(false); return; }
+    if (!userData.user) { setIsAdmin(false); setRole(null); return; }
     setCurrentEmail(userData.user.email ?? null);
-    // Server-side role check (security definer) — cannot be spoofed client-side
-    const { data, error } = await supabase.rpc("has_role", { _user_id: userData.user.id, _role: "admin" });
-    setIsAdmin(!error && data === true);
+    // Server-side role checks (security definer) — cannot be spoofed client-side
+    const uid = userData.user.id;
+    const [adminRes, managerRes, editorRes] = await Promise.all([
+      supabase.rpc("has_role", { _user_id: uid, _role: "admin" }),
+      supabase.rpc("has_role", { _user_id: uid, _role: "manager" }),
+      supabase.rpc("has_role", { _user_id: uid, _role: "editor" }),
+    ]);
+    const r: Role | null = adminRes.data === true ? "admin"
+      : managerRes.data === true ? "manager"
+      : editorRes.data === true ? "editor" : null;
+    setRole(r);
+    setIsAdmin(r !== null);
   }
 
 
@@ -114,7 +135,7 @@ function Admin() {
   }
 
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
-  const navItems: { key: NavKey; label: string; icon: any }[] = [
+  const allNav: { key: NavKey; label: string; icon: any }[] = [
     { key: "dashboard", label: L("Paneli", "Dashboard"), icon: LayoutGrid },
     { key: "sales", label: L("Shitjet", "Sales"), icon: TrendingUp },
     { key: "stats", label: L("Statistika", "Statistics"), icon: BarChart3 },
@@ -122,17 +143,25 @@ function Admin() {
     { key: "inventory", label: L("Inventari", "Inventory"), icon: Boxes },
     { key: "catalog", label: L("Katalogu", "Catalog"), icon: Tag },
     { key: "orders", label: L("Porositë", "Orders"), icon: ShoppingCart },
+    { key: "notifications", label: L("Njoftimet", "Notifications"), icon: Bell },
     { key: "shipping", label: L("Transporti", "Shipping"), icon: Truck },
     { key: "customers", label: L("Klientët", "Customers"), icon: Users },
     { key: "marketing", label: L("Marketing", "Marketing"), icon: Ticket },
     { key: "homepage", label: L("Ballina", "Homepage"), icon: Home },
     { key: "blog", label: L("Blog", "Blog"), icon: Newspaper },
     { key: "messages", label: L("Mesazhet", "Messages"), icon: Inbox },
+    { key: "audit", label: L("Regjistri i aktivitetit", "Activity log"), icon: ScrollText },
     { key: "settings", label: L("Cilësimet", "Settings"), icon: Settings },
-    { key: "admins", label: L("Adminët", "Admins"), icon: Users },
+    { key: "admins", label: L("Rolet & Adminët", "Roles & Admins"), icon: Users },
   ];
 
+  const allowed: NavKey[] | null =
+    role === "admin" ? null : role === "manager" ? MANAGER_NAV : EDITOR_NAV;
+  const navItems = allowed ? allNav.filter((n) => allowed.includes(n.key)) : allNav;
+  const canSee = (k: NavKey) => !allowed || allowed.includes(k);
+
   const currentLabel = navItems.find((n) => n.key === nav)?.label ?? "";
+  const roleBadge = role === "admin" ? L("Admin", "Admin") : role === "manager" ? L("Menaxher", "Manager") : L("Editor", "Editor");
 
   return (
     <div className="fixed inset-0 flex bg-neutral-100">
@@ -142,7 +171,10 @@ function Admin() {
       >
         <div className="flex items-center gap-3 px-6 py-5 border-b border-neutral-800">
           <div className="grid h-9 w-9 place-items-center rounded-full bg-white text-neutral-900 font-display text-sm font-semibold">D</div>
-          <div className="font-display text-xl text-white">Dream Studio</div>
+          <div className="min-w-0">
+            <div className="font-display text-xl text-white leading-none">Dream Studio</div>
+            <div className="mt-1 text-[11px] uppercase tracking-wide text-neutral-400">{roleBadge}</div>
+          </div>
         </div>
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
           {navItems.map((it) => {
@@ -181,27 +213,41 @@ function Admin() {
             </button>
             <h1 className="font-display text-xl lg:text-2xl truncate">{currentLabel}</h1>
           </div>
-          <a href="/" target="_blank" rel="noreferrer" className="grid h-9 w-9 place-items-center rounded-lg text-neutral-600 hover:bg-neutral-100" title={L("Shiko faqen", "View site")}>
-            <ExternalLink className="h-4 w-4" />
-          </a>
+          <div className="flex items-center gap-1">
+            {canSee("notifications") && <NotificationsBell onOpen={() => setNav("notifications")} />}
+            <a href="/" target="_blank" rel="noreferrer" className="grid h-9 w-9 place-items-center rounded-lg text-neutral-600 hover:bg-neutral-100" title={L("Shiko faqen", "View site")}>
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </div>
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 lg:p-8">
-          {nav === "dashboard" && <Dashboard lang={lang} />}
-          {nav === "orders" && <OrdersView lang={lang} tr={tr} />}
-          {nav === "sales" && <SalesView lang={lang} />}
-          {nav === "stats" && <StatsView lang={lang} />}
-          {nav === "products" && <ProductsPanel />}
-          {nav === "inventory" && <InventoryView lang={lang} />}
-          {nav === "catalog" && <CatalogPanel />}
-          {nav === "customers" && <CustomersPanel />}
-          {nav === "shipping" && <ShippingPanel />}
-          {nav === "marketing" && <MarketingPanel />}
-          {nav === "homepage" && <HomepagePanel />}
-          {nav === "blog" && <BlogPanel />}
-          {nav === "messages" && <MessagesPanel />}
-          {nav === "settings" && <SettingsPanel />}
-          {nav === "admins" && <AdminsPanel />}
+          {!canSee(nav) && (
+            <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center text-sm text-neutral-500">
+              {L("Roli i juaj nuk ka akses në këtë seksion.", "Your role has no access to this section.")}
+            </div>
+          )}
+          {canSee(nav) && (
+            <>
+              {nav === "dashboard" && <Dashboard lang={lang} />}
+              {nav === "orders" && <OrdersView lang={lang} tr={tr} />}
+              {nav === "sales" && <SalesView lang={lang} />}
+              {nav === "stats" && <StatsView lang={lang} />}
+              {nav === "products" && <ProductsPanel />}
+              {nav === "inventory" && <InventoryView lang={lang} />}
+              {nav === "catalog" && <CatalogPanel />}
+              {nav === "customers" && <CustomersPanel />}
+              {nav === "shipping" && <ShippingPanel />}
+              {nav === "marketing" && <MarketingPanel />}
+              {nav === "homepage" && <HomepagePanel />}
+              {nav === "blog" && <BlogPanel />}
+              {nav === "messages" && <MessagesPanel />}
+              {nav === "notifications" && <NotificationsPanel />}
+              {nav === "audit" && <AuditPanel />}
+              {nav === "settings" && <SettingsPanel />}
+              {nav === "admins" && <AdminsPanel />}
+            </>
+          )}
         </main>
       </div>
     </div>
