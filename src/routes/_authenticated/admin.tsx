@@ -532,70 +532,176 @@ function SalesView({ lang }: { lang: string }) {
   );
 }
 
+type StatRow = { label: string; orders: number; revenue: number; share: string };
+
 function StatsView({ lang }: { lang: string }) {
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const { data } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: async () => {
-      const { data } = await supabase.from("orders").select("status");
-      return data ?? [];
+      const { data } = await supabase.from("orders").select("status,total,created_at");
+      return (data ?? []) as { status: string; total: number; created_at: string }[];
     },
   });
+  const list = data ?? [];
   const counts: Record<string, number> = {};
-  (data ?? []).forEach((o: any) => { counts[o.status] = (counts[o.status] ?? 0) + 1; });
+  const revByStatus: Record<string, number> = {};
+  list.forEach((o) => {
+    counts[o.status] = (counts[o.status] ?? 0) + 1;
+    revByStatus[o.status] = (revByStatus[o.status] ?? 0) + Number(o.total || 0);
+  });
+  const total = list.length || 1;
+
+  const statusRows: StatRow[] = STATUSES.map((s) => ({
+    label: s,
+    orders: counts[s] ?? 0,
+    revenue: revByStatus[s] ?? 0,
+    share: `${Math.round(((counts[s] ?? 0) / total) * 100)}%`,
+  }));
+
+  const byMonth: Record<string, { orders: number; revenue: number }> = {};
+  list.forEach((o) => {
+    const k = new Date(o.created_at).toISOString().slice(0, 7);
+    byMonth[k] = byMonth[k] ?? { orders: 0, revenue: 0 };
+    byMonth[k].orders += 1;
+    byMonth[k].revenue += Number(o.total || 0);
+  });
+  const monthRows: StatRow[] = Object.entries(byMonth)
+    .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+    .map(([k, v]) => ({ label: k, orders: v.orders, revenue: v.revenue, share: "" }));
+
+  const cols: Column<StatRow>[] = [
+    { key: "label", label: L("Kategoria", "Group"), get: (r) => r.label },
+    { key: "orders", label: L("Porosi", "Orders"), get: (r) => r.orders },
+    { key: "revenue", label: L("Xhiro (EUR)", "Revenue (EUR)"), get: (r) => r.revenue.toFixed(2) },
+    { key: "share", label: L("Pjesa", "Share"), get: (r) => r.share },
+  ];
+
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-      <h2 className="font-display text-lg mb-4">{L("Porositë sipas statusit", "Orders by status")}</h2>
-      <div className="space-y-3">
-        {STATUSES.map((s) => {
-          const n = counts[s] ?? 0;
-          const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
-          const pct = Math.round((n / total) * 100);
-          return (
-            <div key={s}>
-              <div className="flex justify-between text-sm mb-1"><span className="capitalize">{s}</span><span className="text-neutral-500">{n}</span></div>
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-lg">{L("Porositë sipas statusit", "Orders by status")}</h2>
+          <ExportButtons
+            entity="stats"
+            filename={`dream-studio-statistika-status-${new Date().toISOString().slice(0, 10)}`}
+            title={L("Raport statistikor — sipas statusit", "Statistics report — by status")}
+            columns={cols}
+            rows={statusRows}
+            labels={{ csv: L("Eksport CSV", "Export CSV"), pdf: L("Eksport PDF", "Export PDF"), empty: L("Nuk ka të dhëna", "Nothing to export") }}
+          />
+        </div>
+        <div className="space-y-3">
+          {statusRows.map((r) => (
+            <div key={r.label}>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="capitalize">{r.label}</span>
+                <span className="text-neutral-500">{r.orders} · {formatEur(r.revenue)}</span>
+              </div>
               <div className="h-2 rounded-full bg-neutral-100 overflow-hidden">
-                <div className="h-full bg-[var(--pink-deep,#e91e63)]" style={{ width: `${pct}%` }} />
+                <div className="h-full bg-[var(--pink-deep,#e91e63)]" style={{ width: r.share || "0%" }} />
               </div>
             </div>
-          );
-        })}
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-lg">{L("Shitjet sipas mujore", "Sales by month")}</h2>
+          <ExportButtons
+            entity="stats"
+            filename={`dream-studio-statistika-mujore-${new Date().toISOString().slice(0, 10)}`}
+            title={L("Raport statistikor — sipas mujit", "Statistics report — by month")}
+            columns={cols}
+            rows={monthRows}
+            footer={`${L("Xhiro totale", "Total revenue")}: ${formatEur(monthRows.reduce((a, r) => a + r.revenue, 0))}`}
+            labels={{ csv: L("Eksport CSV", "Export CSV"), pdf: L("Eksport PDF", "Export PDF"), empty: L("Nuk ka të dhëna", "Nothing to export") }}
+          />
+        </div>
+        <table className="w-full text-sm">
+          <thead className="text-left text-xs uppercase text-neutral-500">
+            <tr><th className="py-2">{L("Muaji", "Month")}</th><th className="py-2 text-right">{L("Porosi", "Orders")}</th><th className="py-2 text-right">{L("Xhiro", "Revenue")}</th></tr>
+          </thead>
+          <tbody>
+            {monthRows.map((r) => (
+              <tr key={r.label} className="border-t border-neutral-100">
+                <td className="py-2">{r.label}</td>
+                <td className="py-2 text-right">{r.orders}</td>
+                <td className="py-2 text-right font-medium">{formatEur(r.revenue)}</td>
+              </tr>
+            ))}
+            {monthRows.length === 0 && <tr><td colSpan={3} className="py-8 text-center text-neutral-500">{L("Asnjë porosi", "No orders")}</td></tr>}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
+
+type InvRow = { id: string; name_sq: string; name_en: string; stock: number; active: boolean; price: number };
 
 function InventoryView({ lang }: { lang: string }) {
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const { data: products } = useQuery({
     queryKey: ["admin-inventory"],
     queryFn: async () => {
-      const { data } = await supabase.from("products").select("id,name_sq,name_en,stock,active").order("stock", { ascending: true });
-      return data ?? [];
+      const { data } = await supabase.from("products").select("id,name_sq,name_en,stock,active,price").order("stock", { ascending: true });
+      return (data ?? []) as InvRow[];
     },
   });
+  const rows = products ?? [];
+  const cols: Column<InvRow>[] = [
+    { key: "name", label: L("Produkti", "Product"), get: (p) => (lang === "sq" ? p.name_sq : p.name_en) },
+    { key: "stock", label: L("Stoku", "Stock"), get: (p) => p.stock },
+    { key: "price", label: L("Çmimi (EUR)", "Price (EUR)"), get: (p) => Number(p.price).toFixed(2) },
+    { key: "value", label: L("Vlera e stokut (EUR)", "Stock value (EUR)"), get: (p) => (Number(p.price) * p.stock).toFixed(2) },
+    { key: "state", label: L("Statusi", "Status"), get: (p) => (p.stock === 0 ? L("Pa stok", "Out") : p.stock < 5 ? L("Pak", "Low") : "OK") },
+    { key: "active", label: L("Aktiv", "Active"), get: (p) => (p.active ? "yes" : "no") },
+  ];
+  const stockValue = rows.reduce((a, p) => a + Number(p.price) * p.stock, 0);
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-      <table className="w-full text-sm">
-        <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
-          <tr><th className="px-4 py-3">{L("Produkti", "Product")}</th><th className="px-4 py-3">{L("Stoku", "Stock")}</th><th className="px-4 py-3">{L("Statusi", "Status")}</th></tr>
-        </thead>
-        <tbody>
-          {(products ?? []).map((p: any) => (
-            <tr key={p.id} className="border-t border-neutral-100">
-              <td className="px-4 py-3 font-medium">{lang === "sq" ? p.name_sq : p.name_en}</td>
-              <td className="px-4 py-3">
-                <span className={p.stock === 0 ? "text-red-600 font-medium" : p.stock < 5 ? "text-amber-600 font-medium" : ""}>{p.stock}</span>
-              </td>
-              <td className="px-4 py-3">
-                {p.stock === 0 ? <span className="rounded-full bg-red-50 text-red-700 px-2.5 py-0.5 text-xs">{L("Pa stok", "Out")}</span>
-                  : p.stock < 5 ? <span className="rounded-full bg-amber-50 text-amber-700 px-2.5 py-0.5 text-xs">{L("Pak", "Low")}</span>
-                  : <span className="rounded-full bg-green-50 text-green-700 px-2.5 py-0.5 text-xs">OK</span>}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+        <div className="text-xs text-neutral-500">
+          {rows.length} {L("produkte", "products")} · {L("vlera e stokut", "stock value")} {formatEur(stockValue)}
+        </div>
+        <ExportButtons
+          entity="inventory"
+          filename={`dream-studio-inventari-${new Date().toISOString().slice(0, 10)}`}
+          title={L("Raport i inventarit", "Inventory report")}
+          subtitle={`${rows.length} ${L("produkte", "products")}`}
+          columns={cols}
+          rows={rows}
+          footer={`${L("Vlera e stokut", "Stock value")}: ${formatEur(stockValue)}`}
+          labels={{ csv: L("Eksport CSV", "Export CSV"), pdf: L("Eksport PDF", "Export PDF"), empty: L("Nuk ka të dhëna", "Nothing to export") }}
+        />
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <table className="w-full text-sm">
+          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+            <tr><th className="px-4 py-3">{L("Produkti", "Product")}</th><th className="px-4 py-3">{L("Stoku", "Stock")}</th><th className="px-4 py-3 hidden sm:table-cell">{L("Vlera", "Value")}</th><th className="px-4 py-3">{L("Statusi", "Status")}</th></tr>
+          </thead>
+          <tbody>
+            {rows.map((p) => (
+              <tr key={p.id} className="border-t border-neutral-100">
+                <td className="px-4 py-3 font-medium">{lang === "sq" ? p.name_sq : p.name_en}</td>
+                <td className="px-4 py-3">
+                  <span className={p.stock === 0 ? "text-red-600 font-medium" : p.stock < 5 ? "text-amber-600 font-medium" : ""}>{p.stock}</span>
+                </td>
+                <td className="px-4 py-3 hidden sm:table-cell text-neutral-500">{formatEur(Number(p.price) * p.stock)}</td>
+                <td className="px-4 py-3">
+                  {p.stock === 0 ? <span className="rounded-full bg-red-50 text-red-700 px-2.5 py-0.5 text-xs">{L("Pa stok", "Out")}</span>
+                    : p.stock < 5 ? <span className="rounded-full bg-amber-50 text-amber-700 px-2.5 py-0.5 text-xs">{L("Pak", "Low")}</span>
+                    : <span className="rounded-full bg-green-50 text-green-700 px-2.5 py-0.5 text-xs">OK</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
