@@ -447,9 +447,21 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
             </button>
           )}
         </div>
-        <div className="mt-3 text-xs text-neutral-500">
-          {isLoading ? "…" : `${filtered.length} ${L("porosi", "orders")}`}
-          {filtered.length > 0 && ` · ${formatEur(filtered.reduce((a, o) => a + Number(o.total), 0))}`}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs text-neutral-500">
+            {isLoading ? "…" : `${filtered.length} ${L("porosi", "orders")}`}
+            {filtered.length > 0 && ` · ${formatEur(filtered.reduce((a, o) => a + Number(o.total), 0))}`}
+          </div>
+          <ExportButtons
+            entity="orders"
+            filename={`dream-studio-porosite-${new Date().toISOString().slice(0, 10)}`}
+            title={L("Raport i porosive", "Orders report")}
+            subtitle={`${filtered.length} ${L("porosi", "orders")}`}
+            columns={exportColumns}
+            rows={filtered}
+            footer={`${L("Totali", "Total")}: ${formatEur(filtered.reduce((a, o) => a + Number(o.total), 0))}`}
+            labels={{ csv: L("Eksport CSV", "Export CSV"), pdf: L("Eksport PDF", "Export PDF"), empty: L("Nuk ka të dhëna", "Nothing to export") }}
+          />
         </div>
       </div>
 
