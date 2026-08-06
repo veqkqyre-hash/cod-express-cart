@@ -389,10 +389,30 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
   function clearFilters() { setStatus(""); setCity(""); setSearch(""); setFrom(""); setTo(""); }
 
   async function updateStatus(id: string, newStatus: string) {
+    const prev = (orders ?? []).find((o) => o.id === id);
     const { error } = await supabase.from("orders").update({ status: newStatus as any }).eq("id", id);
     if (error) toast.error(error.message);
-    else { toast.success(lang === "sq" ? "Statusi u përditësua" : "Status updated"); refetch(); }
+    else {
+      toast.success(lang === "sq" ? "Statusi u përditësua" : "Status updated");
+      logAction("order.status_changed", "orders", id, {
+        order_number: prev?.order_number, from: prev?.status, to: newStatus,
+      });
+      refetch();
+    }
   }
+
+  const exportColumns: Column<Order>[] = [
+    { key: "order_number", label: L("Nr. porosisë", "Order #"), get: (o) => o.order_number },
+    { key: "created_at", label: L("Data", "Date"), get: (o) => new Date(o.created_at).toLocaleString() },
+    { key: "customer_name", label: L("Klienti", "Customer"), get: (o) => o.customer_name },
+    { key: "phone", label: L("Telefoni", "Phone"), get: (o) => o.phone },
+    { key: "email", label: "Email", get: (o) => o.email ?? "" },
+    { key: "city", label: L("Qyteti", "City"), get: (o) => o.city },
+    { key: "address", label: L("Adresa", "Address"), get: (o) => `${o.address}${o.postal_code ? ", " + o.postal_code : ""}` },
+    { key: "status", label: L("Statusi", "Status"), get: (o) => o.status },
+    { key: "subtotal", label: L("Nëntotali", "Subtotal"), get: (o) => Number(o.subtotal).toFixed(2) },
+    { key: "total", label: L("Totali", "Total"), get: (o) => Number(o.total).toFixed(2) },
+  ];
 
   const openOrder = filtered.find((o) => o.id === openId) ?? null;
   const inputCls = "rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-200";
