@@ -21,6 +21,7 @@ import { CartProvider } from "@/lib/cart";
 import { WishlistProvider } from "@/lib/wishlist";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { VisitTracker } from "@/components/visit-tracker";
 
 function NotFoundComponent() {
   return (
@@ -104,6 +105,7 @@ function RootComponent() {
                 <SiteFooter />
               </div>
             )}
+            <VisitTracker />
             <Toaster position="top-center" richColors />
           </WishlistProvider>
         </CartProvider>

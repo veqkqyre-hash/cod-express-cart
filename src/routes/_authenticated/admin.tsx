@@ -8,12 +8,14 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
 import { CustomersPanel } from "@/components/admin-customers-panel";
 import { AuditPanel } from "@/components/admin-audit-panel";
+import { VisitorsPanel } from "@/components/admin-visitors-panel";
+import { printOrders } from "@/lib/bulk-print";
 import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
 import { ExportButtons } from "@/components/admin-export";
 import type { Column } from "@/lib/export";
@@ -54,12 +56,12 @@ const STATUS_COLOR: Record<string, string> = {
 type NavKey =
   | "dashboard" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
-  | "messages" | "notifications" | "audit" | "settings" | "admins";
+  | "messages" | "notifications" | "audit" | "visitors" | "settings" | "admins";
 
 type Role = "admin" | "manager" | "editor";
 
 // Which sections each role can open (admin sees everything)
-const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats"];
+const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors"];
 const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products"];
 
 function Admin() {
@@ -150,6 +152,7 @@ function Admin() {
     { key: "homepage", label: L("Ballina", "Homepage"), icon: Home },
     { key: "blog", label: L("Blog", "Blog"), icon: Newspaper },
     { key: "messages", label: L("Mesazhet", "Messages"), icon: Inbox },
+    { key: "visitors", label: L("Vizitorët", "Visitors"), icon: Globe },
     { key: "audit", label: L("Regjistri i aktivitetit", "Activity log"), icon: ScrollText },
     { key: "settings", label: L("Cilësimet", "Settings"), icon: Settings },
     { key: "admins", label: L("Rolet & Adminët", "Roles & Admins"), icon: Users },
@@ -243,6 +246,7 @@ function Admin() {
               {nav === "blog" && <BlogPanel />}
               {nav === "messages" && <MessagesPanel />}
               {nav === "notifications" && <NotificationsPanel />}
+              {nav === "visitors" && <VisitorsPanel />}
               {nav === "audit" && <AuditPanel />}
               {nav === "settings" && <SettingsPanel />}
               {nav === "admins" && <AdminsPanel />}
@@ -414,6 +418,35 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
     { key: "total", label: L("Totali", "Total"), get: (o) => Number(o.total).toFixed(2) },
   ];
 
+  async function printAll() {
+    if (filtered.length === 0) return toast.error(L("Nuk ka porosi", "No orders"));
+    const ids = filtered.map((o) => o.id);
+    const { data: items, error } = await supabase
+      .from("order_items")
+      .select("order_id,product_name,quantity,unit_price,subtotal")
+      .in("order_id", ids);
+    if (error) return toast.error(error.message);
+    const byOrder: Record<string, any[]> = {};
+    for (const it of items ?? []) {
+      (byOrder[it.order_id] ??= []).push(it);
+    }
+    const ok = printOrders(filtered as any, byOrder, {
+      invoice: L("Faturë / Fletëdërgesë", "Invoice / Packing slip"),
+      order: L("Porosia", "Order"),
+      customer: L("Klienti", "Customer"),
+      address: L("Adresa", "Address"),
+      item: L("Produkti", "Item"),
+      qty: L("Sasia", "Qty"),
+      price: L("Çmimi", "Price"),
+      total: L("Totali", "Total"),
+      status: L("Statusi", "Status"),
+      cod: L("Pagesa në dorëzim", "Cash on delivery"),
+      notes: L("Shënime", "Notes"),
+    });
+    if (!ok) return toast.error("Pop-up blocked");
+    logAction("print.orders", "orders", null, { count: filtered.length, status: status || "all" });
+  }
+
   const openOrder = filtered.find((o) => o.id === openId) ?? null;
   const inputCls = "rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-200";
 
@@ -452,6 +485,14 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
             {isLoading ? "…" : `${filtered.length} ${L("porosi", "orders")}`}
             {filtered.length > 0 && ` · ${formatEur(filtered.reduce((a, o) => a + Number(o.total), 0))}`}
           </div>
+          <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={printAll}
+            disabled={filtered.length === 0}
+            className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-50 disabled:opacity-40"
+          >
+            <PrinterIcon className="h-4 w-4" /> {L(`Printo ${filtered.length} porosi`, `Print ${filtered.length} orders`)}
+          </button>
           <ExportButtons
             entity="orders"
             filename={`dream-studio-porosite-${new Date().toISOString().slice(0, 10)}`}
@@ -462,6 +503,7 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
             footer={`${L("Totali", "Total")}: ${formatEur(filtered.reduce((a, o) => a + Number(o.total), 0))}`}
             labels={{ csv: L("Eksport CSV", "Export CSV"), pdf: L("Eksport PDF", "Export PDF"), empty: L("Nuk ka të dhëna", "Nothing to export") }}
           />
+          </div>
         </div>
       </div>
 

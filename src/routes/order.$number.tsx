@@ -4,6 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
+import { OrderTimeline } from "@/components/order-timeline";
 
 export const Route = createFileRoute("/order/$number")({
   component: OrderConfirmation,
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/order/$number")({
 
 function OrderConfirmation() {
   const { number } = Route.useParams();
-  const { tr } = useI18n();
+  const { tr, lang } = useI18n();
 
   const { data, isLoading } = useQuery({
     queryKey: ["order", number],
@@ -52,7 +53,13 @@ function OrderConfirmation() {
       </div>
 
       {order && (
-        <div className="mt-10 rounded-2xl border border-border bg-card p-6 shadow-soft">
+        <div className="mt-10">
+          <OrderTimeline status={order.status} createdAt={order.created_at} updatedAt={order.updated_at} lang={lang} />
+        </div>
+      )}
+
+      {order && (
+        <div className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-soft">
           <div className="grid gap-4 sm:grid-cols-2 text-sm">
             <div>
               <div className="text-muted-foreground text-xs uppercase tracking-wide">{tr("customer")}</div>
