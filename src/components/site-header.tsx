@@ -82,6 +82,8 @@ export function SiteHeader() {
             </div>
             <Link to="/shop" search={{}} className="hover:text-[var(--pink-deep)] transition-colors">{tr("newArrivals")}</Link>
             <a href="#brands" className="hover:text-[var(--pink-deep)] transition-colors">{tr("brands")}</a>
+            <Link to="/blog" className="hover:text-[var(--pink-deep)] transition-colors">Blog</Link>
+            <Link to="/contact" className="hover:text-[var(--pink-deep)] transition-colors">{tr("contact")}</Link>
             {signedIn && <Link to="/account" className="hover:text-[var(--pink-deep)] transition-colors">{tr("myOrders")}</Link>}
           </nav>
 
