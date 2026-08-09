@@ -822,6 +822,9 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
             {tr("paymentMethod")}: <strong>{tr("cod")}</strong>
           </div>
 
+          <CustomerMessage order={order} lang={lang} />
+
+
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 no-print">
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">{tr("updateStatus")}:</label>
