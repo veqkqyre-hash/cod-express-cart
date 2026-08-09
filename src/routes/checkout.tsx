@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { useCart, formatEur } from "@/lib/cart";
 import { toast } from "sonner";
-import { Banknote } from "lucide-react";
+import { Banknote, Tag, X as XIcon, Truck } from "lucide-react";
+import { useShipping, validateCoupon } from "@/lib/checkout-extras";
 
 export const Route = createFileRoute("/checkout")({
   component: Checkout,
@@ -40,6 +41,33 @@ function Checkout() {
   const [submitting, setSubmitting] = useState(false);
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
   const [userEmail, setUserEmail] = useState<string>("");
+  const [city, setCity] = useState("");
+  const [code, setCode] = useState("");
+  const [checking, setChecking] = useState(false);
+  const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
+
+  const { fee: shippingFee, zone, freeOver, isFree } = useShipping(city, subtotal);
+  const discount = coupon ? Math.min(coupon.discount, subtotal) : 0;
+  const total = Math.max(0, subtotal - discount) + shippingFee;
+
+  async function applyCoupon() {
+    setChecking(true);
+    const res = await validateCoupon(code, subtotal);
+    setChecking(false);
+    if ("coupon" in res && res.coupon) {
+      setCoupon(res.coupon);
+      toast.success(lang === "sq" ? `Kuponi ${res.coupon.code} u aplikua` : `Coupon ${res.coupon.code} applied`);
+      return;
+    }
+    const msgs: Record<string, string> = {
+      empty: lang === "sq" ? "Shkruani kodin" : "Enter a code",
+      invalid: lang === "sq" ? "Kod i pavlefshëm" : "Invalid code",
+      expired: lang === "sq" ? "Kuponi ka skaduar" : "Coupon expired",
+      min: lang === "sq" ? "Porosia nuk arrin minimumin e kuponit" : "Order below coupon minimum",
+    };
+    setCoupon(null);
+    toast.error(msgs[(res as { error: string }).error] ?? msgs.invalid);
+  }
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -88,10 +116,12 @@ function Checkout() {
           city: parsed.data.city,
           address: parsed.data.address,
           postal_code: parsed.data.postal_code || null,
-          notes: parsed.data.notes || null,
+          notes: [parsed.data.notes || null, coupon ? `Kupon: ${coupon.code} (-${discount.toFixed(2)} EUR)` : null]
+            .filter(Boolean)
+            .join(" | ") || null,
           subtotal,
-          shipping_fee: 0,
-          total: subtotal,
+          shipping_fee: shippingFee,
+          total,
         })
         .select("id, order_number")
         .single();
@@ -128,7 +158,17 @@ function Checkout() {
               <Field label={tr("phone")} name="phone" required type="tel" />
               <Field label={tr("email")} name="email" type="email" defaultValue={userEmail} />
             </div>
-            <Field label={tr("city")} name="city" required />
+            <div>
+              <label className="mb-1.5 block text-sm font-medium">{tr("city")}<span className="text-destructive"> *</span></label>
+              <input
+                name="city"
+                required
+                maxLength={100}
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
             <Field label={tr("address")} name="address" required />
             <Field label={tr("postalCode")} name="postal_code" />
             <div>
@@ -160,11 +200,51 @@ function Checkout() {
               </div>
             ))}
           </div>
+          <div className="mt-4 border-t border-border pt-4">
+            <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
+              <Tag className="h-3.5 w-3.5" /> {lang === "sq" ? "Kupon zbritje" : "Discount coupon"}
+            </label>
+            {coupon ? (
+              <div className="flex items-center justify-between rounded-xl bg-accent/40 px-3 py-2 text-sm">
+                <span className="font-medium">{coupon.code}</span>
+                <button type="button" onClick={() => { setCoupon(null); setCode(""); }} className="grid h-6 w-6 place-items-center rounded-full hover:bg-muted">
+                  <XIcon className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder={lang === "sq" ? "KODI" : "CODE"}
+                  maxLength={40}
+                  className="min-w-0 flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+                <button type="button" onClick={applyCoupon} disabled={checking} className="shrink-0 rounded-xl border border-border px-4 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50">
+                  {checking ? "…" : lang === "sq" ? "Apliko" : "Apply"}
+                </button>
+              </div>
+            )}
+          </div>
+
           <div className="mt-4 space-y-2 text-sm border-t border-border pt-4">
             <div className="flex justify-between"><span>{tr("subtotal")}</span><span>{formatEur(subtotal)}</span></div>
-            <div className="flex justify-between"><span>{tr("shipping")}</span><span>{tr("freeShipping")}</span></div>
+            {discount > 0 && (
+              <div className="flex justify-between text-green-600"><span>{lang === "sq" ? "Zbritja" : "Discount"}</span><span>-{formatEur(discount)}</span></div>
+            )}
+            <div className="flex justify-between">
+              <span className="inline-flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> {tr("shipping")}{zone ? ` · ${zone}` : ""}</span>
+              <span>{shippingFee === 0 ? tr("freeShipping") : formatEur(shippingFee)}</span>
+            </div>
+            {!isFree && (
+              <div className="text-xs text-muted-foreground">
+                {lang === "sq"
+                  ? `Shto ${formatEur(Math.max(0, freeOver - subtotal))} për transport falas`
+                  : `Add ${formatEur(Math.max(0, freeOver - subtotal))} for free shipping`}
+              </div>
+            )}
             <div className="flex justify-between font-display text-xl pt-2 border-t border-border">
-              <span>{tr("total")}</span><span>{formatEur(subtotal)}</span>
+              <span>{tr("total")}</span><span>{formatEur(total)}</span>
             </div>
           </div>
           <button
