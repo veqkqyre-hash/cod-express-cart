@@ -65,9 +65,11 @@ export function SiteFooter() {
             <ul className="space-y-2 text-sm text-white/70">
               <li><Link to="/account" className="hover:text-white transition">{tr("account")}</Link></li>
               <li><Link to="/cart" className="hover:text-white transition">{tr("cart")}</Link></li>
-              <li><a href="#" className="hover:text-white transition">FAQ</a></li>
-              <li><a href="#" className="hover:text-white transition">{tr("shippingPolicy")}</a></li>
-              <li><a href="#" className="hover:text-white transition">{tr("returns")}</a></li>
+              <li><Link to="/faq" className="hover:text-white transition">FAQ</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition">{tr("contact")}</Link></li>
+              <li><Link to="/blog" className="hover:text-white transition">Blog</Link></li>
+              <li><Link to="/shipping" className="hover:text-white transition">{tr("shippingPolicy")}</Link></li>
+              <li><Link to="/returns" className="hover:text-white transition">{tr("returns")}</Link></li>
             </ul>
           </div>
 
@@ -85,8 +87,8 @@ export function SiteFooter() {
           <div className="container-app flex flex-col gap-3 py-5 text-xs text-white/50 md:flex-row md:items-center md:justify-between">
             <div>© {new Date().getFullYear()} Dream Studio. {lang === "sq" ? "Të gjitha të drejtat e rezervuara." : "All rights reserved."}</div>
             <div className="flex items-center gap-4">
-              <a href="#" className="hover:text-white transition">{lang === "sq" ? "Privatësia" : "Privacy"}</a>
-              <a href="#" className="hover:text-white transition">{lang === "sq" ? "Kushtet" : "Terms"}</a>
+              <Link to="/privacy" className="hover:text-white transition">{lang === "sq" ? "Privatësia" : "Privacy"}</Link>
+              <Link to="/terms" className="hover:text-white transition">{lang === "sq" ? "Kushtet" : "Terms"}</Link>
               <span className="opacity-70">{tr("cod")}</span>
             </div>
           </div>
