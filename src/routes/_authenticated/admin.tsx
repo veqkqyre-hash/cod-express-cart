@@ -8,13 +8,15 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
 import { CustomersPanel } from "@/components/admin-customers-panel";
 import { AuditPanel } from "@/components/admin-audit-panel";
 import { VisitorsPanel } from "@/components/admin-visitors-panel";
+import { ReportsPanel } from "@/components/admin-reports-panel";
+import { CustomerMessage } from "@/components/admin-customer-message";
 import { printOrders } from "@/lib/bulk-print";
 import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
 import { ExportButtons } from "@/components/admin-export";
@@ -56,12 +58,12 @@ const STATUS_COLOR: Record<string, string> = {
 type NavKey =
   | "dashboard" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
-  | "messages" | "notifications" | "audit" | "visitors" | "settings" | "admins";
+  | "messages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins";
 
 type Role = "admin" | "manager" | "editor";
 
 // Which sections each role can open (admin sees everything)
-const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors"];
+const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports"];
 const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products"];
 
 function Admin() {
@@ -153,6 +155,7 @@ function Admin() {
     { key: "blog", label: L("Blog", "Blog"), icon: Newspaper },
     { key: "messages", label: L("Mesazhet", "Messages"), icon: Inbox },
     { key: "visitors", label: L("Vizitorët", "Visitors"), icon: Globe },
+    { key: "reports", label: L("Raporte", "Reports"), icon: CalendarDays },
     { key: "audit", label: L("Regjistri i aktivitetit", "Activity log"), icon: ScrollText },
     { key: "settings", label: L("Cilësimet", "Settings"), icon: Settings },
     { key: "admins", label: L("Rolet & Adminët", "Roles & Admins"), icon: Users },
@@ -247,6 +250,7 @@ function Admin() {
               {nav === "messages" && <MessagesPanel />}
               {nav === "notifications" && <NotificationsPanel />}
               {nav === "visitors" && <VisitorsPanel />}
+              {nav === "reports" && <ReportsPanel />}
               {nav === "audit" && <AuditPanel />}
               {nav === "settings" && <SettingsPanel />}
               {nav === "admins" && <AdminsPanel />}
@@ -821,6 +825,9 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
           <div className="mt-4 text-sm text-center rounded-xl bg-accent/40 p-3">
             {tr("paymentMethod")}: <strong>{tr("cod")}</strong>
           </div>
+
+          <CustomerMessage order={order} lang={lang} />
+
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 no-print">
             <div className="flex items-center gap-2">
