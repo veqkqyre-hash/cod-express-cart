@@ -3,16 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { InfoPage, InfoBlock, metaFor } from "@/components/info-page";
+import { useInfoPage, INFO_DEFAULTS } from "@/lib/info-content";
 import { formatEur } from "@/lib/cart";
 
 export const Route = createFileRoute("/shipping")({
   component: Shipping,
-  head: () => metaFor("/shipping", "Transporti", "Tarifat e transportit, kohëzgjatja e dërgesës dhe pagesa në dorëzim në Kosovë — Dream Studio."),
+  head: () => metaFor("/shipping", INFO_DEFAULTS.shipping.title_sq, INFO_DEFAULTS.shipping.meta_sq),
 });
 
 function Shipping() {
   const { lang } = useI18n();
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
+  const page = useInfoPage("shipping");
 
   const { data } = useQuery({
     queryKey: ["shipping-rates-public"],
@@ -26,8 +28,8 @@ function Shipping() {
 
   return (
     <InfoPage
-      title={L("Transporti & dërgesa", "Shipping & delivery")}
-      intro={L("Dërgojmë në të gjithë Kosovën me pagesë në dorëzim.", "We deliver across Kosovo with cash on delivery.")}
+      title={lang === "sq" ? page.title_sq : page.title_en}
+      intro={lang === "sq" ? page.intro_sq : page.intro_en}
     >
       <InfoBlock heading={L("Tarifat", "Rates")}>
         {rates.length === 0 ? (
@@ -50,16 +52,15 @@ function Shipping() {
         )}
       </InfoBlock>
 
-      <InfoBlock heading={L("Kohëzgjatja", "Delivery time")}>
-        <p>{L("Prishtinë: 1 ditë pune. Qytetet e tjera: 1–2 ditë pune. Porositë e bëra pas orës 16:00 përpunohen ditën e nesërme.", "Prishtina: 1 working day. Other cities: 1–2 working days. Orders after 16:00 are processed the next day.")}</p>
-      </InfoBlock>
+      {page.blocks.map((b, i) => (
+        <InfoBlock key={i} heading={lang === "sq" ? b.h_sq : b.h_en}>
+          <p className="whitespace-pre-line">{lang === "sq" ? b.b_sq : b.b_en}</p>
+        </InfoBlock>
+      ))}
 
-      <InfoBlock heading={L("Pagesa në dorëzim (COD)", "Cash on delivery (COD)")}>
-        <p>{L("Paguani me para në dorë kuririn kur pako arrin. Kontrolloni pakon para pagesës.", "Pay the courier in cash when the parcel arrives. You may inspect the parcel before paying.")}</p>
-        <p>
-          <Link to="/faq" className="text-[var(--pink-deep)] hover:underline">{L("Shiko pyetjet e shpeshta", "See the FAQ")}</Link>
-        </p>
-      </InfoBlock>
+      <p className="text-sm">
+        <Link to="/faq" className="text-[var(--pink-deep)] hover:underline">{L("Shiko pyetjet e shpeshta", "See the FAQ")}</Link>
+      </p>
     </InfoPage>
   );
 }
