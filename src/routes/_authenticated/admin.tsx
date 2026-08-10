@@ -831,7 +831,7 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
           </div>
 
           <div className="mt-6 no-print">
-            <OrderTimeline order={order} status={order.status} createdAt={order.created_at} updatedAt={(order as any).updated_at} lang={lang} />
+            <OrderTimeline status={order.status} createdAt={order.created_at} updatedAt={(order as any).updated_at} lang={lang} />
           </div>
 
           <CustomerMessage order={order} lang={lang} />
