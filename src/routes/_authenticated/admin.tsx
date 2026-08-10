@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
@@ -17,6 +17,8 @@ import { AuditPanel } from "@/components/admin-audit-panel";
 import { VisitorsPanel } from "@/components/admin-visitors-panel";
 import { ReportsPanel } from "@/components/admin-reports-panel";
 import { CustomerMessage } from "@/components/admin-customer-message";
+import { PagesPanel } from "@/components/admin-pages-panel";
+import { OrderTimeline } from "@/components/order-timeline";
 import { printOrders } from "@/lib/bulk-print";
 import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
 import { ExportButtons } from "@/components/admin-export";
@@ -58,13 +60,13 @@ const STATUS_COLOR: Record<string, string> = {
 type NavKey =
   | "dashboard" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
-  | "messages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins";
+  | "messages" | "pages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins";
 
 type Role = "admin" | "manager" | "editor";
 
 // Which sections each role can open (admin sees everything)
 const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports"];
-const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products"];
+const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products", "pages"];
 
 function Admin() {
   const { tr, lang } = useI18n();
@@ -154,6 +156,7 @@ function Admin() {
     { key: "homepage", label: L("Ballina", "Homepage"), icon: Home },
     { key: "blog", label: L("Blog", "Blog"), icon: Newspaper },
     { key: "messages", label: L("Mesazhet", "Messages"), icon: Inbox },
+    { key: "pages", label: L("Faqet informative", "Info pages"), icon: FileText },
     { key: "visitors", label: L("Vizitorët", "Visitors"), icon: Globe },
     { key: "reports", label: L("Raporte", "Reports"), icon: CalendarDays },
     { key: "audit", label: L("Regjistri i aktivitetit", "Activity log"), icon: ScrollText },
@@ -248,6 +251,7 @@ function Admin() {
               {nav === "homepage" && <HomepagePanel />}
               {nav === "blog" && <BlogPanel />}
               {nav === "messages" && <MessagesPanel />}
+              {nav === "pages" && <PagesPanel />}
               {nav === "notifications" && <NotificationsPanel />}
               {nav === "visitors" && <VisitorsPanel />}
               {nav === "reports" && <ReportsPanel />}
@@ -824,6 +828,10 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
 
           <div className="mt-4 text-sm text-center rounded-xl bg-accent/40 p-3">
             {tr("paymentMethod")}: <strong>{tr("cod")}</strong>
+          </div>
+
+          <div className="mt-6 no-print">
+            <OrderTimeline status={order.status} createdAt={order.created_at} updatedAt={(order as any).updated_at} lang={lang} />
           </div>
 
           <CustomerMessage order={order} lang={lang} />
