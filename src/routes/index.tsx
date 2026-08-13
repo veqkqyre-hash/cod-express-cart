@@ -35,7 +35,6 @@ export const Route = createFileRoute("/")({
             "Produkte profesionale për thonj: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesë në dorëzim në tërë Kosovën.",
 
           url: "https://cod-express-cart.lovable.app/",
-          telephone: "+383 44 123 456",
           email: "hello@dreamstudio-ks.com",
           priceRange: "€€",
           currenciesAccepted: "EUR",
