@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet, Clock,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
