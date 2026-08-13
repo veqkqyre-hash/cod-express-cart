@@ -228,7 +228,7 @@ function FieldA({ label, name, type = "text", defaultValue, required, step }: { 
   return (
     <div>
       <label className="mb-1.5 block text-sm font-medium">{label}{required && <span className="text-destructive"> *</span>}</label>
-      <input name={name} type={type} step={step} defaultValue={defaultValue} required={required} className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+      <input name={name} type={type} step={step} defaultValue={defaultValue} required={required} autoComplete="off" className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
     </div>
   );
 }
