@@ -78,7 +78,7 @@ ${B.logo_url ? `<div class="c"><img src="${esc(B.logo_url)}" alt="" style="max-w
   ${sale.change_amount != null ? `<div class="row"><span>Kusuri</span><span>${money(Number(sale.change_amount))}</span></div>` : ""}
 </div>
 <hr>
-<div class="c muted">Faleminderit! / Thank you!<br>${esc(STORE.name)}</div>
+<div class="c muted">Faleminderit! / Thank you!<br>${esc(B.business_name)}${B.vat_number ? `<br>TVSH e përfshirë në çmim` : ""}</div>
 </body></html>`;
 
   const w = window.open("", "_blank", `width=${width === 58 ? 320 : 420},height=760`);
