@@ -1,4 +1,5 @@
 // Thermal receipt printing (58mm / 80mm) for POS sales.
+import { cashierDisplay } from "@/lib/cashier";
 
 export type ReceiptItem = { name: string; qty: number; price: number };
 export type ReceiptSale = {
@@ -9,6 +10,7 @@ export type ReceiptSale = {
   paid_amount?: number | null;
   change_amount?: number | null;
   cashier_email?: string | null;
+  cashier_name?: string | null;
 };
 
 const STORE = {
@@ -33,6 +35,7 @@ export function printReceipt(sale: ReceiptSale, items: ReceiptItem[], width: 58 
     )
     .join("");
 
+  const cashier = sale.cashier_email || sale.cashier_name ? cashierDisplay(sale.cashier_email, sale.cashier_name) : "";
   const method = sale.payment_method === "cash" ? "Cash" : sale.payment_method === "card" ? "Card" : "Tjetër";
 
   const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(sale.sale_number)}</title>
@@ -57,7 +60,7 @@ export function printReceipt(sale: ReceiptSale, items: ReceiptItem[], width: 58 
 <div class="muted">
   <div class="row"><span>Nr. shitjes</span><b>${esc(sale.sale_number)}</b></div>
   <div class="row"><span>Data</span><span>${d.toLocaleDateString()} ${d.toLocaleTimeString()}</span></div>
-  ${sale.cashier_email ? `<div class="row"><span>Arkëtari</span><span>${esc(sale.cashier_email)}</span></div>` : ""}
+  ${cashier ? `<div class="row"><span>Arkëtari</span><span>${esc(cashier)}</span></div>` : ""}
 </div>
 <hr>
 <table>${rows}</table>
