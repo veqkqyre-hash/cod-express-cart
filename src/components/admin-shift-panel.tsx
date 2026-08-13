@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
-import { Clock, LockOpen, Lock } from "lucide-react";
+import { Clock, LockOpen, Lock, Trash2 } from "lucide-react";
 
 export type ShiftRow = {
   id: string;
