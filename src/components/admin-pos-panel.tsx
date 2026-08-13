@@ -148,8 +148,7 @@ export function PosPanel() {
     const { data, error } = await supabase.rpc("create_pos_sale", {
       _items: lines.map((l) => ({ product_id: l.product.id, quantity: l.qty })) as never,
       _payment_method: method,
-      _paid_amount: method === "cash" && paid !== "" ? Number(paid) : null,
-      _note: null,
+      ...(method === "cash" && paid !== "" ? { _paid_amount: Number(paid) } : {}),
     });
     setSaving(false);
     if (error) return toast.error(error.message);
