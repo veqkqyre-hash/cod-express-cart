@@ -22,6 +22,7 @@ import { PosPanel } from "@/components/admin-pos-panel";
 import { DashboardCharts } from "@/components/admin-dashboard-charts";
 import { PosSalesPanel } from "@/components/admin-sales-history-panel";
 import { PosReportPanel } from "@/components/admin-pos-report-panel";
+import { ShiftsPanel } from "@/components/admin-shift-panel";
 import { OrderTimeline } from "@/components/order-timeline";
 import { printOrders } from "@/lib/bulk-print";
 import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
@@ -62,14 +63,14 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 type NavKey =
-  | "dashboard" | "pos" | "possales" | "posreport" | "sales" | "stats" | "products" | "inventory" | "catalog"
+  | "dashboard" | "pos" | "possales" | "posreport" | "shifts" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
   | "messages" | "pages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins";
 
 type Role = "admin" | "manager" | "editor";
 
 // Which sections each role can open (admin sees everything)
-const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports", "pos", "possales", "posreport"];
+const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports", "pos", "possales", "posreport", "shifts"];
 const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products", "pages"];
 
 function Admin() {
@@ -150,6 +151,7 @@ function Admin() {
     { key: "pos", label: L("ARKA / SHITJE", "POS / Register"), icon: ScanLine },
     { key: "possales", label: L("Historia e shitjeve", "Sales history"), icon: Receipt },
     { key: "posreport", label: L("Raporti i shitjeve", "Sales report"), icon: Wallet },
+    { key: "shifts", label: L("Sesionet e punës", "Work shifts"), icon: Clock },
     { key: "sales", label: L("Shitjet online", "Online sales"), icon: TrendingUp },
     { key: "stats", label: L("Statistika", "Statistics"), icon: BarChart3 },
     { key: "products", label: L("Produktet", "Products"), icon: Package },
@@ -178,7 +180,7 @@ function Admin() {
 
   // Grupimi i menusë: ARKA lart, pjesa tjetër e adminit poshtë sipas seksioneve
   const navGroups: { title: string; keys: NavKey[] }[] = [
-    { title: L("ARKA / DYQANI", "REGISTER / STORE"), keys: ["pos", "possales", "posreport"] },
+    { title: L("ARKA / DYQANI", "REGISTER / STORE"), keys: ["pos", "possales", "posreport", "shifts"] },
     { title: L("SHITJET ONLINE", "ONLINE SALES"), keys: ["dashboard", "orders", "sales", "stats", "notifications"] },
     { title: L("KATALOGU", "CATALOG"), keys: ["products", "inventory", "catalog", "shipping"] },
     { title: L("KLIENTËT & MARKETINGU", "CUSTOMERS & MARKETING"), keys: ["customers", "marketing", "messages"] },
@@ -280,6 +282,7 @@ function Admin() {
               {nav === "pos" && <PosPanel />}
               {nav === "possales" && <PosSalesPanel />}
               {nav === "posreport" && <PosReportPanel />}
+              {nav === "shifts" && <ShiftsPanel />}
               {nav === "notifications" && <NotificationsPanel />}
               {nav === "visitors" && <VisitorsPanel />}
               {nav === "reports" && <ReportsPanel />}
