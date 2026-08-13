@@ -47,6 +47,7 @@ function Shop() {
         .from("products")
         .select("id,slug,name_sq,name_en,price,image_url,stock,category_id")
         .eq("active", true)
+        .gt("stock", 0)
         .order("created_at", { ascending: false });
       if (category) {
         const cat = categories.data?.find((c) => c.slug === category);
