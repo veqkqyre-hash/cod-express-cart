@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ProductCard, type Product } from "@/components/product-card";
-import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram, Mail, ChevronLeft, ChevronRight, Phone } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import heroNails1 from "@/assets/hero-nails-1.jpg";
@@ -134,10 +134,26 @@ function Home() {
 /* ------------------------------ Sections ------------------------------ */
 
 const HERO_SLIDES = [
-  { src: heroNails1, mobile: heroNails1 },
-  { src: heroNails2, mobile: heroNails2 },
-  { src: heroNails4, mobile: heroNails4 },
-  { src: heroNails3, mobile: heroNails3 },
+  {
+    src: heroNails1,
+    mobile: heroNails1,
+    alt: "Manikyr me gel lak rozë të shkëlqyeshëm — produkte profesionale për thonj nga Dreame Beauty Cosmetics",
+  },
+  {
+    src: heroNails2,
+    mobile: heroNails2,
+    alt: "Set produktesh profesionale për thonj: gel lak, akrilik dhe gel ndërtues, shumicë dhe pakicë në Kosovë",
+  },
+  {
+    src: heroNails4,
+    mobile: heroNails4,
+    alt: "Nail art elegant në formë almond — tipsa, freza dhe dekorime për sallone thonjsh",
+  },
+  {
+    src: heroNails3,
+    mobile: heroNails3,
+    alt: "Lampë UV/LED profesionale për tharjen e gel lakut në sallon thonjsh",
+  },
 ];
 
 function Hero() {
@@ -177,7 +193,7 @@ function Hero() {
 
   return (
     <section
-      className="relative overflow-hidden bg-black select-none"
+      className="relative overflow-hidden bg-black select-none touch-pan-y"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -188,7 +204,8 @@ function Hero() {
           <source media="(max-width: 640px)" srcSet={s.mobile} />
           <img
             src={s.src}
-            alt=""
+            alt={i === idx ? s.alt : ""}
+            title={s.alt}
             width={1600}
             height={900}
             fetchPriority={i === 0 ? "high" : "low"}
@@ -207,19 +224,19 @@ function Hero() {
       <button
         onClick={prev}
         aria-label="Previous slide"
-        className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-10 grid h-12 w-12 md:h-12 md:w-12 place-items-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-md active:scale-95 transition hover:bg-white/25"
+        className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-10 hidden sm:grid h-11 w-11 md:h-12 md:w-12 place-items-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-md active:scale-95 transition hover:bg-white/25"
       >
         <ChevronLeft className="h-6 w-6" />
       </button>
       <button
         onClick={next}
         aria-label="Next slide"
-        className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-10 grid h-12 w-12 md:h-12 md:w-12 place-items-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-md active:scale-95 transition hover:bg-white/25"
+        className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-10 hidden sm:grid h-11 w-11 md:h-12 md:w-12 place-items-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-md active:scale-95 transition hover:bg-white/25"
       >
         <ChevronRight className="h-6 w-6" />
       </button>
 
-      <div className="container-app relative py-16 sm:py-24 md:py-32 lg:py-40 min-h-[520px] sm:min-h-[600px] flex items-center">
+      <div className="container-app relative py-12 sm:py-24 md:py-32 lg:py-40 min-h-[68svh] sm:min-h-[600px] flex items-center">
         <div className="max-w-2xl space-y-5 sm:space-y-7 text-white">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-white backdrop-blur">
             <Sparkles className="h-3 w-3 text-[var(--pink)]" /> {tr("heroBadge")}
@@ -246,6 +263,12 @@ function Hero() {
               className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 sm:px-8 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-white/20"
             >
               {tr("shopCategories")}
+            </a>
+            <a
+              href={`tel:${tr("contactPhone").replace(/\s/g, "")}`}
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--pink)] bg-white px-6 py-3 sm:px-8 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-black transition hover:bg-[var(--pink)] hover:text-white"
+            >
+              <Phone className="h-4 w-4" /> {tr("contactPhone")}
             </a>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 sm:gap-x-7 sm:gap-y-3 pt-2 sm:pt-4 text-[11px] sm:text-xs text-white/80">
