@@ -8,6 +8,10 @@ import { ScanLine, Search, Trash2, Plus, Minus, Printer, Monitor, X, Eraser } fr
 import { printReceipt, type ReceiptSale } from "@/lib/pos-receipt";
 import { ShiftBar, useCurrentShift } from "@/components/admin-shift-panel";
 import { getCashierName, setCashierName, cashierDisplay } from "@/lib/cashier";
+import { logAction } from "@/lib/audit";
+import { ExportButtons } from "@/components/admin-export";
+import type { Column } from "@/lib/export";
+
 
 export type PosProduct = {
   id: string;
