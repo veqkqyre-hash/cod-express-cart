@@ -259,14 +259,33 @@ export function PosPanel() {
     setDone({ sale, items });
     if (autoPrint) printReceipt(sale, items, receiptWidth);
     broadcast({ type: "done", total: Number(sale.total), sale_number: sale.sale_number, change: sale.change_amount });
+
+    // Lidh skanimet/artikujt me shitjen konkrete në audit log
+    const saleId = (raw as unknown as { id?: string }).id ?? null;
+    for (const l of lines) {
+      void logAction("pos.scan_sold", "pos_sales", saleId, {
+        code: l.product.barcode ?? l.product.sku ?? null,
+        product: nameOf(l.product),
+        quantity: l.qty,
+        sale_id: saleId,
+        sale_number: sale.sale_number,
+      });
+    }
+    setScanLog((prev) => prev.map((s) => (s.ok && !s.sale ? { ...s, sale: sale.sale_number } : s)));
+
     setLines([]);
     setPaid("");
     setTerm("");
     refetch();
     refetchShift();
-    toast.success(`${sale.sale_number} · ${formatEur(Number(sale.total))}`);
+    toast.success(`${L("Shitja u regjistrua", "Sale recorded")} · ${sale.sale_number}`, {
+      description: `${formatEur(Number(sale.total))} · ${count} ${L("artikuj", "items")}${
+        sale.change_amount != null ? ` · ${L("kusuri", "change")} ${formatEur(Number(sale.change_amount))}` : ""
+      }`,
+    });
     scanRef.current?.focus();
   }
+
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
