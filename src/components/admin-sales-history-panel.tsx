@@ -9,6 +9,8 @@ import { printReceipt } from "@/lib/pos-receipt";
 import { ExportButtons } from "@/components/admin-export";
 import type { Column } from "@/lib/export";
 import { Panel, Empty } from "@/components/admin-ui";
+import { loadBusinessInfo } from "@/lib/store-info";
+
 
 type Sale = {
   id: string;
