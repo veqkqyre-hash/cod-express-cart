@@ -85,7 +85,7 @@ export function SiteFooter() {
 
         <div className="border-t border-white/10">
           <div className="container-app flex flex-col gap-3 py-5 text-xs text-white/50 md:flex-row md:items-center md:justify-between">
-            <div>© {new Date().getFullYear()} Dreame Beauty Cosmetics L.L.C.. {lang === "sq" ? "Të gjitha të drejtat e rezervuara." : "All rights reserved."}</div>
+            <div>© {new Date().getFullYear()} Dreame Beauty Cosmetics L.L.C. {lang === "sq" ? "Të gjitha të drejtat e rezervuara." : "All rights reserved."}</div>
             <div className="flex items-center gap-4">
               <Link to="/privacy" className="hover:text-white transition">{lang === "sq" ? "Privatësia" : "Privacy"}</Link>
               <Link to="/terms" className="hover:text-white transition">{lang === "sq" ? "Kushtet" : "Terms"}</Link>
