@@ -323,6 +323,17 @@ export function AuditPanel() {
                       <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${ACTION_TONE(l.action)}`}>
                         {l.action}
                       </span>
+                      {saleNumberOf(l) && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSale(saleNumberOf(l)!);
+                          }}
+                          className="ml-2 inline-flex items-center gap-1 rounded-full border border-neutral-300 px-2.5 py-0.5 text-xs font-semibold hover:bg-neutral-100"
+                        >
+                          <Receipt className="h-3 w-3" /> {L("Shiko porosinë", "View sale")}
+                        </button>
+                      )}
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell text-neutral-500">{l.entity}</td>
                     <td className="px-4 py-3 hidden lg:table-cell max-w-xs truncate font-mono text-xs text-neutral-500">
@@ -341,12 +352,21 @@ export function AuditPanel() {
                             <span className="font-semibold">ID:</span> {l.entity_id ?? "—"}
                           </div>
                         </div>
+                        {saleNumberOf(l) && (
+                          <button
+                            onClick={() => setSale(saleNumberOf(l)!)}
+                            className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-white"
+                          >
+                            <Receipt className="h-3.5 w-3.5" /> {L("Shiko porosinë", "View sale")} {saleNumberOf(l)}
+                          </button>
+                        )}
                         <pre className="mt-2 overflow-x-auto rounded-xl bg-white p-3 font-mono text-xs text-neutral-700">
                           {JSON.stringify(l.details ?? {}, null, 2)}
                         </pre>
                       </td>
                     </tr>
                   )}
+
                 </Fragment>
               ))}
               {rows.length === 0 && (
