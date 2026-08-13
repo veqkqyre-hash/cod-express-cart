@@ -77,6 +77,16 @@ export function PosPanel() {
     );
   }
 
+  const scanColumns: Column<ScanEntry>[] = [
+    { key: "at", label: L("Ora", "Time"), get: (s) => s.at },
+    { key: "code", label: L("Kodi", "Code"), get: (s) => s.code },
+    { key: "status", label: L("Statusi", "Status"), get: (s) => (s.ok ? L("Sukses", "Success") : L("Gabim", "Error")) },
+    { key: "label", label: L("Produkti / Gabimi", "Product / Error"), get: (s) => s.label },
+    { key: "hint", label: L("Sqarim", "Detail"), get: (s) => s.hint ?? "" },
+    { key: "sale", label: L("Shitja", "Sale"), get: (s) => s.sale ?? "" },
+  ];
+
+
 
   /** Përkthe gabimet e serverit në mesazhe të qarta (titull + zgjidhje), pa e bllokuar arkën. */
   function scanErrorMessage(raw: string, code: string): { msg: string; hint: string } {
