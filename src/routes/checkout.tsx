@@ -106,6 +106,30 @@ function Checkout() {
     }
     setSubmitting(true);
     try {
+      // Verifiko stokun aktual (i njëjti inventar si ARKA/admin) para porosisë
+      const { data: stockRows, error: stockErr } = await supabase
+        .from("products")
+        .select("id,name_sq,name_en,stock,active")
+        .in("id", items.map((it) => it.id));
+      if (stockErr) throw stockErr;
+      for (const it of items) {
+        const p = (stockRows ?? []).find((r) => r.id === it.id);
+        if (!p || !p.active || p.stock <= 0) {
+          setSubmitting(false);
+          return toast.error(
+            lang === "sq" ? `${it.name} nuk ka stok.` : `${it.name} is out of stock.`,
+          );
+        }
+        if (p.stock < it.quantity) {
+          setSubmitting(false);
+          return toast.error(
+            lang === "sq"
+              ? `${it.name}: vetëm ${p.stock} në stok.`
+              : `${it.name}: only ${p.stock} in stock.`,
+          );
+        }
+      }
+
       const { data: order, error } = await supabase
         .from("orders")
         .insert({
