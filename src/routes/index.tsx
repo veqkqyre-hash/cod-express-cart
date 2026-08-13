@@ -134,22 +134,10 @@ function Home() {
 /* ------------------------------ Sections ------------------------------ */
 
 const HERO_SLIDES = [
-  {
-    src: "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?crop=entropy&cs=srgb&fm=jpg&w=1600&q=80",
-    mobile: "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?crop=entropy&cs=srgb&fm=jpg&w=800&q=70",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1639629509821-c54cdd984227?crop=entropy&cs=srgb&fm=jpg&w=1600&q=80",
-    mobile: "https://images.unsplash.com/photo-1639629509821-c54cdd984227?crop=entropy&cs=srgb&fm=jpg&w=800&q=70",
-  },
-  {
-    src: "https://images.pexels.com/photos/9774854/pexels-photo-9774854.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    mobile: "https://images.pexels.com/photos/9774854/pexels-photo-9774854.jpeg?auto=compress&cs=tinysrgb&w=800",
-  },
-  {
-    src: "https://images.pexels.com/photos/3997379/pexels-photo-3997379.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    mobile: "https://images.pexels.com/photos/3997379/pexels-photo-3997379.jpeg?auto=compress&cs=tinysrgb&w=800",
-  },
+  { src: heroNails1, mobile: heroNails1 },
+  { src: heroNails2, mobile: heroNails2 },
+  { src: heroNails4, mobile: heroNails4 },
+  { src: heroNails3, mobile: heroNails3 },
 ];
 
 function Hero() {
