@@ -810,6 +810,7 @@ export type Database = {
         Args: { _note?: string; _opening_cash?: number }
         Returns: Json
       }
+      pos_scan: { Args: { _code: string }; Returns: Json }
       revoke_admin: { Args: { _user_id: string }; Returns: undefined }
       revoke_role: {
         Args: {
