@@ -116,15 +116,26 @@ export function PosPanel() {
   function onScan(e: React.FormEvent) {
     e.preventDefault();
     const v = code.trim();
-    if (!v) return;
+    if (!v) {
+      toast.error(L("Skanimi nuk prodhoi vlerë — provo përsëri.", "The scan produced no value — try again."));
+      scanRef.current?.focus();
+      return;
+    }
+    if (!/^[A-Za-z0-9._-]{2,32}$/.test(v)) {
+      toast.error(L("Barkod i pavlefshëm (pa zbrazëti, max 32 karaktere).", "Invalid barcode (no spaces, max 32 characters)."));
+      setCode("");
+      scanRef.current?.focus();
+      return;
+    }
     const found = (products ?? []).find(
       (p) => (p.barcode && p.barcode === v) || (p.sku && p.sku.toLowerCase() === v.toLowerCase()),
     );
     if (!found) {
-      toast.error(L("Produkti nuk u gjet.", "Product not found."));
+      toast.error(`${L("Barkodi nuk u njoh", "Barcode not recognised")}: ${v}`);
       setTerm(v);
     } else {
       add(found);
+      toast.success(`${L("U skanua", "Scanned")}: ${nameOf(found)}`);
     }
     setCode("");
     scanRef.current?.focus();
@@ -186,7 +197,16 @@ export function PosPanel() {
               ref={scanRef}
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              onBlur={() => setTimeout(() => scanRef.current?.focus(), 150)}
+              onBlur={() => {
+                // Rikthe fokusin vetëm kur nuk ka shkuar në një fushë/buton tjetër
+                setTimeout(() => {
+                  const el = document.activeElement as HTMLElement | null;
+                  const tag = el?.tagName;
+                  const interactive =
+                    tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || el?.isContentEditable;
+                  if (!interactive) scanRef.current?.focus();
+                }, 150);
+              }}
               autoComplete="off"
               placeholder="⌨ 1234567890123"
               className="flex-1 rounded-xl border-2 border-neutral-300 px-4 py-4 text-2xl font-mono tracking-wider focus:border-[var(--pink-deep,#e91e63)] focus:outline-none"
