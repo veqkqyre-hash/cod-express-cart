@@ -381,6 +381,9 @@ export function AuditPanel() {
           </table>
         </div>
       </div>
+
+      {sale && <SaleDialog saleNumber={sale} onClose={() => setSale(null)} L={L} />}
     </div>
+
   );
 }
