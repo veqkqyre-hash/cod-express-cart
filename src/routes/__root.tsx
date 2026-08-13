@@ -90,7 +90,8 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   const pathname = router.state.location.pathname;
-  const isAdmin = pathname.startsWith("/admin");
+  // Admin dhe ekrani i klientit (POS) shfaqen pa header/footer të dyqanit
+  const isAdmin = pathname.startsWith("/admin") || pathname.startsWith("/pos-display");
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
