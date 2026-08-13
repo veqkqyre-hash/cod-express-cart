@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ExportButtons } from "@/components/admin-export";
 import type { Column } from "@/lib/export";
-import { ScrollText, RefreshCw, ChevronDown, ChevronRight } from "lucide-react";
+import { ScrollText, RefreshCw, ChevronDown, ChevronRight, X, Receipt } from "lucide-react";
 
 type Log = {
   id: string;
