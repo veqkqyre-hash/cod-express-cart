@@ -11,10 +11,10 @@ export const Route = createFileRoute("/")({
   component: Home,
   head: () => ({
     meta: [
-      { title: "Dreame Beauty Cosmetics L.L.C. — Furnizime Premium për Sallone Bukurie" },
-      { name: "description", content: "Dreame Beauty Cosmetics L.L.C.: produkte premium për sallone bukurie, floktari, barber, thonj dhe makeup. Pagesa në dorëzim (COD) në tërë Kosovën." },
-      { property: "og:title", content: "Dreame Beauty Cosmetics L.L.C. — Furnizime Premium për Sallone Bukurie" },
-      { property: "og:description", content: "Dreame Beauty Cosmetics L.L.C.: produkte premium për sallone bukurie, floktari, barber, thonj dhe makeup. Pagesa në dorëzim (COD) në tërë Kosovën." },
+      { title: "Dreame Beauty Cosmetics — Produkte për Thonj, Shumicë & Pakicë" },
+      { name: "description", content: "Produkte profesionale për thonj: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesë në dorëzim në tërë Kosovën." },
+      { property: "og:title", content: "Dreame Beauty Cosmetics — Produkte për Thonj, Shumicë & Pakicë" },
+      { property: "og:description", content: "Gel lak, akrilik, freza, lampa UV/LED, tipsa, nail art dhe pedikyr — shumicë dhe pakicë, pagesë në dorëzim." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://cod-express-cart.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -28,7 +28,8 @@ export const Route = createFileRoute("/")({
           "@type": "Store",
           name: "Dreame Beauty Cosmetics L.L.C.",
           description:
-            "Furnizime premium për sallone bukurie: floktari, barber, thonj, makeup dhe pajisje. Pagesa në dorëzim (COD) në tërë Kosovën.",
+            "Produkte profesionale për thonj: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesë në dorëzim në tërë Kosovën.",
+
           url: "https://cod-express-cart.lovable.app/",
           telephone: "+383 44 123 456",
           email: "hello@dreamstudio-ks.com",
@@ -49,21 +50,21 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-// Category card visuals — soft pink illustrated tiles
+// Category card visuals — nail-focused illustrated tiles
 const CATEGORY_ART: Record<string, { hue: string; emoji: string }> = {
-  "hair-care": { hue: "from-pink-100 to-white", emoji: "💗" },
-  "hair-color": { hue: "from-rose-100 to-white", emoji: "🎨" },
-  barber: { hue: "from-neutral-100 to-white", emoji: "✂️" },
-  nails: { hue: "from-pink-50 to-white", emoji: "💅" },
-  makeup: { hue: "from-fuchsia-100 to-white", emoji: "💄" },
-  eyelashes: { hue: "from-rose-50 to-white", emoji: "👁️" },
-  waxing: { hue: "from-amber-50 to-white", emoji: "🕯️" },
-  equipment: { hue: "from-slate-100 to-white", emoji: "⚙️" },
-  "salon-equipment": { hue: "from-slate-100 to-white", emoji: "⚙️" },
-  furniture: { hue: "from-neutral-100 to-white", emoji: "🪑" },
-  accessories: { hue: "from-pink-100 to-white", emoji: "✨" },
-  "professional-accessories": { hue: "from-pink-100 to-white", emoji: "✨" },
+  "gel-lak": { hue: "from-pink-100 to-white", emoji: "💅" },
+  "akrilik-pluhur": { hue: "from-rose-100 to-white", emoji: "🧁" },
+  "gel-thonj": { hue: "from-fuchsia-100 to-white", emoji: "🪄" },
+  "baze-top-coat": { hue: "from-pink-50 to-white", emoji: "🫧" },
+  "freza-aparate": { hue: "from-slate-100 to-white", emoji: "🛠️" },
+  "lampa-uv-led": { hue: "from-amber-50 to-white", emoji: "💡" },
+  "lime-instrumente": { hue: "from-neutral-100 to-white", emoji: "✂️" },
+  "tipsa-forma": { hue: "from-rose-50 to-white", emoji: "🤍" },
+  "nail-art": { hue: "from-fuchsia-50 to-white", emoji: "✨" },
+  pedikyr: { hue: "from-pink-50 to-white", emoji: "🦶" },
+  higjena: { hue: "from-sky-50 to-white", emoji: "🧼" },
 };
+
 
 function Home() {
   const { tr, lang } = useI18n();
@@ -339,7 +340,7 @@ function PromoDuo() {
           <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink-deep)]">{tr("summerCollection")}</div>
           <h3 className="mt-2 font-display text-3xl md:text-4xl leading-tight">{tr("promoDuo1Title")}</h3>
           <p className="mt-3 text-sm text-muted-foreground">{tr("promoDuo1Sub")}</p>
-          <Link to="/shop" search={{ category: "makeup" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-black px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink-deep)] transition">
+          <Link to="/shop" search={{ category: "gel-lak" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-black px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink-deep)] transition">
             {tr("discover")} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -350,7 +351,7 @@ function PromoDuo() {
           <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink)]">{tr("proExclusive")}</div>
           <h3 className="mt-2 font-display text-3xl md:text-4xl leading-tight">{tr("promoDuo2Title")}</h3>
           <p className="mt-3 text-sm text-white/70">{tr("promoDuo2Sub")}</p>
-          <Link to="/shop" search={{ category: "barber" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-[var(--pink-deep)] px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink)] transition">
+          <Link to="/shop" search={{ category: "freza-aparate" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-[var(--pink-deep)] px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink)] transition">
             {tr("shopNow")} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>

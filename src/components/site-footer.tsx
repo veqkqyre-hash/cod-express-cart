@@ -37,9 +37,10 @@ export function SiteFooter() {
             </Link>
             <p className="text-sm text-white/70 max-w-xs">
               {lang === "sq"
-                ? "Furnizim luksoz e profesional për sallone bukurie. Bukuri e dorëzuar në derën tuaj."
-                : "Luxury professional supplies for beauty salons. Beauty delivered to your door."}
+                ? "Furnizime profesionale për thonj — shumicë dhe pakicë. Dorëzim në derën tuaj."
+                : "Professional nail supplies — wholesale and retail. Delivered to your door."}
             </p>
+
             <div className="flex gap-2">
               {[Instagram, Facebook, Youtube].map((I, i) => (
                 <a key={i} href="#" aria-label="social" className="grid h-10 w-10 place-items-center rounded-full border border-white/15 hover:border-[var(--pink)] hover:bg-[var(--pink-deep)] transition">
@@ -53,9 +54,10 @@ export function SiteFooter() {
             <div className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink)]">{tr("shop")}</div>
             <ul className="space-y-2 text-sm text-white/70">
               <li><Link to="/shop" className="hover:text-white transition">{tr("allProducts")}</Link></li>
-              <li><Link to="/shop" search={{ category: "hair-care" }} className="hover:text-white transition">Hair Care</Link></li>
-              <li><Link to="/shop" search={{ category: "makeup" }} className="hover:text-white transition">Makeup</Link></li>
-              <li><Link to="/shop" search={{ category: "nails" }} className="hover:text-white transition">Nails</Link></li>
+              <li><Link to="/shop" search={{ category: "gel-lak" }} className="hover:text-white transition">{lang === "sq" ? "Gel Lak" : "Gel Polish"}</Link></li>
+              <li><Link to="/shop" search={{ category: "freza-aparate" }} className="hover:text-white transition">{lang === "sq" ? "Freza & Aparate" : "Drills & Machines"}</Link></li>
+              <li><Link to="/shop" search={{ category: "pedikyr" }} className="hover:text-white transition">{lang === "sq" ? "Pedikyr" : "Pedicure"}</Link></li>
+
               <li><Link to="/wishlist" className="hover:text-white transition">{tr("wishlist")}</Link></li>
             </ul>
           </div>
