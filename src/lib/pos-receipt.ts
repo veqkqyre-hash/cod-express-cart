@@ -24,6 +24,8 @@ const money = (n: number) => `${n.toFixed(2)} €`;
 /** Opens a print window sized for a thermal roll. width = 58 | 80 (mm) */
 export function printReceipt(sale: ReceiptSale, items: ReceiptItem[], width: 58 | 80 = 80) {
   const d = new Date(sale.created_at);
+  const B = businessInfo();
+
   const rows = items
     .map(
       (i) => `<tr><td class="n">${esc(i.name)}<div class="s">${i.qty} × ${money(i.price)}</div></td>
