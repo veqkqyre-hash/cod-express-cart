@@ -32,7 +32,7 @@ export function SiteFooter() {
         <div className="container-app grid gap-10 py-16 md:grid-cols-12">
           <div className="md:col-span-4 space-y-5">
             <Link to="/" className="flex items-center gap-2">
-              <span className="grid h-11 w-11 place-items-center rounded-full bg-[var(--pink-deep)] text-white font-display text-lg">P</span>
+              <span className="grid h-11 w-11 place-items-center rounded-full bg-[var(--pink-deep)] text-white font-display text-lg">D</span>
               <span className="font-display text-3xl tracking-tight">Dreame Beauty Cosmetics L.L.C.</span>
             </Link>
             <p className="text-sm text-white/70 max-w-xs">
