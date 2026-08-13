@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
@@ -18,6 +18,9 @@ import { VisitorsPanel } from "@/components/admin-visitors-panel";
 import { ReportsPanel } from "@/components/admin-reports-panel";
 import { CustomerMessage } from "@/components/admin-customer-message";
 import { PagesPanel } from "@/components/admin-pages-panel";
+import { PosPanel } from "@/components/admin-pos-panel";
+import { PosSalesPanel } from "@/components/admin-sales-history-panel";
+import { PosReportPanel } from "@/components/admin-pos-report-panel";
 import { OrderTimeline } from "@/components/order-timeline";
 import { printOrders } from "@/lib/bulk-print";
 import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
@@ -58,14 +61,14 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 type NavKey =
-  | "dashboard" | "sales" | "stats" | "products" | "inventory" | "catalog"
+  | "dashboard" | "pos" | "possales" | "posreport" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
   | "messages" | "pages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins";
 
 type Role = "admin" | "manager" | "editor";
 
 // Which sections each role can open (admin sees everything)
-const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports"];
+const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports", "pos", "possales", "posreport"];
 const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products", "pages"];
 
 function Admin() {
@@ -143,7 +146,10 @@ function Admin() {
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const allNav: { key: NavKey; label: string; icon: any }[] = [
     { key: "dashboard", label: L("Paneli", "Dashboard"), icon: LayoutGrid },
-    { key: "sales", label: L("Shitjet", "Sales"), icon: TrendingUp },
+    { key: "pos", label: L("ARKA / SHITJE", "POS / Register"), icon: ScanLine },
+    { key: "possales", label: L("Historia e shitjeve", "Sales history"), icon: Receipt },
+    { key: "posreport", label: L("Raporti i shitjeve", "Sales report"), icon: Wallet },
+    { key: "sales", label: L("Shitjet online", "Online sales"), icon: TrendingUp },
     { key: "stats", label: L("Statistika", "Statistics"), icon: BarChart3 },
     { key: "products", label: L("Produktet", "Products"), icon: Package },
     { key: "inventory", label: L("Inventari", "Inventory"), icon: Boxes },
@@ -252,6 +258,9 @@ function Admin() {
               {nav === "blog" && <BlogPanel />}
               {nav === "messages" && <MessagesPanel />}
               {nav === "pages" && <PagesPanel />}
+              {nav === "pos" && <PosPanel />}
+              {nav === "possales" && <PosSalesPanel />}
+              {nav === "posreport" && <PosReportPanel />}
               {nav === "notifications" && <NotificationsPanel />}
               {nav === "visitors" && <VisitorsPanel />}
               {nav === "reports" && <ReportsPanel />}
