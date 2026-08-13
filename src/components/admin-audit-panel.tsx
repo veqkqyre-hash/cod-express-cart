@@ -92,8 +92,28 @@ export function AuditPanel() {
     { key: "action", label: L("Veprimi", "Action"), get: (r) => r.action },
     { key: "entity", label: L("Objekti", "Entity"), get: (r) => r.entity },
     { key: "entity_id", label: "ID", get: (r) => r.entity_id ?? "" },
+    { key: "sale", label: L("Shitja", "Sale"), get: (r) => saleNumberOf(r) ?? "" },
     { key: "details", label: L("Detajet", "Details"), get: (r) => JSON.stringify(r.details ?? {}) },
   ];
+
+  const scanRows = rows.filter((l) => l.action.startsWith("pos.scan"));
+  const scanColumns: Column<Log>[] = [
+    { key: "created_at", label: L("Data", "Date"), get: (r) => new Date(r.created_at).toLocaleString() },
+    { key: "actor", label: L("Përdoruesi", "User"), get: (r) => r.actor_email ?? "—" },
+    { key: "code", label: L("Kodi", "Code"), get: (r) => detailOf(r, "code") ?? "" },
+    { key: "product", label: L("Produkti", "Product"), get: (r) => detailOf(r, "product") ?? "" },
+    { key: "result", label: L("Rezultati", "Result"), get: (r) => scanLabel(r) },
+    { key: "sale", label: L("Shitja", "Sale"), get: (r) => saleNumberOf(r) ?? "" },
+  ];
+
+  function scanLabel(l: Log) {
+    if (l.action === "pos.scan") return L("Sukses", "Success");
+    if (l.action === "pos.scan_sold") return L("Shitur", "Sold");
+    if (l.action === "pos.scan_not_found") return L("Nuk u gjet", "Not found");
+    if (l.action === "pos.scan_invalid") return L("Barkod i pavlefshëm", "Invalid barcode");
+    return l.action;
+  }
+
 
   const inputCls =
     "rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-200";
