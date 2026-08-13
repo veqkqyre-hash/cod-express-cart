@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
@@ -189,9 +189,8 @@ export function AuditPanel() {
             </thead>
             <tbody>
               {rows.map((l) => (
-                <>
+                <Fragment key={l.id}>
                   <tr
-                    key={l.id}
                     onClick={() => setOpen(open === l.id ? null : l.id)}
                     className="cursor-pointer border-t border-neutral-100 hover:bg-neutral-50"
                   >
@@ -211,7 +210,7 @@ export function AuditPanel() {
                     </td>
                   </tr>
                   {open === l.id && (
-                    <tr key={`${l.id}-d`} className="border-t border-neutral-100 bg-neutral-50/60">
+                    <tr className="border-t border-neutral-100 bg-neutral-50/60">
                       <td />
                       <td colSpan={5} className="px-4 py-3">
                         <div className="grid gap-1 text-xs text-neutral-600 sm:grid-cols-2">
@@ -228,7 +227,7 @@ export function AuditPanel() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
               {rows.length === 0 && (
                 <tr>
