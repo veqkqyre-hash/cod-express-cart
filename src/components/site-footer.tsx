@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, Youtube, Mail, Phone, MapPin, CreditCard, Truck, ShieldCheck, Headphones } from "lucide-react";
+import { Instagram, Facebook, Youtube, Mail, MapPin, CreditCard, Truck, ShieldCheck, Headphones } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 export function SiteFooter() {
@@ -79,7 +79,6 @@ export function SiteFooter() {
             <div className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink)]">{tr("contact")}</div>
             <ul className="space-y-3 text-sm text-white/80">
               <li className="flex items-start gap-2.5"><MapPin className="mt-0.5 h-4 w-4 text-[var(--pink)] shrink-0" /> Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë</li>
-              <li className="flex items-center gap-2.5"><Phone className="h-4 w-4 text-[var(--pink)] shrink-0" /> +383 44 123 456</li>
               <li className="flex items-center gap-2.5"><Mail className="h-4 w-4 text-[var(--pink)] shrink-0" /> hello@dreamstudio-ks.com</li>
             </ul>
           </div>

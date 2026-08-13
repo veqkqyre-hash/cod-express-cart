@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ProductCard, type Product } from "@/components/product-card";
-import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram, Mail, ChevronLeft, ChevronRight, Phone } from "lucide-react";
+import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import heroNails1 from "@/assets/hero-nails-1.jpg";
@@ -35,7 +35,6 @@ export const Route = createFileRoute("/")({
             "Produkte profesionale për thonj: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesë në dorëzim në tërë Kosovën.",
 
           url: "https://cod-express-cart.lovable.app/",
-          telephone: "+383 44 123 456",
           email: "hello@dreamstudio-ks.com",
           priceRange: "€€",
           currenciesAccepted: "EUR",
@@ -263,12 +262,6 @@ function Hero() {
               className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 sm:px-8 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-white/20"
             >
               {tr("shopCategories")}
-            </a>
-            <a
-              href={`tel:${tr("contactPhone").replace(/\s/g, "")}`}
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--pink)] bg-white px-6 py-3 sm:px-8 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-black transition hover:bg-[var(--pink)] hover:text-white"
-            >
-              <Phone className="h-4 w-4" /> {tr("contactPhone")}
             </a>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 sm:gap-x-7 sm:gap-y-3 pt-2 sm:pt-4 text-[11px] sm:text-xs text-white/80">

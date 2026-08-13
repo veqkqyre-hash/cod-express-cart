@@ -21,7 +21,6 @@ import { CartProvider } from "@/lib/cart";
 import { WishlistProvider } from "@/lib/wishlist";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { CallButton } from "@/components/call-button";
 import { VisitTracker } from "@/components/visit-tracker";
 import { ProductSync } from "@/components/product-sync";
 
@@ -106,7 +105,6 @@ function RootComponent() {
                 <SiteHeader />
                 <main className="flex-1"><Outlet /></main>
                 <SiteFooter />
-                <CallButton />
               </div>
             )}
             <VisitTracker />

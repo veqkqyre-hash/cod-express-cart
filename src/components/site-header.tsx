@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingBag, Menu, X, User, Heart, Search, ChevronDown, Phone } from "lucide-react";
+import { ShoppingBag, Menu, X, User, Heart, Search, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
@@ -52,9 +52,6 @@ export function SiteHeader() {
             <span className="hidden sm:inline">✦</span>
             <span className="truncate">{tr("announcementBar")}</span>
           </div>
-          <a href="tel:+38344123456" className="hidden md:inline-flex items-center gap-1.5 text-white/80 hover:text-white transition">
-            <Phone className="h-3 w-3" /> +383 44 123 456
-          </a>
         </div>
       </div>
 
