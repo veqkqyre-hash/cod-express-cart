@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ScanLine, Search, Trash2, Plus, Minus, Printer, Monitor, X, Eraser } from "lucide-react";
 import { printReceipt, type ReceiptSale } from "@/lib/pos-receipt";
 import { ShiftBar, useCurrentShift } from "@/components/admin-shift-panel";
+import { getCashierName, setCashierName, cashierDisplay } from "@/lib/cashier";
 
 export type PosProduct = {
   id: string;
@@ -47,6 +48,8 @@ export function PosPanel() {
   const [done, setDone] = useState<{ sale: ReceiptSale; items: { name: string; qty: number; price: number }[] } | null>(null);
   const [autoPrint, setAutoPrint] = useState(true);
   const [receiptWidth, setReceiptWidth] = useState<58 | 80>(80);
+  const [cashier, setCashier] = useState("");
+  useEffect(() => setCashier(getCashierName()), []);
   const scanRef = useRef<HTMLInputElement>(null);
   const { data: shift, refetch: refetchShift } = useCurrentShift();
 
@@ -169,7 +172,8 @@ export function PosPanel() {
     setSaving(false);
     if (error) return toast.error(error.message);
 
-    const sale = data as unknown as ReceiptSale;
+    const raw = data as unknown as ReceiptSale;
+    const sale: ReceiptSale = { ...raw, cashier_name: cashierDisplay(raw.cashier_email, cashier) };
     const items = lines.map((l) => ({ name: nameOf(l.product), qty: l.qty, price: Number(l.product.price) }));
     setDone({ sale, items });
     if (autoPrint) printReceipt(sale, items, receiptWidth);
@@ -403,6 +407,21 @@ export function PosPanel() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="rounded-2xl border border-neutral-200 bg-white p-4">
+          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            {L("Emri i arkëtarit (del në faturë)", "Cashier name (printed on receipt)")}
+          </label>
+          <input
+            value={cashier}
+            onChange={(e) => {
+              setCashier(e.target.value);
+              setCashierName(e.target.value);
+            }}
+            placeholder={L("p.sh. Arta Krasniqi", "e.g. Arta Krasniqi")}
+            className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+          />
         </div>
 
         <button

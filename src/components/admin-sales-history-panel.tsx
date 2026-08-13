@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { cashierDisplay } from "@/lib/cashier";
 import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { Printer, X } from "lucide-react";
@@ -56,7 +57,7 @@ export function PosSalesPanel() {
     { key: "items", label: L("Artikuj", "Items"), get: (s) => s.item_count },
     { key: "total", label: L("Totali", "Total"), get: (s) => Number(s.total).toFixed(2) },
     { key: "method", label: L("Pagesa", "Payment"), get: (s) => s.payment_method },
-    { key: "cashier", label: L("Përdoruesi", "User"), get: (s) => s.cashier_email ?? "" },
+    { key: "cashier", label: L("Përdoruesi", "User"), get: (s) => cashierDisplay(s.cashier_email) },
   ];
 
   return (
@@ -99,7 +100,7 @@ export function PosSalesPanel() {
                     <td className="px-4 py-3">{s.item_count}</td>
                     <td className="px-4 py-3 font-semibold">{formatEur(Number(s.total))}</td>
                     <td className="px-4 py-3 capitalize">{s.payment_method}</td>
-                    <td className="px-4 py-3 text-neutral-500">{s.cashier_email ?? "—"}</td>
+                    <td className="px-4 py-3 text-neutral-500">{cashierDisplay(s.cashier_email)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -158,7 +159,7 @@ function SaleModal({ sale, onClose, L }: { sale: Sale; onClose: () => void; L: (
             <Row label={L("Pagesa", "Payment")} value={sale.payment_method} />
             {sale.paid_amount != null && <Row label={L("Paguar", "Paid")} value={formatEur(Number(sale.paid_amount))} />}
             {sale.change_amount != null && <Row label={L("Kusuri", "Change")} value={formatEur(Number(sale.change_amount))} />}
-            <Row label={L("Përdoruesi", "User")} value={sale.cashier_email ?? "—"} />
+            <Row label={L("Përdoruesi", "User")} value={cashierDisplay(sale.cashier_email)} />
           </div>
 
           <div className="mt-5 flex gap-2">
