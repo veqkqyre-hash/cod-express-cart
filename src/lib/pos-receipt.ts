@@ -1,5 +1,6 @@
 // Thermal receipt printing (58mm / 80mm) for POS sales.
 import { cashierDisplay } from "@/lib/cashier";
+import { businessInfo } from "@/lib/store-info";
 
 export type ReceiptItem = { name: string; qty: number; price: number };
 export type ReceiptSale = {
@@ -13,10 +14,6 @@ export type ReceiptSale = {
   cashier_name?: string | null;
 };
 
-const STORE = {
-  name: "Dreame Beauty Cosmetics L.L.C.",
-  addr: "Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë",
-};
 
 function esc(s: unknown) {
   return String(s ?? "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c] as string);
