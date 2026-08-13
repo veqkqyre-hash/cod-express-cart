@@ -233,6 +233,75 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
   );
 }
 
+/** Barkodi: 4–32 karaktere, shifra/shkronja/-/_ , pa zbrazëti. */
+export const BARCODE_RE = /^[A-Za-z0-9._-]{4,32}$/;
+
+function BarcodeField({ lang, defaultValue }: { lang: string; defaultValue: string }) {
+  const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
+  const [value, setValue] = useState(defaultValue);
+  const [touched, setTouched] = useState(false);
+  const lastKey = useRef(0);
+  const fast = useRef(0);
+
+  const invalid = value.trim().length > 0 && !BARCODE_RE.test(value.trim());
+  const hasSpace = /\s/.test(value);
+
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    const now = Date.now();
+    if (now - lastKey.current < 35) fast.current += 1;
+    else if (e.key !== "Enter") fast.current = 0;
+    lastKey.current = now;
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const v = (e.currentTarget.value || "").trim();
+      setTouched(true);
+      if (!v) {
+        toast.error(L("Skanimi nuk prodhoi vlerë — provo përsëri.", "The scan produced no value — try again."));
+      } else if (!BARCODE_RE.test(v)) {
+        toast.error(L("Barkod i pavlefshëm: pa zbrazëti, 4–32 karaktere.", "Invalid barcode: no spaces, 4–32 characters."));
+      } else {
+        setValue(v);
+        toast.success(`${L("Barkodi u skanua", "Barcode scanned")}: ${v}`);
+      }
+      fast.current = 0;
+    }
+  }
+
+  return (
+    <div>
+      <label className="mb-1.5 block text-sm font-medium">{L("Barkodi", "Barcode")}</label>
+      <input
+        name="barcode"
+        value={value}
+        onChange={(e) => setValue(e.target.value.replace(/\s+/g, ""))}
+        onBlur={() => setTouched(true)}
+        onKeyDown={onKeyDown}
+        autoComplete="off"
+        spellCheck={false}
+        inputMode="text"
+        maxLength={32}
+        placeholder={L("Skano ose shkruaj barkodin", "Scan or type the barcode")}
+        aria-invalid={invalid}
+        className={`w-full rounded-xl border bg-background px-4 py-2.5 font-mono text-sm focus:outline-none focus:ring-2 ${
+          touched && invalid ? "border-destructive focus:ring-destructive" : "border-input focus:ring-ring"
+        }`}
+      />
+      {touched && invalid ? (
+        <p className="mt-1 text-xs text-destructive">
+          {hasSpace
+            ? L("Barkodi nuk mund të ketë zbrazëti.", "The barcode cannot contain spaces.")
+            : L("4–32 karaktere: shifra, shkronja, - ose _", "4–32 characters: digits, letters, - or _")}
+        </p>
+      ) : (
+        <p className="mt-1 text-xs text-neutral-500">
+          {L("Kliko brenda dhe skano — Enter nuk e ruan formularin.", "Click inside and scan — Enter does not submit the form.")}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function FieldA({ label, name, type = "text", defaultValue, required, step }: { label: string; name: string; type?: string; defaultValue?: string; required?: boolean; step?: string }) {
   return (
     <div>
