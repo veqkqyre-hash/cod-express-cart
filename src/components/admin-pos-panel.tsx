@@ -153,23 +153,38 @@ export function PosPanel() {
     setCode("");
     if (!v) {
       toast.error(L("Skanimi nuk prodhoi vlerë — provo përsëri.", "The scan produced no value — try again."));
+      pushScan("—", false, L("Skanim i zbrazët", "Empty scan"));
       scanRef.current?.focus();
       return;
     }
     // Validim + regjistrim i skanimit në server (RPC pos_scan)
-    const { data, error } = await supabase.rpc("pos_scan", { _code: v });
+    let res: { found: boolean; code: string; product?: PosProduct } | null = null;
+    try {
+      const { data, error } = await supabase.rpc("pos_scan", { _code: v });
+      if (error) throw new Error(error.message);
+      res = data as unknown as { found: boolean; code: string; product?: PosProduct };
+    } catch (err) {
+      const msg = scanErrorMessage(err instanceof Error ? err.message : String(err), v);
+      toast.error(msg);
+      pushScan(v, false, msg);
+      setTerm(v); // arka vazhdon: kërko manualisht
+      scanRef.current?.focus();
+      return;
+    }
     scanRef.current?.focus();
-    if (error) return toast.error(error.message);
-    const res = data as unknown as { found: boolean; code: string; product?: PosProduct };
     if (!res?.found || !res.product) {
-      toast.error(`${L("Barkodi nuk u njoh", "Barcode not recognised")}: ${res?.code ?? v}`);
+      const msg = `${L("Barkodi nuk u njoh", "Barcode not recognised")}: ${res?.code ?? v}`;
+      toast.error(msg);
+      pushScan(v, false, msg);
       setTerm(v);
       return;
     }
     const live = (products ?? []).find((p) => p.id === res.product!.id) ?? res.product;
     add(live);
+    pushScan(v, true, nameOf(live));
     toast.success(`${L("U skanua", "Scanned")}: ${nameOf(live)}`);
   }
+
 
   const results = useMemo(() => {
     const q = term.trim().toLowerCase();
