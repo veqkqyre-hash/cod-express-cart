@@ -338,23 +338,34 @@ export function PosPanel() {
             <li>{L("Skano: produkti hyn në shportë; sasia rritet automatikisht për skanim të përsëritur.", "Scan: the product enters the cart; repeated scans increase quantity.")}</li>
             <li>{L("Produkt i re: Katalogu → Produktet → Shto produkt → skano në fushën Barkodi.", "New product: Catalog → Products → Add product → scan into the Barcode field.")}</li>
             <li>{L("Nëse barkodi nuk njihet, kërkimi hapet automatikisht me atë kod.", "If the barcode is unknown, the search opens automatically with that code.")}</li>
-            <li>{L("Nëse barkodi nuk njihet, kërkimi hapet automatikisht me atë kod.", "If the barcode is unknown, the search opens automatically with that code.")}</li>
             <li>{L("Skanim i dyfishtë/gabim rrjeti? Arka nuk bllokohet — shto produktin nga kërkimi manual.", "Duplicate scan or network error? The register never blocks — add the product from manual search.")}</li>
+            <li>{L("Pas përfundimit të shitjes, skanimet lidhen me numrin e shitjes (POS-…).", "After the sale is finished, scans are linked to the sale number (POS-…).")}</li>
             <li>{L("Të gjitha skanimet ruhen në SISTEMI → Regjistri i aktivitetit (filtro 'Skanimet').", "Every scan is stored in SYSTEM → Activity log (use the 'Scans' filter).")}</li>
           </ol>
         </details>
 
         {/* Historiku i skanimeve (sesioni aktual) */}
         <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-          <div className="mb-2 flex items-center justify-between">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
               {L("Historik skanimesh", "Scan history")}
             </span>
-            {scanLog.length > 0 && (
-              <button onClick={() => setScanLog([])} className="text-xs text-neutral-500 hover:text-neutral-900">
-                {L("Fshij listën", "Clear list")}
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              <ExportButtons
+                entity="pos_scans"
+                filename={`skanime-${new Date().toISOString().slice(0, 10)}`}
+                title={L("Historik skanimesh", "Scan history")}
+                subtitle={`${scanLog.length} ${L("skanime", "scans")}`}
+                columns={scanColumns}
+                rows={scanLog}
+                labels={{ csv: "CSV", pdf: "PDF", empty: L("Nuk ka skanime", "No scans") }}
+              />
+              {scanLog.length > 0 && (
+                <button onClick={() => setScanLog([])} className="text-xs text-neutral-500 hover:text-neutral-900">
+                  {L("Fshij listën", "Clear list")}
+                </button>
+              )}
+            </div>
           </div>
           {scanLog.length === 0 ? (
             <p className="py-3 text-sm text-neutral-500">{L("Asnjë skanim në këtë sesion.", "No scans in this session yet.")}</p>
@@ -370,13 +381,22 @@ export function PosPanel() {
                     {s.ok ? "✓" : "!"}
                   </span>
                   <span className="font-mono text-xs text-neutral-500">{s.code}</span>
-                  <span className={`min-w-0 flex-1 truncate ${s.ok ? "" : "text-red-700"}`}>{s.label}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className={s.ok ? "" : "font-medium text-red-700"}>{s.label}</span>
+                    {s.hint && <span className="block text-xs text-neutral-500">{s.hint}</span>}
+                    {s.sale && (
+                      <span className="mt-0.5 inline-block rounded-full bg-neutral-900 px-2 py-0.5 text-[11px] font-semibold text-white">
+                        {s.sale}
+                      </span>
+                    )}
+                  </span>
                   <span className="shrink-0 text-xs text-neutral-400">{s.at}</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
+
 
 
         <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
