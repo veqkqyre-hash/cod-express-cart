@@ -32,8 +32,11 @@ export function useNotifications() {
   });
 
   useEffect(() => {
+    // Unique topic per hook instance: reusing one topic across multiple
+    // mounted consumers throws "cannot add postgres_changes callbacks ... after subscribe()".
+    const topic = `admin-notifications-${Math.random().toString(36).slice(2)}`;
     const ch = supabase
-      .channel("admin-notifications")
+      .channel(topic)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications" }, (p) => {
         const n = p.new as Notif;
         toast.info(n.title, { description: n.body ?? undefined });
