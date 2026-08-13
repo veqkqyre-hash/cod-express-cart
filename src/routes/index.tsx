@@ -340,7 +340,7 @@ function PromoDuo() {
           <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink-deep)]">{tr("summerCollection")}</div>
           <h3 className="mt-2 font-display text-3xl md:text-4xl leading-tight">{tr("promoDuo1Title")}</h3>
           <p className="mt-3 text-sm text-muted-foreground">{tr("promoDuo1Sub")}</p>
-          <Link to="/shop" search={{ category: "makeup" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-black px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink-deep)] transition">
+          <Link to="/shop" search={{ category: "gel-lak" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-black px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink-deep)] transition">
             {tr("discover")} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -351,7 +351,7 @@ function PromoDuo() {
           <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink)]">{tr("proExclusive")}</div>
           <h3 className="mt-2 font-display text-3xl md:text-4xl leading-tight">{tr("promoDuo2Title")}</h3>
           <p className="mt-3 text-sm text-white/70">{tr("promoDuo2Sub")}</p>
-          <Link to="/shop" search={{ category: "barber" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-[var(--pink-deep)] px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink)] transition">
+          <Link to="/shop" search={{ category: "freza-aparate" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-[var(--pink-deep)] px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink)] transition">
             {tr("shopNow")} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
