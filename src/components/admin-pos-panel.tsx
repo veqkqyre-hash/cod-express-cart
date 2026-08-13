@@ -276,8 +276,46 @@ export function PosPanel() {
             <li>{L("Skano: produkti hyn në shportë; sasia rritet automatikisht për skanim të përsëritur.", "Scan: the product enters the cart; repeated scans increase quantity.")}</li>
             <li>{L("Produkt i re: Katalogu → Produktet → Shto produkt → skano në fushën Barkodi.", "New product: Catalog → Products → Add product → scan into the Barcode field.")}</li>
             <li>{L("Nëse barkodi nuk njihet, kërkimi hapet automatikisht me atë kod.", "If the barcode is unknown, the search opens automatically with that code.")}</li>
+            <li>{L("Nëse barkodi nuk njihet, kërkimi hapet automatikisht me atë kod.", "If the barcode is unknown, the search opens automatically with that code.")}</li>
+            <li>{L("Skanim i dyfishtë/gabim rrjeti? Arka nuk bllokohet — shto produktin nga kërkimi manual.", "Duplicate scan or network error? The register never blocks — add the product from manual search.")}</li>
+            <li>{L("Të gjitha skanimet ruhen në SISTEMI → Regjistri i aktivitetit (filtro 'Skanimet').", "Every scan is stored in SYSTEM → Activity log (use the 'Scans' filter).")}</li>
           </ol>
         </details>
+
+        {/* Historiku i skanimeve (sesioni aktual) */}
+        <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              {L("Historik skanimesh", "Scan history")}
+            </span>
+            {scanLog.length > 0 && (
+              <button onClick={() => setScanLog([])} className="text-xs text-neutral-500 hover:text-neutral-900">
+                {L("Fshij listën", "Clear list")}
+              </button>
+            )}
+          </div>
+          {scanLog.length === 0 ? (
+            <p className="py-3 text-sm text-neutral-500">{L("Asnjë skanim në këtë sesion.", "No scans in this session yet.")}</p>
+          ) : (
+            <ul className="divide-y divide-neutral-100 text-sm">
+              {scanLog.map((s) => (
+                <li key={s.id} className="flex items-start gap-3 py-2">
+                  <span
+                    className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                      s.ok ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {s.ok ? "✓" : "!"}
+                  </span>
+                  <span className="font-mono text-xs text-neutral-500">{s.code}</span>
+                  <span className={`min-w-0 flex-1 truncate ${s.ok ? "" : "text-red-700"}`}>{s.label}</span>
+                  <span className="shrink-0 text-xs text-neutral-400">{s.at}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
 
         <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
           <div className="flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2">
