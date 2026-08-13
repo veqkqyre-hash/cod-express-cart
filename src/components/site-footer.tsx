@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, Youtube, Mail, Phone, MapPin, CreditCard, Truck, ShieldCheck, Headphones } from "lucide-react";
+import { Instagram, Facebook, Youtube, Mail, MapPin, CreditCard, Truck, ShieldCheck, Headphones } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 export function SiteFooter() {

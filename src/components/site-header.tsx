@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingBag, Menu, X, User, Heart, Search, ChevronDown, Phone } from "lucide-react";
+import { ShoppingBag, Menu, X, User, Heart, Search, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { metaFor } from "@/components/info-page";
 import { toast } from "sonner";
-import { Mail, Phone, MapPin, Clock, Send, MessageCircle } from "lucide-react";
+import { Mail, MapPin, Clock, Send, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
   component: Contact,
