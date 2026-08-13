@@ -6,11 +6,11 @@ export const Route = createFileRoute("/pos-display")({
   component: PosDisplay,
   head: () => ({
     meta: [
-      { title: "Ekrani i klientit · Dream Studio" },
-      { name: "description", content: "Ekrani i klientit për arkën e Dream Studio — produktet, sasitë dhe totali i shitjes." },
+      { title: "Ekrani i klientit · Dreame Beauty Cosmetics L.L.C." },
+      { name: "description", content: "Ekrani i klientit për arkën e Dreame Beauty Cosmetics L.L.C. — produktet, sasitë dhe totali i shitjes." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Ekrani i klientit · Dream Studio" },
-      { property: "og:description", content: "Ekran i dytë për arkën e Dream Studio." },
+      { property: "og:title", content: "Ekrani i klientit · Dreame Beauty Cosmetics L.L.C." },
+      { property: "og:description", content: "Ekran i dytë për arkën e Dreame Beauty Cosmetics L.L.C." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -48,7 +48,7 @@ function PosDisplay() {
   return (
     <div className="fixed inset-0 flex flex-col bg-neutral-950 text-white">
       <header className="flex items-center justify-between border-b border-neutral-800 px-8 py-5">
-        <h1 className="font-display text-3xl">Dream Studio</h1>
+        <h1 className="font-display text-3xl">Dreame Beauty Cosmetics L.L.C.</h1>
         <span className="text-xs uppercase tracking-[0.3em] text-neutral-400">Mirë se vini</span>
       </header>
 

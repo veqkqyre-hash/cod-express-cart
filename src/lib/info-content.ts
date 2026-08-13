@@ -31,7 +31,7 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
     title_en: "Frequently asked questions",
     intro_sq: "",
     intro_en: "",
-    meta_sq: "Përgjigje për porositë, pagesën në dorëzim (COD), transportin dhe kthimet — Dream Studio.",
+    meta_sq: "Përgjigje për porositë, pagesën në dorëzim (COD), transportin dhe kthimet — Dreame Beauty Cosmetics L.L.C.",
     blocks: [
       {
         h_sq: "Si funksionon pagesa në dorëzim (COD)?",
@@ -82,7 +82,7 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
     title_en: "Shipping & delivery",
     intro_sq: "Dërgojmë në të gjithë Kosovën me pagesë në dorëzim.",
     intro_en: "We deliver across Kosovo with cash on delivery.",
-    meta_sq: "Tarifat e transportit, kohëzgjatja e dërgesës dhe pagesa në dorëzim në Kosovë — Dream Studio.",
+    meta_sq: "Tarifat e transportit, kohëzgjatja e dërgesës dhe pagesa në dorëzim në Kosovë — Dreame Beauty Cosmetics L.L.C.",
     blocks: [
       {
         h_sq: "Kohëzgjatja",
@@ -103,7 +103,7 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
     title_en: "Returns & exchanges",
     intro_sq: "Nëse nuk jeni i kënaqur, kthimi është i mundur brenda 14 ditësh.",
     intro_en: "Not happy with your order? Returns are accepted within 14 days.",
-    meta_sq: "Politika e kthimit dhe ndërrimit të produkteve brenda 14 ditësh — Dream Studio.",
+    meta_sq: "Politika e kthimit dhe ndërrimit të produkteve brenda 14 ditësh — Dreame Beauty Cosmetics L.L.C.",
     blocks: [
       {
         h_sq: "Afati",
@@ -136,7 +136,7 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
     title_en: "Privacy policy",
     intro_sq: "Të dhënat tuaja përdoren vetëm për përpunimin e porosive.",
     intro_en: "Your data is used only to process your orders.",
-    meta_sq: "Si mbledhim dhe mbrojmë të dhënat tuaja personale — Dream Studio.",
+    meta_sq: "Si mbledhim dhe mbrojmë të dhënat tuaja personale — Dreame Beauty Cosmetics L.L.C.",
     blocks: [
       {
         h_sq: "Çfarë mbledhim",
@@ -169,7 +169,7 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
     title_en: "Terms of service",
     intro_sq: "Duke bërë një porosi, pranoni kushtet e mëposhtme.",
     intro_en: "By placing an order you accept the following terms.",
-    meta_sq: "Kushtet e blerjes, çmimet, porositë dhe pagesa në dorëzim — Dream Studio.",
+    meta_sq: "Kushtet e blerjes, çmimet, porositë dhe pagesa në dorëzim — Dreame Beauty Cosmetics L.L.C.",
     blocks: [
       {
         h_sq: "Porositë",
@@ -198,8 +198,8 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
       {
         h_sq: "Kontakti",
         h_en: "Contact",
-        b_sq: "Dream Studio · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com",
-        b_en: "Dream Studio · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com",
+        b_sq: "Dreame Beauty Cosmetics L.L.C. · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com",
+        b_en: "Dreame Beauty Cosmetics L.L.C. · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com",
       },
     ],
   },

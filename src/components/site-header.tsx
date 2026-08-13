@@ -65,7 +65,7 @@ export function SiteHeader() {
             <span className="grid h-10 w-10 place-items-center rounded-full bg-black text-white font-display text-lg tracking-tight shadow-pink">
               D
             </span>
-            <span className="font-display text-xl md:text-2xl tracking-tight font-semibold">Dream Studio</span>
+            <span className="font-display text-xl md:text-2xl tracking-tight font-semibold">Dreame Beauty Cosmetics L.L.C.</span>
           </Link>
 
           {/* Nav */}

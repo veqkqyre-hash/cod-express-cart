@@ -8,10 +8,10 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
   head: () => ({
     meta: [
-      { title: "Kyçu ose regjistrohu — Dream Studio" },
-      { name: "description", content: "Krijo llogari në Dream Studio për të porositur produkte profesionale për sallon me pagesë në dorëzim." },
-      { property: "og:title", content: "Kyçu ose regjistrohu — Dream Studio" },
-      { property: "og:description", content: "Krijo llogari në Dream Studio për të porositur produkte profesionale për sallon me pagesë në dorëzim." },
+      { title: "Kyçu ose regjistrohu — Dreame Beauty Cosmetics L.L.C." },
+      { name: "description", content: "Krijo llogari në Dreame Beauty Cosmetics L.L.C. për të porositur produkte profesionale për sallon me pagesë në dorëzim." },
+      { property: "og:title", content: "Kyçu ose regjistrohu — Dreame Beauty Cosmetics L.L.C." },
+      { property: "og:description", content: "Krijo llogari në Dreame Beauty Cosmetics L.L.C. për të porositur produkte profesionale për sallon me pagesë në dorëzim." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://cod-express-cart.lovable.app/auth" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -187,7 +187,7 @@ function Admin() {
         <div className="flex items-center gap-3 px-6 py-5 border-b border-neutral-800">
           <div className="grid h-9 w-9 place-items-center rounded-full bg-white text-neutral-900 font-display text-sm font-semibold">D</div>
           <div className="min-w-0">
-            <div className="font-display text-xl text-white leading-none">Dream Studio</div>
+            <div className="font-display text-xl text-white leading-none">Dreame Beauty Cosmetics L.L.C.</div>
             <div className="mt-1 text-[11px] uppercase tracking-wide text-neutral-400">{roleBadge}</div>
           </div>
         </div>
@@ -789,7 +789,7 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
           </div>
 
           <div className="hidden print:block mb-6 border-b border-black/20 pb-4">
-            <h1 className="print-brand font-display text-3xl tracking-tight">Dream Studio</h1>
+            <h1 className="print-brand font-display text-3xl tracking-tight">Dreame Beauty Cosmetics L.L.C.</h1>
             <div className="print-brand text-xs">Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com</div>
             <div className="mt-2 text-sm font-medium">{tr("invoice")} #{order.order_number}</div>
             <div className="text-xs">{new Date(order.created_at).toLocaleDateString(lang === "sq" ? "sq-AL" : "en-GB")}</div>

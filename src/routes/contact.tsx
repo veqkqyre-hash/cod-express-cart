@@ -9,7 +9,7 @@ import { Mail, Phone, MapPin, Clock, Send, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
   component: Contact,
-  head: () => metaFor("/contact", "Kontakti", "Kontaktoni Dream Studio — Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë. Telefon +383 44 123 456."),
+  head: () => metaFor("/contact", "Kontakti", "Kontaktoni Dreame Beauty Cosmetics L.L.C. — Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë. Telefon +383 44 123 456."),
 });
 
 const schema = z.object({
