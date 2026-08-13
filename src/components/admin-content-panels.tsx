@@ -599,7 +599,13 @@ export function SettingsPanel() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const value = {
-      store_name: String(fd.get("store_name") || ""),
+      ...(data ?? {}),
+      business_name: String(fd.get("business_name") || ""),
+      store_name: String(fd.get("business_name") || ""),
+      nui: String(fd.get("nui") || ""),
+      vat_number: String(fd.get("vat_number") || ""),
+      city: String(fd.get("city") || ""),
+      logo_url: String(fd.get("logo_url") || ""),
       phone: String(fd.get("phone") || ""),
       email: String(fd.get("email") || ""),
       address: String(fd.get("address") || ""),
@@ -614,6 +620,7 @@ export function SettingsPanel() {
     const { error } = await supabase.from("site_settings").upsert({ key: SETTINGS_KEY, value }, { onConflict: "key" });
     setSaving(false);
     if (error) return toast.error(error.message);
+    await loadBusinessInfo();
     toast.success(L("Cilësimet u ruajtën", "Settings saved"));
     refetch();
   }
@@ -621,18 +628,35 @@ export function SettingsPanel() {
   return (
     <Panel>
       <form onSubmit={onSave} className="space-y-4 p-6">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={L("Emri i dyqanit", "Store name")} name="store_name" defaultValue={data?.store_name ?? "Dreame Beauty Cosmetics L.L.C."} />
-          <Field label={L("Telefoni", "Phone")} name="phone" defaultValue={data?.phone ?? ""} />
+        <div>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+            {L("Të dhënat e biznesit", "Business details")}
+          </h3>
+          <p className="mt-1 text-xs text-neutral-500">
+            {L("Këto të dhëna printohen automatikisht në faturat e arkës.", "These details are printed automatically on POS receipts.")}
+          </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={L("Emri i biznesit", "Business name")} name="business_name" defaultValue={data?.business_name ?? data?.store_name ?? "Dreame Beauty Cosmetics L.L.C."} />
+          <Field label={L("NUI / Numri fiskal", "Business / fiscal number")} name="nui" defaultValue={data?.nui ?? ""} />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={L("Numri i TVSH-së (nëse aplikohet)", "VAT number (if applicable)")} name="vat_number" defaultValue={data?.vat_number ?? ""} />
+          <Field label={L("Qyteti", "City")} name="city" defaultValue={data?.city ?? "Fushë Kosovë 12000, Kosovë"} />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={L("Adresa", "Address")} name="address" defaultValue={data?.address ?? "Rr. Nëna Terezë"} />
+          <Field label={L("Logoja (URL)", "Logo (URL)")} name="logo_url" defaultValue={data?.logo_url ?? ""} placeholder="https://…" />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={L("Telefoni", "Phone")} name="phone" defaultValue={data?.phone ?? ""} />
           <Field label="Email" name="email" defaultValue={data?.email ?? ""} />
-          <Field label={L("Adresa", "Address")} name="address" defaultValue={data?.address ?? "Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë"} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Instagram" name="instagram" defaultValue={data?.instagram ?? ""} />
           <Field label="Facebook" name="facebook" defaultValue={data?.facebook ?? ""} />
         </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={L("Tarifa e transportit (€)", "Shipping fee (€)")} name="shipping_fee" type="number" step="0.01" defaultValue={data?.shipping_fee ?? 0} />
           <Field label={L("Transport falas mbi (€)", "Free shipping over (€)")} name="free_shipping_over" type="number" step="0.01" defaultValue={data?.free_shipping_over ?? 0} />
