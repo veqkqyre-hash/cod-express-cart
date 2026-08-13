@@ -766,6 +766,7 @@ export type Database = {
         Returns: Json
       }
       current_pos_shift: { Args: never; Returns: Json }
+      delete_pos_shift: { Args: { _id: string }; Returns: undefined }
       get_order_by_number: { Args: { _order_number: string }; Returns: Json }
       grant_admin_by_email: { Args: { _email: string }; Returns: Json }
       grant_role_by_email: {
