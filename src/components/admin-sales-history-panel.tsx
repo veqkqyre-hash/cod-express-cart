@@ -36,6 +36,10 @@ export function PosSalesPanel() {
   const { lang } = useI18n();
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const [open, setOpen] = useState<Sale | null>(null);
+  useEffect(() => {
+    void loadBusinessInfo();
+  }, []);
+
 
   const { data: sales } = useQuery({
     queryKey: ["pos-sales"],
