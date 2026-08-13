@@ -46,7 +46,11 @@ function Account() {
   const { data: orders } = useQuery({
     queryKey: ["my-orders", userId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
