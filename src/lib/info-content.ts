@@ -72,8 +72,8 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
       {
         h_sq: "Ofroni çmime për sallone?",
         h_en: "Do you offer salon pricing?",
-        b_sq: "Po. Për blerje me shumicë shkruani në hello@dreamstudio-ks.com për ofertë të personalizuar.",
-        b_en: "Yes. For wholesale orders email hello@dreamstudio-ks.com for a custom quote.",
+        b_sq: "Po. Për blerje me shumicë shkruani në info@dreamebeautycosmetics.com për ofertë të personalizuar.",
+        b_en: "Yes. For wholesale orders email info@dreamebeautycosmetics.com for a custom quote.",
       },
     ],
   },
@@ -120,8 +120,8 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
       {
         h_sq: "Si të kthej një produkt",
         h_en: "How to return",
-        b_sq: "1. Shkruani në hello@dreamstudio-ks.com  me numrin e porosisë.\n2. Ekipi ju konfirmon kthimin dhe organizon marrjen e pakos.\n3. Rimbursimi bëhet brenda 7 ditëve pune pas pranimit të produktit.",
-        b_en: "1. Email hello@dreamstudio-ks.com  with your order number.\n2. Our team confirms the return and arranges pickup.\n3. Refund is issued within 7 working days after we receive the item.",
+        b_sq: "1. Shkruani në info@dreamebeautycosmetics.com  me numrin e porosisë.\n2. Ekipi ju konfirmon kthimin dhe organizon marrjen e pakos.\n3. Rimbursimi bëhet brenda 7 ditëve pune pas pranimit të produktit.",
+        b_en: "1. Email info@dreamebeautycosmetics.com  with your order number.\n2. Our team confirms the return and arranges pickup.\n3. Refund is issued within 7 working days after we receive the item.",
       },
       {
         h_sq: "Produkt i dëmtuar",
@@ -159,8 +159,8 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
       {
         h_sq: "Të drejtat tuaja",
         h_en: "Your rights",
-        b_sq: "Mund të kërkoni në çdo kohë qasje, korrigjim ose fshirje të të dhënave tuaja në hello@dreamstudio-ks.com.",
-        b_en: "You may request access, correction or deletion of your data at any time at hello@dreamstudio-ks.com.",
+        b_sq: "Mund të kërkoni në çdo kohë qasje, korrigjim ose fshirje të të dhënave tuaja në info@dreamebeautycosmetics.com.",
+        b_en: "You may request access, correction or deletion of your data at any time at info@dreamebeautycosmetics.com.",
       },
     ],
   },
@@ -198,8 +198,8 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
       {
         h_sq: "Kontakti",
         h_en: "Contact",
-        b_sq: "Dreame Beauty Cosmetics L.L.C. · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · hello@dreamstudio-ks.com",
-        b_en: "Dreame Beauty Cosmetics L.L.C. · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · hello@dreamstudio-ks.com",
+        b_sq: "Dreame Beauty Cosmetics L.L.C. · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · info@dreamebeautycosmetics.com",
+        b_en: "Dreame Beauty Cosmetics L.L.C. · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · info@dreamebeautycosmetics.com",
       },
     ],
   },

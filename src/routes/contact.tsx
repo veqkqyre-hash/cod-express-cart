@@ -107,7 +107,7 @@ function Contact() {
           <aside className="lg:col-span-2 space-y-4">
             {[
               { icon: MapPin, title: L("Adresa", "Address"), value: "Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë" },
-              { icon: Mail, title: "Email", value: "hello@dreamstudio-ks.com" },
+              { icon: Mail, title: "Email", value: "info@dreamebeautycosmetics.com" },
               { icon: Clock, title: L("Orari", "Hours"), value: L("Hën–Sht: 09:00 – 19:00", "Mon–Sat: 09:00 – 19:00") },
             ].map((c, i) => (
               <div key={i} className="flex items-start gap-3 rounded-2xl border border-border bg-card p-5 shadow-soft">
@@ -121,7 +121,7 @@ function Contact() {
               </div>
             ))}
             <a
-              href="mailto:hello@dreamstudio-ks.com"
+              href="mailto:info@dreamebeautycosmetics.com"
               target="_blank"
               rel="noopener"
               className="flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-5 py-3 text-sm font-medium text-white hover:bg-green-700"

@@ -38,7 +38,7 @@ export function printOrders(
       return `<section class="page">
   <header>
     <h1>Dreame Beauty Cosmetics L.L.C.</h1>
-    <div class="addr">Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · hello@dreamstudio-ks.com</div>
+    <div class="addr">Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · info@dreamebeautycosmetics.com</div>
   </header>
   <div class="doc">
     <h2>${esc(labels.invoice)} · ${esc(o.order_number)}</h2>

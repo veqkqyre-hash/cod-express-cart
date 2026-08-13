@@ -22,7 +22,7 @@ const DEFAULTS: BusinessInfo = {
   address: "Rr. Nëna Terezë",
   city: "Fushë Kosovë 12000, Kosovë",
   phone: "",
-  email: "",
+  email: "info@dreamebeautycosmetics.com",
   logo_url: "",
 };
 
