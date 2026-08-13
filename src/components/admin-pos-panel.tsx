@@ -182,8 +182,10 @@ export function PosPanel() {
     const v = code.trim();
     setCode("");
     if (!v) {
-      toast.error(L("Skanimi nuk prodhoi vlerë — provo përsëri.", "The scan produced no value — try again."));
-      pushScan("—", false, L("Skanim i zbrazët", "Empty scan"));
+      toast.error(L("Skanimi nuk prodhoi vlerë", "The scan produced no value"), {
+        description: L("Skano përsëri ose shkruaj barkodin me dorë.", "Scan again or type the barcode manually."),
+      });
+      pushScan("—", false, L("Skanim i zbrazët", "Empty scan"), L("Nuk arriti kod nga skaneri.", "No code arrived from the scanner."));
       scanRef.current?.focus();
       return;
     }
@@ -194,9 +196,9 @@ export function PosPanel() {
       if (error) throw new Error(error.message);
       res = data as unknown as { found: boolean; code: string; product?: PosProduct };
     } catch (err) {
-      const msg = scanErrorMessage(err instanceof Error ? err.message : String(err), v);
-      toast.error(msg);
-      pushScan(v, false, msg);
+      const { msg, hint } = scanErrorMessage(err instanceof Error ? err.message : String(err), v);
+      toast.error(msg, { description: hint });
+      pushScan(v, false, msg, hint);
       setTerm(v); // arka vazhdon: kërko manualisht
       scanRef.current?.focus();
       return;
@@ -204,16 +206,23 @@ export function PosPanel() {
     scanRef.current?.focus();
     if (!res?.found || !res.product) {
       const msg = `${L("Barkodi nuk u njoh", "Barcode not recognised")}: ${res?.code ?? v}`;
-      toast.error(msg);
-      pushScan(v, false, msg);
+      const hint = L(
+        "Kërkimi manual u hap me këtë kod — ose regjistroje produktin në Katalogu → Produktet.",
+        "Manual search opened with this code — or register the product in Catalog → Products.",
+      );
+      toast.error(msg, { description: hint });
+      pushScan(v, false, msg, hint);
       setTerm(v);
       return;
     }
     const live = (products ?? []).find((p) => p.id === res.product!.id) ?? res.product;
     add(live);
     pushScan(v, true, nameOf(live));
-    toast.success(`${L("U skanua", "Scanned")}: ${nameOf(live)}`);
+    toast.success(`${L("U skanua", "Scanned")}: ${nameOf(live)}`, {
+      description: `${formatEur(Number(live.price))} · ${L("stok", "stock")}: ${live.stock}`,
+    });
   }
+
 
 
   const results = useMemo(() => {
