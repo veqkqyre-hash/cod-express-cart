@@ -12,7 +12,7 @@ export type ReceiptSale = {
 };
 
 const STORE = {
-  name: "Dream Studio",
+  name: "Dreame Beauty Cosmetics L.L.C.",
   addr: "Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë",
   phone: "+383 44 123 456",
 };

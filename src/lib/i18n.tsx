@@ -5,7 +5,7 @@ export type Lang = "sq" | "en" | "de";
 type Dict = Record<string, { sq: string; en: string }>;
 
 export const t: Dict = {
-  brand: { sq: "Dream Studio", en: "Dream Studio" },
+  brand: { sq: "Dreame Beauty Cosmetics L.L.C.", en: "Dreame Beauty Cosmetics L.L.C." },
   tagline: { sq: "Furnizim luksoz për sallone bukurie", en: "Luxury beauty salon supplies" },
   home: { sq: "Ballina", en: "Home" },
   shop: { sq: "Dyqani", en: "Shop" },
@@ -68,7 +68,7 @@ export const t: Dict = {
   updateStatus: { sq: "Ndrysho Statusin", en: "Update Status" },
   filter: { sq: "Filtro", en: "Filter" },
   back: { sq: "Kthehu", en: "Back" },
-  footerNote: { sq: "© Dream Studio. Pagesë në dorëzim me postë.", en: "© Dream Studio. Cash on Delivery via post." },
+  footerNote: { sq: "© Dreame Beauty Cosmetics L.L.C.. Pagesë në dorëzim me postë.", en: "© Dreame Beauty Cosmetics L.L.C.. Cash on Delivery via post." },
   account: { sq: "Llogaria Ime", en: "My Account" },
   myOrders: { sq: "Porositë e Mia", en: "My Orders" },
   loginRequired: { sq: "Kyçuni për të vazhduar", en: "Sign in to continue" },
@@ -147,7 +147,7 @@ export const t: Dict = {
   productsCount: { sq: "Produkte", en: "Products" },
   topBrandsTitle: { sq: "Bli sipas markës", en: "Shop by brand" },
   topBrandsSub: { sq: "Punojmë vetëm me markat lider në industri.", en: "We partner only with industry-leading brands." },
-  whyUs: { sq: "Pse Dream Studio", en: "Why Dream Studio" },
+  whyUs: { sq: "Pse Dreame Beauty Cosmetics L.L.C.", en: "Why Dreame Beauty Cosmetics L.L.C." },
   whyUsTitle: { sq: "Përvoja luksoze për profesionistë", en: "Luxury experience for professionals" },
   whyUsSub: { sq: "Ne besojmë që sallonet meritojnë më të mirën — nga produkti te shërbimi.", en: "We believe salons deserve the very best — from product to service." },
   whyPremiumTitle: { sq: "Cilësi Premium", en: "Premium Quality" },

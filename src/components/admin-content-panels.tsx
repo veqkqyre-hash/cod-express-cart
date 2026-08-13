@@ -622,7 +622,7 @@ export function SettingsPanel() {
     <Panel>
       <form onSubmit={onSave} className="space-y-4 p-6">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={L("Emri i dyqanit", "Store name")} name="store_name" defaultValue={data?.store_name ?? "Dream Studio"} />
+          <Field label={L("Emri i dyqanit", "Store name")} name="store_name" defaultValue={data?.store_name ?? "Dreame Beauty Cosmetics L.L.C."} />
           <Field label={L("Telefoni", "Phone")} name="phone" defaultValue={data?.phone ?? ""} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">

@@ -15,10 +15,10 @@ export const Route = createFileRoute("/shop")({
   component: Shop,
   head: () => ({
     meta: [
-      { title: "Dyqani — Dream Studio" },
-      { name: "description", content: "Blej produkte profesionale për sallon në Dream Studio: floktari, ngjyra, barber, thonj, makeup dhe mobilje. Pagesa në dorëzim." },
-      { property: "og:title", content: "Dyqani — Dream Studio" },
-      { property: "og:description", content: "Blej produkte profesionale për sallon në Dream Studio: floktari, ngjyra, barber, thonj, makeup dhe mobilje. Pagesa në dorëzim." },
+      { title: "Dyqani — Dreame Beauty Cosmetics L.L.C." },
+      { name: "description", content: "Blej produkte profesionale për sallon në Dreame Beauty Cosmetics L.L.C.: floktari, ngjyra, barber, thonj, makeup dhe mobilje. Pagesa në dorëzim." },
+      { property: "og:title", content: "Dyqani — Dreame Beauty Cosmetics L.L.C." },
+      { property: "og:description", content: "Blej produkte profesionale për sallon në Dreame Beauty Cosmetics L.L.C.: floktari, ngjyra, barber, thonj, makeup dhe mobilje. Pagesa në dorëzim." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://cod-express-cart.lovable.app/shop" },
       { name: "twitter:card", content: "summary_large_image" },

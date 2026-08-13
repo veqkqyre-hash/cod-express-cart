@@ -37,7 +37,7 @@ export function printOrders(
       const items = itemsByOrder[o.id] ?? [];
       return `<section class="page">
   <header>
-    <h1>Dream Studio</h1>
+    <h1>Dreame Beauty Cosmetics L.L.C.</h1>
     <div class="addr">Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com</div>
   </header>
   <div class="doc">
@@ -62,7 +62,7 @@ export function printOrders(
     })
     .join("");
 
-  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Dream Studio — ${esc(labels.invoice)}</title>
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Dreame Beauty Cosmetics L.L.C. — ${esc(labels.invoice)}</title>
 <style>
   *{box-sizing:border-box}
   body{font-family:Georgia,'Times New Roman',serif;color:#111;margin:0}

@@ -11,10 +11,10 @@ export const Route = createFileRoute("/")({
   component: Home,
   head: () => ({
     meta: [
-      { title: "Dream Studio — Furnizime Premium për Sallone Bukurie" },
-      { name: "description", content: "Dream Studio: produkte premium për sallone bukurie, floktari, barber, thonj dhe makeup. Pagesa në dorëzim (COD) në tërë Kosovën." },
-      { property: "og:title", content: "Dream Studio — Furnizime Premium për Sallone Bukurie" },
-      { property: "og:description", content: "Dream Studio: produkte premium për sallone bukurie, floktari, barber, thonj dhe makeup. Pagesa në dorëzim (COD) në tërë Kosovën." },
+      { title: "Dreame Beauty Cosmetics L.L.C. — Furnizime Premium për Sallone Bukurie" },
+      { name: "description", content: "Dreame Beauty Cosmetics L.L.C.: produkte premium për sallone bukurie, floktari, barber, thonj dhe makeup. Pagesa në dorëzim (COD) në tërë Kosovën." },
+      { property: "og:title", content: "Dreame Beauty Cosmetics L.L.C. — Furnizime Premium për Sallone Bukurie" },
+      { property: "og:description", content: "Dreame Beauty Cosmetics L.L.C.: produkte premium për sallone bukurie, floktari, barber, thonj dhe makeup. Pagesa në dorëzim (COD) në tërë Kosovën." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://cod-express-cart.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Store",
-          name: "Dream Studio",
+          name: "Dreame Beauty Cosmetics L.L.C.",
           description:
             "Furnizime premium për sallone bukurie: floktari, barber, thonj, makeup dhe pajisje. Pagesa në dorëzim (COD) në tërë Kosovën.",
           url: "https://cod-express-cart.lovable.app/",

@@ -10,10 +10,10 @@ export const Route = createFileRoute("/account")({
   component: Account,
   head: () => ({
     meta: [
-      { title: "Llogaria juaj — Dream Studio" },
-      { name: "description", content: "Shiko porositë e tua dhe statusin e dërgesave në Dream Studio." },
-      { property: "og:title", content: "Llogaria juaj — Dream Studio" },
-      { property: "og:description", content: "Shiko porositë e tua dhe statusin e dërgesave në Dream Studio." },
+      { title: "Llogaria juaj — Dreame Beauty Cosmetics L.L.C." },
+      { name: "description", content: "Shiko porositë e tua dhe statusin e dërgesave në Dreame Beauty Cosmetics L.L.C.." },
+      { property: "og:title", content: "Llogaria juaj — Dreame Beauty Cosmetics L.L.C." },
+      { property: "og:description", content: "Shiko porositë e tua dhe statusin e dërgesave në Dreame Beauty Cosmetics L.L.C.." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://cod-express-cart.lovable.app/account" },
       { name: "twitter:card", content: "summary_large_image" },
