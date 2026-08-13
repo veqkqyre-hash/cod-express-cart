@@ -156,7 +156,15 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={onClose}>
       <div className="w-full max-w-2xl max-h-[90vh] overflow-auto rounded-2xl bg-background shadow-elev" onClick={(e) => e.stopPropagation()}>
-        <form onSubmit={onSubmit} className="p-6 space-y-4">
+        <form
+          onSubmit={onSubmit}
+          onKeyDown={(e) => {
+            // Barcode scanners send Enter after the code — don't submit the form mid-entry
+            const el = e.target as HTMLElement;
+            if (e.key === "Enter" && el.tagName === "INPUT") e.preventDefault();
+          }}
+          className="p-6 space-y-4"
+        >
           <div className="flex items-center justify-between">
             <h2 className="font-display text-2xl">{product ? tr("editProduct") : tr("addProduct")}</h2>
             <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted"><X className="h-4 w-4" /></button>
