@@ -54,9 +54,10 @@ export function SiteFooter() {
             <div className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink)]">{tr("shop")}</div>
             <ul className="space-y-2 text-sm text-white/70">
               <li><Link to="/shop" className="hover:text-white transition">{tr("allProducts")}</Link></li>
-              <li><Link to="/shop" search={{ category: "hair-care" }} className="hover:text-white transition">Hair Care</Link></li>
-              <li><Link to="/shop" search={{ category: "makeup" }} className="hover:text-white transition">Makeup</Link></li>
-              <li><Link to="/shop" search={{ category: "nails" }} className="hover:text-white transition">Nails</Link></li>
+              <li><Link to="/shop" search={{ category: "gel-lak" }} className="hover:text-white transition">{lang === "sq" ? "Gel Lak" : "Gel Polish"}</Link></li>
+              <li><Link to="/shop" search={{ category: "freza-aparate" }} className="hover:text-white transition">{lang === "sq" ? "Freza & Aparate" : "Drills & Machines"}</Link></li>
+              <li><Link to="/shop" search={{ category: "pedikyr" }} className="hover:text-white transition">{lang === "sq" ? "Pedikyr" : "Pedicure"}</Link></li>
+
               <li><Link to="/wishlist" className="hover:text-white transition">{tr("wishlist")}</Link></li>
             </ul>
           </div>
