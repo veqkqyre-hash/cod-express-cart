@@ -19,6 +19,7 @@ import { ReportsPanel } from "@/components/admin-reports-panel";
 import { CustomerMessage } from "@/components/admin-customer-message";
 import { PagesPanel } from "@/components/admin-pages-panel";
 import { PosPanel } from "@/components/admin-pos-panel";
+import { DashboardCharts } from "@/components/admin-dashboard-charts";
 import { PosSalesPanel } from "@/components/admin-sales-history-panel";
 import { PosReportPanel } from "@/components/admin-pos-report-panel";
 import { OrderTimeline } from "@/components/order-timeline";
