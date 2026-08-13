@@ -6,6 +6,8 @@ import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { Pencil, Trash2, Mail, MailOpen } from "lucide-react";
 import { AddButton, Check, Empty, Field, FormActions, Modal, Panel, TextArea } from "@/components/admin-ui";
+import { loadBusinessInfo } from "@/lib/store-info";
+
 
 function useL() {
   const { lang } = useI18n();
