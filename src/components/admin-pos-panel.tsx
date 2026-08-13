@@ -116,32 +116,28 @@ export function PosPanel() {
     );
   }
 
-  function onScan(e: React.FormEvent) {
+  async function onScan(e: React.FormEvent) {
     e.preventDefault();
     const v = code.trim();
+    setCode("");
     if (!v) {
       toast.error(L("Skanimi nuk prodhoi vlerë — provo përsëri.", "The scan produced no value — try again."));
       scanRef.current?.focus();
       return;
     }
-    if (!/^[A-Za-z0-9._-]{2,32}$/.test(v)) {
-      toast.error(L("Barkod i pavlefshëm (pa zbrazëti, max 32 karaktere).", "Invalid barcode (no spaces, max 32 characters)."));
-      setCode("");
-      scanRef.current?.focus();
+    // Validim + regjistrim i skanimit në server (RPC pos_scan)
+    const { data, error } = await supabase.rpc("pos_scan", { _code: v });
+    scanRef.current?.focus();
+    if (error) return toast.error(error.message);
+    const res = data as unknown as { found: boolean; code: string; product?: PosProduct };
+    if (!res?.found || !res.product) {
+      toast.error(`${L("Barkodi nuk u njoh", "Barcode not recognised")}: ${res?.code ?? v}`);
+      setTerm(v);
       return;
     }
-    const found = (products ?? []).find(
-      (p) => (p.barcode && p.barcode === v) || (p.sku && p.sku.toLowerCase() === v.toLowerCase()),
-    );
-    if (!found) {
-      toast.error(`${L("Barkodi nuk u njoh", "Barcode not recognised")}: ${v}`);
-      setTerm(v);
-    } else {
-      add(found);
-      toast.success(`${L("U skanua", "Scanned")}: ${nameOf(found)}`);
-    }
-    setCode("");
-    scanRef.current?.focus();
+    const live = (products ?? []).find((p) => p.id === res.product!.id) ?? res.product;
+    add(live);
+    toast.success(`${L("U skanua", "Scanned")}: ${nameOf(live)}`);
   }
 
   const results = useMemo(() => {
@@ -217,7 +213,25 @@ export function PosPanel() {
             />
             <button className="rounded-xl bg-neutral-900 px-6 text-sm font-semibold text-white">OK</button>
           </div>
+          <p className="mt-2 text-xs text-neutral-500">
+            {L(
+              "Barkodi: 4–32 karaktere, pa zbrazëti (A-Z, 0-9, . _ -). Çdo skanim regjistrohet në Audit log.",
+              "Barcode: 4–32 characters, no spaces (A-Z, 0-9, . _ -). Every scan is recorded in the audit log.",
+            )}
+          </p>
         </form>
+
+        <details className="rounded-2xl border border-neutral-200 bg-white p-4 text-sm shadow-sm">
+          <summary className="cursor-pointer font-semibold">{L("Udhëzime për skanim", "Scanning guide")}</summary>
+          <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-neutral-600">
+            <li>{L("Lidh skanerin USB/Bluetooth — punon si tastierë (HID), pa driver.", "Connect the USB/Bluetooth scanner — it works as a keyboard (HID), no driver needed.")}</li>
+            <li>{L("Skaneri duhet të dërgojë Enter (CR) në fund të skanimit dhe layout US.", "The scanner must send Enter (CR) after each scan and use the US layout.")}</li>
+            <li>{L("Kliko në fushën e madhe të barkodit — fokusi mbahet automatikisht.", "Click the large barcode field — focus is kept automatically.")}</li>
+            <li>{L("Skano: produkti hyn në shportë; sasia rritet automatikisht për skanim të përsëritur.", "Scan: the product enters the cart; repeated scans increase quantity.")}</li>
+            <li>{L("Produkt i re: Katalogu → Produktet → Shto produkt → skano në fushën Barkodi.", "New product: Catalog → Products → Add product → scan into the Barcode field.")}</li>
+            <li>{L("Nëse barkodi nuk njihet, kërkimi hapet automatikisht me atë kod.", "If the barcode is unknown, the search opens automatically with that code.")}</li>
+          </ol>
+        </details>
 
         <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
           <div className="flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2">
