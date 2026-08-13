@@ -190,7 +190,7 @@ export function ShiftBar({ compact = false }: { compact?: boolean }) {
 export function ShiftsPanel() {
   const { lang } = useI18n();
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
-  const { data: shifts } = useQuery({
+  const { data: shifts, refetch } = useQuery({
     queryKey: ["pos-shifts"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -218,12 +218,13 @@ export function ShiftsPanel() {
               <th className="px-4 py-3 text-right">{L("Kartë", "Card")}</th>
               <th className="px-4 py-3 text-right">{L("Numëruar", "Counted")}</th>
               <th className="px-4 py-3 text-right">{L("Diferenca", "Difference")}</th>
+              <th className="px-4 py-3 text-right">{L("Veprime", "Actions")}</th>
             </tr>
           </thead>
           <tbody>
             {(shifts ?? []).length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-neutral-500">
+                <td colSpan={9} className="px-4 py-10 text-center text-neutral-500">
                   {L("Nuk ka sesione.", "No shifts yet.")}
                 </td>
               </tr>
@@ -247,6 +248,24 @@ export function ShiftsPanel() {
                   }`}
                 >
                   {s.difference == null ? "—" : formatEur(Number(s.difference))}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  {s.closed_at ? (
+                    <button
+                      onClick={async () => {
+                        if (!confirm(L("Fshij këtë sesion pune? Shitjet ruhen, por shkëputen nga sesioni.", "Delete this work shift? Sales are kept but unlinked from the shift."))) return;
+                        const { error } = await supabase.rpc("delete_pos_shift", { _id: s.id });
+                        if (error) return toast.error(error.message);
+                        toast.success(L("Sesioni u fshi.", "Shift deleted."));
+                        refetch();
+                      }}
+                      className="inline-flex items-center gap-1 rounded-full border border-red-200 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> {L("Fshij", "Delete")}
+                    </button>
+                  ) : (
+                    <span className="text-xs text-neutral-400">{L("hapur", "open")}</span>
+                  )}
                 </td>
               </tr>
             ))}
