@@ -49,9 +49,40 @@ export function PosPanel() {
   const [autoPrint, setAutoPrint] = useState(true);
   const [receiptWidth, setReceiptWidth] = useState<58 | 80>(80);
   const [cashier, setCashier] = useState("");
+  const [scanLog, setScanLog] = useState<{ id: string; code: string; ok: boolean; label: string; at: string }[]>([]);
   useEffect(() => setCashier(getCashierName()), []);
   const scanRef = useRef<HTMLInputElement>(null);
   const { data: shift, refetch: refetchShift } = useCurrentShift();
+
+  function pushScan(code: string, ok: boolean, label: string) {
+    setScanLog((prev) =>
+      [{ id: `${Date.now()}-${Math.random()}`, code, ok, label, at: new Date().toLocaleTimeString() }, ...prev].slice(0, 12),
+    );
+  }
+
+  /** Përkthe gabimet e serverit në mesazhe të qarta, pa e bllokuar arkën. */
+  function scanErrorMessage(raw: string, code: string) {
+    const m = (raw || "").toLowerCase();
+    if (m.includes("invalid") || m.includes("pavlefsh"))
+      return L(
+        `Barkod i pavlefshëm: ${code} — duhet 4–32 karaktere, pa zbrazëti (A-Z, 0-9, . _ -).`,
+        `Invalid barcode: ${code} — needs 4–32 characters, no spaces (A-Z, 0-9, . _ -).`,
+      );
+    if (m.includes("duplicate") || m.includes("unique"))
+      return L(
+        `Barkodi ${code} është i regjistruar në më shumë se një produkt — rregulloje në Katalogu → Produktet.`,
+        `Barcode ${code} is registered on more than one product — fix it in Catalog → Products.`,
+      );
+    if (m.includes("not authenticated") || m.includes("jwt") || m.includes("not authorized"))
+      return L("Sesioni skadoi — kyçu përsëri për të vazhduar skanimin.", "Session expired — sign in again to keep scanning.");
+    if (m.includes("failed to fetch") || m.includes("network") || m.includes("timeout") || m.includes("fetch"))
+      return L(
+        "Serveri nuk u arrit — kontrollo internetin. Mund të vazhdosh me kërkimin manual.",
+        "Server unreachable — check your connection. You can continue with manual search.",
+      );
+    return raw || L("Skanimi dështoi — provo përsëri.", "Scan failed — try again.");
+  }
+
 
   const { data: products, refetch } = useQuery({
     queryKey: ["pos-products"],
