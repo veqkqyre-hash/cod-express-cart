@@ -1,5 +1,6 @@
 // Thermal receipt printing (58mm / 80mm) for POS sales.
 import { cashierDisplay } from "@/lib/cashier";
+import { businessInfo } from "@/lib/store-info";
 
 export type ReceiptItem = { name: string; qty: number; price: number };
 export type ReceiptSale = {
@@ -13,10 +14,6 @@ export type ReceiptSale = {
   cashier_name?: string | null;
 };
 
-const STORE = {
-  name: "Dreame Beauty Cosmetics L.L.C.",
-  addr: "Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë",
-};
 
 function esc(s: unknown) {
   return String(s ?? "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c] as string);
@@ -27,6 +24,8 @@ const money = (n: number) => `${n.toFixed(2)} €`;
 /** Opens a print window sized for a thermal roll. width = 58 | 80 (mm) */
 export function printReceipt(sale: ReceiptSale, items: ReceiptItem[], width: 58 | 80 = 80) {
   const d = new Date(sale.created_at);
+  const B = businessInfo();
+
   const rows = items
     .map(
       (i) => `<tr><td class="n">${esc(i.name)}<div class="s">${i.qty} × ${money(i.price)}</div></td>
@@ -53,8 +52,16 @@ export function printReceipt(sale: ReceiptSale, items: ReceiptItem[], width: 58 
   .tot{font-size:${width === 58 ? 13 : 15}px;font-weight:bold}
   .row{display:flex;justify-content:space-between;gap:6px}
 </style></head><body>
-<h1>${esc(STORE.name)}</h1>
-<div class="c muted">${esc(STORE.addr)}</div>
+${B.logo_url ? `<div class="c"><img src="${esc(B.logo_url)}" alt="" style="max-width:70%;max-height:18mm;object-fit:contain"></div>` : ""}
+<h1>${esc(B.business_name)}</h1>
+<div class="c muted">
+  ${esc([B.address, B.city].filter(Boolean).join(", "))}
+  ${B.phone ? `<br>Tel: ${esc(B.phone)}` : ""}
+  ${B.email ? `<br>${esc(B.email)}` : ""}
+  ${B.nui ? `<br>NUI / Nr. fiskal: ${esc(B.nui)}` : ""}
+  ${B.vat_number ? `<br>Nr. TVSH: ${esc(B.vat_number)}` : ""}
+</div>
+
 <hr>
 <div class="muted">
   <div class="row"><span>Nr. shitjes</span><b>${esc(sale.sale_number)}</b></div>
@@ -71,7 +78,7 @@ export function printReceipt(sale: ReceiptSale, items: ReceiptItem[], width: 58 
   ${sale.change_amount != null ? `<div class="row"><span>Kusuri</span><span>${money(Number(sale.change_amount))}</span></div>` : ""}
 </div>
 <hr>
-<div class="c muted">Faleminderit! / Thank you!<br>${esc(STORE.name)}</div>
+<div class="c muted">Faleminderit! / Thank you!<br>${esc(B.business_name)}${B.vat_number ? `<br>TVSH e përfshirë në çmim` : ""}</div>
 </body></html>`;
 
   const w = window.open("", "_blank", `width=${width === 58 ? 320 : 420},height=760`);

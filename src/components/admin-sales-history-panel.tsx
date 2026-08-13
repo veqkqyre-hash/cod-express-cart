@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cashierDisplay } from "@/lib/cashier";
@@ -9,6 +9,8 @@ import { printReceipt } from "@/lib/pos-receipt";
 import { ExportButtons } from "@/components/admin-export";
 import type { Column } from "@/lib/export";
 import { Panel, Empty } from "@/components/admin-ui";
+import { loadBusinessInfo } from "@/lib/store-info";
+
 
 type Sale = {
   id: string;
@@ -36,6 +38,10 @@ export function PosSalesPanel() {
   const { lang } = useI18n();
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const [open, setOpen] = useState<Sale | null>(null);
+  useEffect(() => {
+    void loadBusinessInfo();
+  }, []);
+
 
   const { data: sales } = useQuery({
     queryKey: ["pos-sales"],
