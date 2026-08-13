@@ -144,6 +144,14 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
       toast.error(lang === "sq" ? "Plotësoni fushat" : "Fill required fields");
       return;
     }
+    if (payload.barcode && !BARCODE_RE.test(payload.barcode)) {
+      toast.error(
+        lang === "sq"
+          ? "Barkod i pavlefshëm: 4–32 karaktere, vetëm shifra/shkronja dhe -, pa zbrazëti."
+          : "Invalid barcode: 4–32 characters, digits/letters and - only, no spaces.",
+      );
+      return;
+    }
     setSaving(true);
     const { error } = product
       ? await supabase.from("products").update(payload).eq("id", product.id)
@@ -159,9 +167,10 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
         <form
           onSubmit={onSubmit}
           onKeyDown={(e) => {
-            // Barcode scanners send Enter after the code — don't submit the form mid-entry
-            const el = e.target as HTMLElement;
-            if (e.key === "Enter" && el.tagName === "INPUT") e.preventDefault();
+            // Enter bllokohet vetëm në fushat e skanimit (barkod / SKU) — skaneri dërgon Enter në fund
+            const el = e.target as HTMLInputElement;
+            const scanField = el.tagName === "INPUT" && (el.name === "barcode" || el.name === "sku");
+            if (e.key === "Enter" && scanField) e.preventDefault();
           }}
           className="p-6 space-y-4"
         >
@@ -176,7 +185,7 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FieldA label={lang === "sq" ? "Barkodi" : "Barcode"} name="barcode" defaultValue={product?.barcode ?? ""} />
+            <BarcodeField lang={lang} defaultValue={product?.barcode ?? ""} />
             <FieldA label="SKU" name="sku" defaultValue={product?.sku ?? ""} />
           </div>
 
