@@ -64,7 +64,11 @@ export function PosPanel() {
     at: string;
   };
   const [scanLog, setScanLog] = useState<ScanEntry[]>([]);
-  useEffect(() => setCashier(getCashierName()), []);
+  useEffect(() => {
+    setCashier(getCashierName());
+    void loadBusinessInfo();
+  }, []);
+
   const scanRef = useRef<HTMLInputElement>(null);
   const { data: shift, refetch: refetchShift } = useCurrentShift();
 
