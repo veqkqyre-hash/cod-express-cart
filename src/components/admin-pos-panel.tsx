@@ -74,28 +74,44 @@ export function PosPanel() {
   }
 
 
-  /** Përkthe gabimet e serverit në mesazhe të qarta, pa e bllokuar arkën. */
-  function scanErrorMessage(raw: string, code: string) {
+  /** Përkthe gabimet e serverit në mesazhe të qarta (titull + zgjidhje), pa e bllokuar arkën. */
+  function scanErrorMessage(raw: string, code: string): { msg: string; hint: string } {
     const m = (raw || "").toLowerCase();
     if (m.includes("invalid") || m.includes("pavlefsh"))
-      return L(
-        `Barkod i pavlefshëm: ${code} — duhet 4–32 karaktere, pa zbrazëti (A-Z, 0-9, . _ -).`,
-        `Invalid barcode: ${code} — needs 4–32 characters, no spaces (A-Z, 0-9, . _ -).`,
-      );
+      return {
+        msg: L(`Barkod i pavlefshëm: ${code}`, `Invalid barcode: ${code}`),
+        hint: L(
+          "Duhet 4–32 karaktere, pa zbrazëti (A-Z, 0-9, . _ -). Kontrollo layout-in US të skanerit.",
+          "Needs 4–32 characters, no spaces (A-Z, 0-9, . _ -). Check the scanner's US layout.",
+        ),
+      };
     if (m.includes("duplicate") || m.includes("unique"))
-      return L(
-        `Barkodi ${code} është i regjistruar në më shumë se një produkt — rregulloje në Katalogu → Produktet.`,
-        `Barcode ${code} is registered on more than one product — fix it in Catalog → Products.`,
-      );
+      return {
+        msg: L(`Barkodi ${code} është dublikat`, `Barcode ${code} is a duplicate`),
+        hint: L(
+          "I njëjti barkod është në më shumë produkte — rregulloje në Katalogu → Produktet.",
+          "The same barcode exists on several products — fix it in Catalog → Products.",
+        ),
+      };
     if (m.includes("not authenticated") || m.includes("jwt") || m.includes("not authorized"))
-      return L("Sesioni skadoi — kyçu përsëri për të vazhduar skanimin.", "Session expired — sign in again to keep scanning.");
+      return {
+        msg: L("Sesioni skadoi", "Session expired"),
+        hint: L("Kyçu përsëri për të vazhduar skanimin.", "Sign in again to keep scanning."),
+      };
     if (m.includes("failed to fetch") || m.includes("network") || m.includes("timeout") || m.includes("fetch"))
-      return L(
-        "Serveri nuk u arrit — kontrollo internetin. Mund të vazhdosh me kërkimin manual.",
-        "Server unreachable — check your connection. You can continue with manual search.",
-      );
-    return raw || L("Skanimi dështoi — provo përsëri.", "Scan failed — try again.");
+      return {
+        msg: L("Serveri nuk u arrit", "Server unreachable"),
+        hint: L(
+          "Kontrollo internetin — arka vazhdon, shto produktin nga kërkimi manual.",
+          "Check your connection — the register keeps working, add the product from manual search.",
+        ),
+      };
+    return {
+      msg: L("Skanimi dështoi", "Scan failed"),
+      hint: raw || L("Provo përsëri ose kërko produktin manualisht.", "Try again or search the product manually."),
+    };
   }
+
 
 
   const { data: products, refetch } = useQuery({
