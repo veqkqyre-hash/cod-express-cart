@@ -134,6 +134,8 @@ export function AuditPanel() {
   const [preset, setPreset] = useState("all");
   const [range, setRange] = useState("7");
   const [open, setOpen] = useState<string | null>(null);
+  const [sale, setSale] = useState<string | null>(null);
+
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["admin-audit"],
