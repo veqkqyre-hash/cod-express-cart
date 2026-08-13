@@ -49,21 +49,21 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-// Category card visuals — soft pink illustrated tiles
+// Category card visuals — nail-focused illustrated tiles
 const CATEGORY_ART: Record<string, { hue: string; emoji: string }> = {
-  "hair-care": { hue: "from-pink-100 to-white", emoji: "💗" },
-  "hair-color": { hue: "from-rose-100 to-white", emoji: "🎨" },
-  barber: { hue: "from-neutral-100 to-white", emoji: "✂️" },
-  nails: { hue: "from-pink-50 to-white", emoji: "💅" },
-  makeup: { hue: "from-fuchsia-100 to-white", emoji: "💄" },
-  eyelashes: { hue: "from-rose-50 to-white", emoji: "👁️" },
-  waxing: { hue: "from-amber-50 to-white", emoji: "🕯️" },
-  equipment: { hue: "from-slate-100 to-white", emoji: "⚙️" },
-  "salon-equipment": { hue: "from-slate-100 to-white", emoji: "⚙️" },
-  furniture: { hue: "from-neutral-100 to-white", emoji: "🪑" },
-  accessories: { hue: "from-pink-100 to-white", emoji: "✨" },
-  "professional-accessories": { hue: "from-pink-100 to-white", emoji: "✨" },
+  "gel-lak": { hue: "from-pink-100 to-white", emoji: "💅" },
+  "akrilik-pluhur": { hue: "from-rose-100 to-white", emoji: "🧁" },
+  "gel-thonj": { hue: "from-fuchsia-100 to-white", emoji: "🪄" },
+  "baze-top-coat": { hue: "from-pink-50 to-white", emoji: "🫧" },
+  "freza-aparate": { hue: "from-slate-100 to-white", emoji: "🛠️" },
+  "lampa-uv-led": { hue: "from-amber-50 to-white", emoji: "💡" },
+  "lime-instrumente": { hue: "from-neutral-100 to-white", emoji: "✂️" },
+  "tipsa-forma": { hue: "from-rose-50 to-white", emoji: "🤍" },
+  "nail-art": { hue: "from-fuchsia-50 to-white", emoji: "✨" },
+  pedikyr: { hue: "from-pink-50 to-white", emoji: "🦶" },
+  higjena: { hue: "from-sky-50 to-white", emoji: "🧼" },
 };
+
 
 function Home() {
   const { tr, lang } = useI18n();
