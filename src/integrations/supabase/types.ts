@@ -382,10 +382,111 @@ export type Database = {
         }
         Relationships: []
       }
+      pos_sale_items: {
+        Row: {
+          barcode: string | null
+          created_at: string
+          id: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          sale_id: string
+          subtotal: number
+          unit_cost: number
+          unit_price: number
+        }
+        Insert: {
+          barcode?: string | null
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name: string
+          quantity: number
+          sale_id: string
+          subtotal: number
+          unit_cost?: number
+          unit_price: number
+        }
+        Update: {
+          barcode?: string | null
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          sale_id?: string
+          subtotal?: number
+          unit_cost?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sale_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_sales: {
+        Row: {
+          cashier_email: string | null
+          cashier_id: string | null
+          change_amount: number | null
+          cost_total: number
+          created_at: string
+          id: string
+          item_count: number
+          note: string | null
+          paid_amount: number | null
+          payment_method: string
+          sale_number: string
+          total: number
+        }
+        Insert: {
+          cashier_email?: string | null
+          cashier_id?: string | null
+          change_amount?: number | null
+          cost_total?: number
+          created_at?: string
+          id?: string
+          item_count?: number
+          note?: string | null
+          paid_amount?: number | null
+          payment_method?: string
+          sale_number?: string
+          total?: number
+        }
+        Update: {
+          cashier_email?: string | null
+          cashier_id?: string | null
+          change_amount?: number | null
+          cost_total?: number
+          created_at?: string
+          id?: string
+          item_count?: number
+          note?: string | null
+          paid_amount?: number | null
+          payment_method?: string
+          sale_number?: string
+          total?: number
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           active: boolean
+          barcode: string | null
           category_id: string | null
+          cost_price: number
           created_at: string
           description_en: string | null
           description_sq: string | null
@@ -395,13 +496,16 @@ export type Database = {
           name_en: string
           name_sq: string
           price: number
+          sku: string | null
           slug: string
           stock: number
           updated_at: string
         }
         Insert: {
           active?: boolean
+          barcode?: string | null
           category_id?: string | null
+          cost_price?: number
           created_at?: string
           description_en?: string | null
           description_sq?: string | null
@@ -411,13 +515,16 @@ export type Database = {
           name_en: string
           name_sq: string
           price: number
+          sku?: string | null
           slug: string
           stock?: number
           updated_at?: string
         }
         Update: {
           active?: boolean
+          barcode?: string | null
           category_id?: string | null
+          cost_price?: number
           created_at?: string
           description_en?: string | null
           description_sq?: string | null
@@ -427,6 +534,7 @@ export type Database = {
           name_en?: string
           name_sq?: string
           price?: number
+          sku?: string | null
           slug?: string
           stock?: number
           updated_at?: string
@@ -567,6 +675,15 @@ export type Database = {
     }
     Functions: {
       claim_admin_if_none: { Args: never; Returns: Json }
+      create_pos_sale: {
+        Args: {
+          _items: Json
+          _note?: string
+          _paid_amount?: number
+          _payment_method?: string
+        }
+        Returns: Json
+      }
       get_order_by_number: { Args: { _order_number: string }; Returns: Json }
       grant_admin_by_email: { Args: { _email: string }; Returns: Json }
       grant_role_by_email: {

@@ -19,6 +19,9 @@ type ProductRow = {
   stock: number;
   active: boolean;
   featured: boolean;
+  barcode: string | null;
+  sku: string | null;
+  cost_price: number;
 };
 
 export function ProductsPanel() {
@@ -67,6 +70,7 @@ export function ProductsPanel() {
               <tr>
                 <th className="px-4 py-3"></th>
                 <th className="px-4 py-3">{tr("productName")}</th>
+                <th className="px-4 py-3">{lang === "sq" ? "Barkodi" : "Barcode"}</th>
                 <th className="px-4 py-3">{tr("price")}</th>
                 <th className="px-4 py-3">{tr("stock")}</th>
                 <th className="px-4 py-3">{tr("active")}</th>
@@ -80,6 +84,7 @@ export function ProductsPanel() {
                     {p.image_url ? <img src={p.image_url} alt="" className="h-10 w-10 rounded object-cover" /> : <div className="h-10 w-10 rounded bg-muted" />}
                   </td>
                   <td className="px-4 py-3 font-medium">{lang === "sq" ? p.name_sq : p.name_en}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-neutral-500">{p.barcode ?? "—"}</td>
                   <td className="px-4 py-3">{formatEur(Number(p.price))}</td>
                   <td className="px-4 py-3">{p.stock}</td>
                   <td className="px-4 py-3">{p.active ? "✓" : "—"}</td>
@@ -126,6 +131,9 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
       description_sq: String(fd.get("description_sq") || "") || null,
       description_en: String(fd.get("description_en") || "") || null,
       price: Number(fd.get("price")),
+      cost_price: Number(fd.get("cost_price") || 0),
+      barcode: String(fd.get("barcode") || "").trim() || null,
+      sku: String(fd.get("sku") || "").trim() || null,
       stock: Number(fd.get("stock")),
       image_url: String(fd.get("image_url") || "") || null,
       category_id: String(fd.get("category_id") || "") || null,
@@ -159,9 +167,17 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
             <FieldA label={`${tr("productName")} (EN)`} name="name_en" defaultValue={product?.name_en} required />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
-            <FieldA label={tr("price") + " (€)"} name="price" type="number" step="0.01" defaultValue={product?.price?.toString()} required />
-            <FieldA label={tr("stock")} name="stock" type="number" defaultValue={(product?.stock ?? 0).toString()} required />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FieldA label={lang === "sq" ? "Barkodi" : "Barcode"} name="barcode" defaultValue={product?.barcode ?? ""} />
+            <FieldA label="SKU" name="sku" defaultValue={product?.sku ?? ""} />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FieldA label={(lang === "sq" ? "Çmimi i blerjes" : "Cost price") + " (€)"} name="cost_price" type="number" step="0.01" defaultValue={(product?.cost_price ?? 0).toString()} />
+            <FieldA label={(lang === "sq" ? "Çmimi i shitjes" : "Sale price") + " (€)"} name="price" type="number" step="0.01" defaultValue={product?.price?.toString()} required />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2"> <FieldA label={tr("stock")} name="stock" type="number" defaultValue={(product?.stock ?? 0).toString()} required />
             <div>
               <label className="mb-1.5 block text-sm font-medium">{tr("category")}</label>
               <select name="category_id" defaultValue={product?.category_id ?? ""} className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm">
