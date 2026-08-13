@@ -175,6 +175,19 @@ function Admin() {
   const navItems = allowed ? allNav.filter((n) => allowed.includes(n.key)) : allNav;
   const canSee = (k: NavKey) => !allowed || allowed.includes(k);
 
+  // Grupimi i menusë: ARKA lart, pjesa tjetër e adminit poshtë sipas seksioneve
+  const navGroups: { title: string; keys: NavKey[] }[] = [
+    { title: L("ARKA / DYQANI", "REGISTER / STORE"), keys: ["pos", "possales", "posreport"] },
+    { title: L("SHITJET ONLINE", "ONLINE SALES"), keys: ["dashboard", "orders", "sales", "stats", "notifications"] },
+    { title: L("KATALOGU", "CATALOG"), keys: ["products", "inventory", "catalog", "shipping"] },
+    { title: L("KLIENTËT & MARKETINGU", "CUSTOMERS & MARKETING"), keys: ["customers", "marketing", "messages"] },
+    { title: L("PËRMBAJTJA", "CONTENT"), keys: ["homepage", "blog", "pages"] },
+    { title: L("SISTEMI", "SYSTEM"), keys: ["visitors", "reports", "audit", "settings", "admins"] },
+  ];
+  const groupedNav = navGroups
+    .map((g) => ({ title: g.title, items: g.keys.map((k) => navItems.find((n) => n.key === k)).filter(Boolean) as typeof navItems }))
+    .filter((g) => g.items.length > 0);
+
   const currentLabel = navItems.find((n) => n.key === nav)?.label ?? "";
   const roleBadge = role === "admin" ? L("Admin", "Admin") : role === "manager" ? L("Menaxher", "Manager") : L("Editor", "Editor");
 
@@ -191,24 +204,29 @@ function Admin() {
             <div className="mt-1 text-[11px] uppercase tracking-wide text-neutral-400">{roleBadge}</div>
           </div>
         </div>
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          {navItems.map((it) => {
-            const Icon = it.icon;
-            const active = nav === it.key;
-            return (
-              <button
-                key={it.key}
-                onClick={() => { setNav(it.key); setSidebarOpen(false); }}
-                className={`w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-                  active
-                    ? "bg-[var(--pink-deep,#e91e63)] text-white shadow-lg shadow-pink-500/20"
-                    : "text-neutral-300 hover:bg-neutral-800/70 hover:text-white"
-                }`}
-              >
-                <Icon className="h-4 w-4" /> {it.label}
-              </button>
-            );
-          })}
+        <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-4">
+          {groupedNav.map((g) => (
+            <div key={g.title} className="space-y-1">
+              <div className="px-4 pb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-500">{g.title}</div>
+              {g.items.map((it) => {
+                const Icon = it.icon;
+                const active = nav === it.key;
+                return (
+                  <button
+                    key={it.key}
+                    onClick={() => { setNav(it.key); setSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
+                      active
+                        ? "bg-[var(--pink-deep,#e91e63)] text-white shadow-lg shadow-pink-500/20"
+                        : "text-neutral-300 hover:bg-neutral-800/70 hover:text-white"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" /> {it.label}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </nav>
         <div className="border-t border-neutral-800 p-3">
           <button onClick={signOut} className="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-neutral-300 hover:bg-neutral-800 hover:text-white">
