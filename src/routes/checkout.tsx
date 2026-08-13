@@ -13,9 +13,9 @@ export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
       { title: "Përfundo porosinë — Dreame Beauty Cosmetics L.L.C." },
-      { name: "description", content: "Plotëso të dhënat e dërgesës dhe porosit me pagesë në dorëzim (COD) në Dreame Beauty Cosmetics L.L.C.." },
+      { name: "description", content: "Plotëso të dhënat e dërgesës dhe porosit me pagesë në dorëzim (COD) në Dreame Beauty Cosmetics L.L.C." },
       { property: "og:title", content: "Përfundo porosinë — Dreame Beauty Cosmetics L.L.C." },
-      { property: "og:description", content: "Plotëso të dhënat e dërgesës dhe porosit me pagesë në dorëzim (COD) në Dreame Beauty Cosmetics L.L.C.." },
+      { property: "og:description", content: "Plotëso të dhënat e dërgesës dhe porosit me pagesë në dorëzim (COD) në Dreame Beauty Cosmetics L.L.C." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://cod-express-cart.lovable.app/checkout" },
       { name: "twitter:card", content: "summary_large_image" },

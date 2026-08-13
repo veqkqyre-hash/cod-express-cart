@@ -10,7 +10,7 @@ export const Route = createFileRoute("/pos-display")({
       { name: "description", content: "Ekrani i klientit për arkën e Dreame Beauty Cosmetics L.L.C. — produktet, sasitë dhe totali i shitjes." },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Ekrani i klientit · Dreame Beauty Cosmetics L.L.C." },
-      { property: "og:description", content: "Ekran i dytë për arkën e Dreame Beauty Cosmetics L.L.C.." },
+      { property: "og:description", content: "Ekran i dytë për arkën e Dreame Beauty Cosmetics L.L.C." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

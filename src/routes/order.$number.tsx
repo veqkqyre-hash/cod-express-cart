@@ -13,7 +13,7 @@ export const Route = createFileRoute("/order/$number")({
       { title: `Porosia ${params.number} — Dreame Beauty Cosmetics L.L.C.` },
       { name: "description", content: "Detajet dhe statusi i porosisë tuaj në Dreame Beauty Cosmetics L.L.C., me pagesë në dorëzim." },
       { property: "og:title", content: `Porosia ${params.number} — Dreame Beauty Cosmetics L.L.C.` },
-      { property: "og:description", content: "Detajet dhe statusi i porosisë tuaj në Dreame Beauty Cosmetics L.L.C.." },
+      { property: "og:description", content: "Detajet dhe statusi i porosisë tuaj në Dreame Beauty Cosmetics L.L.C." },
       { property: "og:type", content: "website" },
       { name: "robots", content: "noindex" },
       { name: "twitter:card", content: "summary" },

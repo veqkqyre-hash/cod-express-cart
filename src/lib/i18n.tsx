@@ -68,7 +68,7 @@ export const t: Dict = {
   updateStatus: { sq: "Ndrysho Statusin", en: "Update Status" },
   filter: { sq: "Filtro", en: "Filter" },
   back: { sq: "Kthehu", en: "Back" },
-  footerNote: { sq: "© Dreame Beauty Cosmetics L.L.C.. Pagesë në dorëzim me postë.", en: "© Dreame Beauty Cosmetics L.L.C.. Cash on Delivery via post." },
+  footerNote: { sq: "© Dreame Beauty Cosmetics L.L.C. Pagesë në dorëzim me postë.", en: "© Dreame Beauty Cosmetics L.L.C. Cash on Delivery via post." },
   account: { sq: "Llogaria Ime", en: "My Account" },
   myOrders: { sq: "Porositë e Mia", en: "My Orders" },
   loginRequired: { sq: "Kyçuni për të vazhduar", en: "Sign in to continue" },
