@@ -11,10 +11,10 @@ export const Route = createFileRoute("/")({
   component: Home,
   head: () => ({
     meta: [
-      { title: "Dreame Beauty Cosmetics L.L.C. — Furnizime Premium për Sallone Bukurie" },
-      { name: "description", content: "Dreame Beauty Cosmetics L.L.C.: produkte premium për sallone bukurie, floktari, barber, thonj dhe makeup. Pagesa në dorëzim (COD) në tërë Kosovën." },
-      { property: "og:title", content: "Dreame Beauty Cosmetics L.L.C. — Furnizime Premium për Sallone Bukurie" },
-      { property: "og:description", content: "Dreame Beauty Cosmetics L.L.C.: produkte premium për sallone bukurie, floktari, barber, thonj dhe makeup. Pagesa në dorëzim (COD) në tërë Kosovën." },
+      { title: "Dreame Beauty Cosmetics — Produkte për Thonj, Shumicë & Pakicë" },
+      { name: "description", content: "Produkte profesionale për thonj: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesë në dorëzim në tërë Kosovën." },
+      { property: "og:title", content: "Dreame Beauty Cosmetics — Produkte për Thonj, Shumicë & Pakicë" },
+      { property: "og:description", content: "Gel lak, akrilik, freza, lampa UV/LED, tipsa, nail art dhe pedikyr — shumicë dhe pakicë, pagesë në dorëzim." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://cod-express-cart.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -28,7 +28,8 @@ export const Route = createFileRoute("/")({
           "@type": "Store",
           name: "Dreame Beauty Cosmetics L.L.C.",
           description:
-            "Furnizime premium për sallone bukurie: floktari, barber, thonj, makeup dhe pajisje. Pagesa në dorëzim (COD) në tërë Kosovën.",
+            "Produkte profesionale për thonj: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesë në dorëzim në tërë Kosovën.",
+
           url: "https://cod-express-cart.lovable.app/",
           telephone: "+383 44 123 456",
           email: "hello@dreamstudio-ks.com",
