@@ -356,6 +356,8 @@ function Dashboard({ lang }: { lang: string }) {
         <StatCard icon={Users} label={L("Klientë", "Customers")} value={String(stats?.totalOrders ?? 0)} tone="amber" />
       </div>
 
+      <DashboardCharts lang={lang} />
+
       <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
         <div className="flex items-center justify-between p-5 border-b border-neutral-100">
           <h2 className="font-display text-lg">{L("Porositë e fundit", "Recent orders")}</h2>
