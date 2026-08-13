@@ -449,6 +449,7 @@ export type Database = {
           paid_amount: number | null
           payment_method: string
           sale_number: string
+          shift_id: string | null
           total: number
         }
         Insert: {
@@ -463,6 +464,7 @@ export type Database = {
           paid_amount?: number | null
           payment_method?: string
           sale_number?: string
+          shift_id?: string | null
           total?: number
         }
         Update: {
@@ -477,7 +479,82 @@ export type Database = {
           paid_amount?: number | null
           payment_method?: string
           sale_number?: string
+          shift_id?: string | null
           total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sales_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "pos_shifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_shifts: {
+        Row: {
+          card_sales: number
+          cash_sales: number
+          closed_at: string | null
+          closed_by: string | null
+          closed_email: string | null
+          counted_cash: number | null
+          created_at: string
+          difference: number | null
+          expected_cash: number | null
+          id: string
+          note: string | null
+          opened_at: string
+          opened_by: string | null
+          opened_email: string | null
+          opening_cash: number
+          other_sales: number
+          sales_count: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          card_sales?: number
+          cash_sales?: number
+          closed_at?: string | null
+          closed_by?: string | null
+          closed_email?: string | null
+          counted_cash?: number | null
+          created_at?: string
+          difference?: number | null
+          expected_cash?: number | null
+          id?: string
+          note?: string | null
+          opened_at?: string
+          opened_by?: string | null
+          opened_email?: string | null
+          opening_cash?: number
+          other_sales?: number
+          sales_count?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          card_sales?: number
+          cash_sales?: number
+          closed_at?: string | null
+          closed_by?: string | null
+          closed_email?: string | null
+          counted_cash?: number | null
+          created_at?: string
+          difference?: number | null
+          expected_cash?: number | null
+          id?: string
+          note?: string | null
+          opened_at?: string
+          opened_by?: string | null
+          opened_email?: string | null
+          opening_cash?: number
+          other_sales?: number
+          sales_count?: number
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -675,6 +752,10 @@ export type Database = {
     }
     Functions: {
       claim_admin_if_none: { Args: never; Returns: Json }
+      close_pos_shift: {
+        Args: { _counted_cash?: number; _note?: string }
+        Returns: Json
+      }
       create_pos_sale: {
         Args: {
           _items: Json
@@ -684,6 +765,7 @@ export type Database = {
         }
         Returns: Json
       }
+      current_pos_shift: { Args: never; Returns: Json }
       get_order_by_number: { Args: { _order_number: string }; Returns: Json }
       grant_admin_by_email: { Args: { _email: string }; Returns: Json }
       grant_role_by_email: {
@@ -722,6 +804,10 @@ export type Database = {
           _entity_id: string
         }
         Returns: undefined
+      }
+      open_pos_shift: {
+        Args: { _note?: string; _opening_cash?: number }
+        Returns: Json
       }
       revoke_admin: { Args: { _user_id: string }; Returns: undefined }
       revoke_role: {

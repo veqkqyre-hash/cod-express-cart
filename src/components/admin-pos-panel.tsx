@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
-import { ScanLine, Search, Trash2, Plus, Minus, Printer, Monitor, X } from "lucide-react";
+import { ScanLine, Search, Trash2, Plus, Minus, Printer, Monitor, X, Eraser } from "lucide-react";
 import { printReceipt, type ReceiptSale } from "@/lib/pos-receipt";
+import { ShiftBar, useCurrentShift } from "@/components/admin-shift-panel";
 
 export type PosProduct = {
   id: string;
@@ -44,7 +45,10 @@ export function PosPanel() {
   const [paid, setPaid] = useState("");
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState<{ sale: ReceiptSale; items: { name: string; qty: number; price: number }[] } | null>(null);
+  const [autoPrint, setAutoPrint] = useState(true);
+  const [receiptWidth, setReceiptWidth] = useState<58 | 80>(80);
   const scanRef = useRef<HTMLInputElement>(null);
+  const { data: shift, refetch: refetchShift } = useCurrentShift();
 
   const { data: products, refetch } = useQuery({
     queryKey: ["pos-products"],
@@ -142,6 +146,7 @@ export function PosPanel() {
 
   async function finish() {
     if (lines.length === 0) return toast.error(L("Shporta është e zbrazët.", "Cart is empty."));
+    if (!shift) return toast.error(L("Hap sesionin e punës para shitjes.", "Open a work shift before selling."));
     if (method === "cash" && paid !== "" && Number(paid) < total)
       return toast.error(L("Shuma e paguar është më e vogël se totali.", "Paid amount is below the total."));
     setSaving(true);
@@ -156,11 +161,13 @@ export function PosPanel() {
     const sale = data as unknown as ReceiptSale;
     const items = lines.map((l) => ({ name: nameOf(l.product), qty: l.qty, price: Number(l.product.price) }));
     setDone({ sale, items });
+    if (autoPrint) printReceipt(sale, items, receiptWidth);
     broadcast({ type: "done", total: Number(sale.total), sale_number: sale.sale_number, change: sale.change_amount });
     setLines([]);
     setPaid("");
     setTerm("");
     refetch();
+    refetchShift();
     toast.success(`${sale.sale_number} · ${formatEur(Number(sale.total))}`);
     scanRef.current?.focus();
   }
@@ -169,6 +176,7 @@ export function PosPanel() {
     <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
       {/* Left: scan + search */}
       <div className="space-y-4">
+        <ShiftBar compact />
         <form onSubmit={onScan} className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
           <label className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
             <ScanLine className="h-4 w-4" /> {L("Skano ose shkruaj barkodin", "Scan or type the barcode")}
@@ -262,7 +270,17 @@ export function PosPanel() {
                       <button onClick={() => setQty(l.product.id, l.qty - 1)} className="grid h-8 w-8 place-items-center rounded-lg border border-neutral-200 hover:bg-neutral-50">
                         <Minus className="h-3.5 w-3.5" />
                       </button>
-                      <span className="w-8 text-center font-semibold">{l.qty}</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={l.product.stock}
+                        value={l.qty}
+                        onChange={(e) => {
+                          const v = parseInt(e.target.value, 10);
+                          if (!Number.isNaN(v)) setQty(l.product.id, v);
+                        }}
+                        className="w-14 rounded-lg border border-neutral-200 px-2 py-1 text-center font-semibold focus:outline-none"
+                      />
                       <button onClick={() => setQty(l.product.id, l.qty + 1)} className="grid h-8 w-8 place-items-center rounded-lg border border-neutral-200 hover:bg-neutral-50">
                         <Plus className="h-3.5 w-3.5" />
                       </button>
@@ -278,6 +296,19 @@ export function PosPanel() {
               ))}
             </tbody>
           </table>
+          {lines.length > 0 && (
+            <div className="flex items-center justify-between border-t border-neutral-100 px-4 py-3">
+              <button
+                onClick={() => setLines([])}
+                className="inline-flex items-center gap-2 rounded-full border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
+              >
+                <Eraser className="h-3.5 w-3.5" /> {L("Zbraz shportën", "Clear cart")}
+              </button>
+              <div className="text-sm text-neutral-500">
+                {count} {L("artikuj", "items")} · <span className="font-semibold text-neutral-900">{formatEur(total)}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -334,6 +365,24 @@ export function PosPanel() {
           >
             {saving ? "…" : L("PËRFUNDO SHITJEN", "COMPLETE SALE")}
           </button>
+        </div>
+
+        <div className="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm shadow-sm">
+          <label className="inline-flex items-center gap-2 font-medium">
+            <input type="checkbox" checked={autoPrint} onChange={(e) => setAutoPrint(e.target.checked)} />
+            {L("Printo faturën automatikisht", "Auto-print receipt")}
+          </label>
+          <div className="inline-flex overflow-hidden rounded-lg border border-neutral-200">
+            {([80, 58] as const).map((w) => (
+              <button
+                key={w}
+                onClick={() => setReceiptWidth(w)}
+                className={`px-2.5 py-1 text-xs font-semibold ${receiptWidth === w ? "bg-neutral-900 text-white" : "hover:bg-neutral-50"}`}
+              >
+                {w}mm
+              </button>
+            ))}
+          </div>
         </div>
 
         <button
