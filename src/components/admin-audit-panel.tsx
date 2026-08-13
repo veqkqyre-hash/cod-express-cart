@@ -44,6 +44,88 @@ const RANGES = [
   { id: "all", sq: "Gjithçka", en: "All time", days: 0 },
 ];
 
+function detailOf(l: Log, key: string): string | null {
+  const d = l.details as Record<string, unknown> | null;
+  const v = d && typeof d === "object" ? d[key] : null;
+  return v === null || v === undefined || v === "" ? null : String(v);
+}
+
+function saleNumberOf(l: Log): string | null {
+  return detailOf(l, "sale_number");
+}
+
+type SaleRow = {
+  id: string;
+  sale_number: string;
+  total: number;
+  item_count: number;
+  payment_method: string;
+  cashier_email: string | null;
+  created_at: string;
+};
+
+function SaleDialog({ saleNumber, onClose, L }: { saleNumber: string; onClose: () => void; L: (sq: string, en: string) => string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["audit-sale", saleNumber],
+    queryFn: async () => {
+      const { data: sale, error } = await supabase
+        .from("pos_sales")
+        .select("id,sale_number,total,item_count,payment_method,cashier_email,created_at")
+        .eq("sale_number", saleNumber)
+        .maybeSingle();
+      if (error) throw error;
+      if (!sale) return null;
+      const { data: items } = await supabase
+        .from("pos_sale_items")
+        .select("id,product_name,barcode,quantity,unit_price,subtotal")
+        .eq("sale_id", (sale as SaleRow).id);
+      return { sale: sale as SaleRow, items: items ?? [] };
+    },
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={onClose}>
+      <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">
+            {L("Porosia / Shitja", "Sale")} {saleNumber}
+          </h3>
+          <button onClick={onClose} className="rounded-full p-1 hover:bg-neutral-100">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        {isLoading ? (
+          <p className="py-6 text-sm text-neutral-500">…</p>
+        ) : !data ? (
+          <p className="py-6 text-sm text-neutral-500">{L("Shitja nuk u gjet.", "Sale not found.")}</p>
+        ) : (
+          <>
+            <div className="mt-3 grid gap-1 text-sm text-neutral-600 sm:grid-cols-2">
+              <div>{new Date(data.sale.created_at).toLocaleString()}</div>
+              <div>{data.sale.payment_method}</div>
+              <div>{data.sale.cashier_email ?? "—"}</div>
+              <div className="font-semibold text-neutral-900">
+                {Number(data.sale.total).toFixed(2)} € · {data.sale.item_count} {L("artikuj", "items")}
+              </div>
+            </div>
+            <ul className="mt-3 divide-y divide-neutral-100 text-sm">
+              {data.items.map((it: { id: string; product_name: string; quantity: number; subtotal: number }) => (
+                <li key={it.id} className="flex justify-between py-1.5">
+                  <span>
+                    {it.quantity} × {it.product_name}
+                  </span>
+                  <span>{Number(it.subtotal).toFixed(2)} €</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 export function AuditPanel() {
   const { lang } = useI18n();
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
