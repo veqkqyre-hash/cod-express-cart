@@ -8,6 +8,10 @@ import { ScanLine, Search, Trash2, Plus, Minus, Printer, Monitor, X, Eraser } fr
 import { printReceipt, type ReceiptSale } from "@/lib/pos-receipt";
 import { ShiftBar, useCurrentShift } from "@/components/admin-shift-panel";
 import { getCashierName, setCashierName, cashierDisplay } from "@/lib/cashier";
+import { logAction } from "@/lib/audit";
+import { ExportButtons } from "@/components/admin-export";
+import type { Column } from "@/lib/export";
+
 
 export type PosProduct = {
   id: string;
@@ -49,39 +53,79 @@ export function PosPanel() {
   const [autoPrint, setAutoPrint] = useState(true);
   const [receiptWidth, setReceiptWidth] = useState<58 | 80>(80);
   const [cashier, setCashier] = useState("");
-  const [scanLog, setScanLog] = useState<{ id: string; code: string; ok: boolean; label: string; at: string }[]>([]);
+  type ScanEntry = {
+    id: string;
+    code: string;
+    ok: boolean;
+    label: string;
+    hint?: string;
+    qty?: number;
+    sale?: string;
+    at: string;
+  };
+  const [scanLog, setScanLog] = useState<ScanEntry[]>([]);
   useEffect(() => setCashier(getCashierName()), []);
   const scanRef = useRef<HTMLInputElement>(null);
   const { data: shift, refetch: refetchShift } = useCurrentShift();
 
-  function pushScan(code: string, ok: boolean, label: string) {
+  function pushScan(code: string, ok: boolean, label: string, hint?: string) {
     setScanLog((prev) =>
-      [{ id: `${Date.now()}-${Math.random()}`, code, ok, label, at: new Date().toLocaleTimeString() }, ...prev].slice(0, 12),
+      [
+        { id: `${Date.now()}-${Math.random()}`, code, ok, label, hint, at: new Date().toLocaleTimeString() },
+        ...prev,
+      ].slice(0, 40),
     );
   }
 
-  /** Përkthe gabimet e serverit në mesazhe të qarta, pa e bllokuar arkën. */
-  function scanErrorMessage(raw: string, code: string) {
+  const scanColumns: Column<ScanEntry>[] = [
+    { key: "at", label: L("Ora", "Time"), get: (s) => s.at },
+    { key: "code", label: L("Kodi", "Code"), get: (s) => s.code },
+    { key: "status", label: L("Statusi", "Status"), get: (s) => (s.ok ? L("Sukses", "Success") : L("Gabim", "Error")) },
+    { key: "label", label: L("Produkti / Gabimi", "Product / Error"), get: (s) => s.label },
+    { key: "hint", label: L("Sqarim", "Detail"), get: (s) => s.hint ?? "" },
+    { key: "sale", label: L("Shitja", "Sale"), get: (s) => s.sale ?? "" },
+  ];
+
+
+
+  /** Përkthe gabimet e serverit në mesazhe të qarta (titull + zgjidhje), pa e bllokuar arkën. */
+  function scanErrorMessage(raw: string, code: string): { msg: string; hint: string } {
     const m = (raw || "").toLowerCase();
     if (m.includes("invalid") || m.includes("pavlefsh"))
-      return L(
-        `Barkod i pavlefshëm: ${code} — duhet 4–32 karaktere, pa zbrazëti (A-Z, 0-9, . _ -).`,
-        `Invalid barcode: ${code} — needs 4–32 characters, no spaces (A-Z, 0-9, . _ -).`,
-      );
+      return {
+        msg: L(`Barkod i pavlefshëm: ${code}`, `Invalid barcode: ${code}`),
+        hint: L(
+          "Duhet 4–32 karaktere, pa zbrazëti (A-Z, 0-9, . _ -). Kontrollo layout-in US të skanerit.",
+          "Needs 4–32 characters, no spaces (A-Z, 0-9, . _ -). Check the scanner's US layout.",
+        ),
+      };
     if (m.includes("duplicate") || m.includes("unique"))
-      return L(
-        `Barkodi ${code} është i regjistruar në më shumë se një produkt — rregulloje në Katalogu → Produktet.`,
-        `Barcode ${code} is registered on more than one product — fix it in Catalog → Products.`,
-      );
+      return {
+        msg: L(`Barkodi ${code} është dublikat`, `Barcode ${code} is a duplicate`),
+        hint: L(
+          "I njëjti barkod është në më shumë produkte — rregulloje në Katalogu → Produktet.",
+          "The same barcode exists on several products — fix it in Catalog → Products.",
+        ),
+      };
     if (m.includes("not authenticated") || m.includes("jwt") || m.includes("not authorized"))
-      return L("Sesioni skadoi — kyçu përsëri për të vazhduar skanimin.", "Session expired — sign in again to keep scanning.");
+      return {
+        msg: L("Sesioni skadoi", "Session expired"),
+        hint: L("Kyçu përsëri për të vazhduar skanimin.", "Sign in again to keep scanning."),
+      };
     if (m.includes("failed to fetch") || m.includes("network") || m.includes("timeout") || m.includes("fetch"))
-      return L(
-        "Serveri nuk u arrit — kontrollo internetin. Mund të vazhdosh me kërkimin manual.",
-        "Server unreachable — check your connection. You can continue with manual search.",
-      );
-    return raw || L("Skanimi dështoi — provo përsëri.", "Scan failed — try again.");
+      return {
+        msg: L("Serveri nuk u arrit", "Server unreachable"),
+        hint: L(
+          "Kontrollo internetin — arka vazhdon, shto produktin nga kërkimi manual.",
+          "Check your connection — the register keeps working, add the product from manual search.",
+        ),
+      };
+    return {
+      msg: L("Skanimi dështoi", "Scan failed"),
+      hint: raw || L("Provo përsëri ose kërko produktin manualisht.", "Try again or search the product manually."),
+    };
   }
+
 
 
   const { data: products, refetch } = useQuery({
@@ -152,8 +196,10 @@ export function PosPanel() {
     const v = code.trim();
     setCode("");
     if (!v) {
-      toast.error(L("Skanimi nuk prodhoi vlerë — provo përsëri.", "The scan produced no value — try again."));
-      pushScan("—", false, L("Skanim i zbrazët", "Empty scan"));
+      toast.error(L("Skanimi nuk prodhoi vlerë", "The scan produced no value"), {
+        description: L("Skano përsëri ose shkruaj barkodin me dorë.", "Scan again or type the barcode manually."),
+      });
+      pushScan("—", false, L("Skanim i zbrazët", "Empty scan"), L("Nuk arriti kod nga skaneri.", "No code arrived from the scanner."));
       scanRef.current?.focus();
       return;
     }
@@ -164,9 +210,9 @@ export function PosPanel() {
       if (error) throw new Error(error.message);
       res = data as unknown as { found: boolean; code: string; product?: PosProduct };
     } catch (err) {
-      const msg = scanErrorMessage(err instanceof Error ? err.message : String(err), v);
-      toast.error(msg);
-      pushScan(v, false, msg);
+      const { msg, hint } = scanErrorMessage(err instanceof Error ? err.message : String(err), v);
+      toast.error(msg, { description: hint });
+      pushScan(v, false, msg, hint);
       setTerm(v); // arka vazhdon: kërko manualisht
       scanRef.current?.focus();
       return;
@@ -174,16 +220,23 @@ export function PosPanel() {
     scanRef.current?.focus();
     if (!res?.found || !res.product) {
       const msg = `${L("Barkodi nuk u njoh", "Barcode not recognised")}: ${res?.code ?? v}`;
-      toast.error(msg);
-      pushScan(v, false, msg);
+      const hint = L(
+        "Kërkimi manual u hap me këtë kod — ose regjistroje produktin në Katalogu → Produktet.",
+        "Manual search opened with this code — or register the product in Catalog → Products.",
+      );
+      toast.error(msg, { description: hint });
+      pushScan(v, false, msg, hint);
       setTerm(v);
       return;
     }
     const live = (products ?? []).find((p) => p.id === res.product!.id) ?? res.product;
     add(live);
     pushScan(v, true, nameOf(live));
-    toast.success(`${L("U skanua", "Scanned")}: ${nameOf(live)}`);
+    toast.success(`${L("U skanua", "Scanned")}: ${nameOf(live)}`, {
+      description: `${formatEur(Number(live.price))} · ${L("stok", "stock")}: ${live.stock}`,
+    });
   }
+
 
 
   const results = useMemo(() => {
@@ -220,14 +273,33 @@ export function PosPanel() {
     setDone({ sale, items });
     if (autoPrint) printReceipt(sale, items, receiptWidth);
     broadcast({ type: "done", total: Number(sale.total), sale_number: sale.sale_number, change: sale.change_amount });
+
+    // Lidh skanimet/artikujt me shitjen konkrete në audit log
+    const saleId = (raw as unknown as { id?: string }).id ?? null;
+    for (const l of lines) {
+      void logAction("pos.scan_sold", "pos_sales", saleId, {
+        code: l.product.barcode ?? l.product.sku ?? null,
+        product: nameOf(l.product),
+        quantity: l.qty,
+        sale_id: saleId,
+        sale_number: sale.sale_number,
+      });
+    }
+    setScanLog((prev) => prev.map((s) => (s.ok && !s.sale ? { ...s, sale: sale.sale_number } : s)));
+
     setLines([]);
     setPaid("");
     setTerm("");
     refetch();
     refetchShift();
-    toast.success(`${sale.sale_number} · ${formatEur(Number(sale.total))}`);
+    toast.success(`${L("Shitja u regjistrua", "Sale recorded")} · ${sale.sale_number}`, {
+      description: `${formatEur(Number(sale.total))} · ${count} ${L("artikuj", "items")}${
+        sale.change_amount != null ? ` · ${L("kusuri", "change")} ${formatEur(Number(sale.change_amount))}` : ""
+      }`,
+    });
     scanRef.current?.focus();
   }
+
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
@@ -276,23 +348,34 @@ export function PosPanel() {
             <li>{L("Skano: produkti hyn në shportë; sasia rritet automatikisht për skanim të përsëritur.", "Scan: the product enters the cart; repeated scans increase quantity.")}</li>
             <li>{L("Produkt i re: Katalogu → Produktet → Shto produkt → skano në fushën Barkodi.", "New product: Catalog → Products → Add product → scan into the Barcode field.")}</li>
             <li>{L("Nëse barkodi nuk njihet, kërkimi hapet automatikisht me atë kod.", "If the barcode is unknown, the search opens automatically with that code.")}</li>
-            <li>{L("Nëse barkodi nuk njihet, kërkimi hapet automatikisht me atë kod.", "If the barcode is unknown, the search opens automatically with that code.")}</li>
             <li>{L("Skanim i dyfishtë/gabim rrjeti? Arka nuk bllokohet — shto produktin nga kërkimi manual.", "Duplicate scan or network error? The register never blocks — add the product from manual search.")}</li>
+            <li>{L("Pas përfundimit të shitjes, skanimet lidhen me numrin e shitjes (POS-…).", "After the sale is finished, scans are linked to the sale number (POS-…).")}</li>
             <li>{L("Të gjitha skanimet ruhen në SISTEMI → Regjistri i aktivitetit (filtro 'Skanimet').", "Every scan is stored in SYSTEM → Activity log (use the 'Scans' filter).")}</li>
           </ol>
         </details>
 
         {/* Historiku i skanimeve (sesioni aktual) */}
         <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-          <div className="mb-2 flex items-center justify-between">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
               {L("Historik skanimesh", "Scan history")}
             </span>
-            {scanLog.length > 0 && (
-              <button onClick={() => setScanLog([])} className="text-xs text-neutral-500 hover:text-neutral-900">
-                {L("Fshij listën", "Clear list")}
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              <ExportButtons
+                entity="pos_scans"
+                filename={`skanime-${new Date().toISOString().slice(0, 10)}`}
+                title={L("Historik skanimesh", "Scan history")}
+                subtitle={`${scanLog.length} ${L("skanime", "scans")}`}
+                columns={scanColumns}
+                rows={scanLog}
+                labels={{ csv: "CSV", pdf: "PDF", empty: L("Nuk ka skanime", "No scans") }}
+              />
+              {scanLog.length > 0 && (
+                <button onClick={() => setScanLog([])} className="text-xs text-neutral-500 hover:text-neutral-900">
+                  {L("Fshij listën", "Clear list")}
+                </button>
+              )}
+            </div>
           </div>
           {scanLog.length === 0 ? (
             <p className="py-3 text-sm text-neutral-500">{L("Asnjë skanim në këtë sesion.", "No scans in this session yet.")}</p>
@@ -308,13 +391,22 @@ export function PosPanel() {
                     {s.ok ? "✓" : "!"}
                   </span>
                   <span className="font-mono text-xs text-neutral-500">{s.code}</span>
-                  <span className={`min-w-0 flex-1 truncate ${s.ok ? "" : "text-red-700"}`}>{s.label}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className={s.ok ? "" : "font-medium text-red-700"}>{s.label}</span>
+                    {s.hint && <span className="block text-xs text-neutral-500">{s.hint}</span>}
+                    {s.sale && (
+                      <span className="mt-0.5 inline-block rounded-full bg-neutral-900 px-2 py-0.5 text-[11px] font-semibold text-white">
+                        {s.sale}
+                      </span>
+                    )}
+                  </span>
                   <span className="shrink-0 text-xs text-neutral-400">{s.at}</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
+
 
 
         <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">

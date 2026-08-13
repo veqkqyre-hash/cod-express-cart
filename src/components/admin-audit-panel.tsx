@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ExportButtons } from "@/components/admin-export";
 import type { Column } from "@/lib/export";
-import { ScrollText, RefreshCw, ChevronDown, ChevronRight } from "lucide-react";
+import { ScrollText, RefreshCw, ChevronDown, ChevronRight, X, Receipt } from "lucide-react";
 
 type Log = {
   id: string;
@@ -44,6 +44,88 @@ const RANGES = [
   { id: "all", sq: "Gjithçka", en: "All time", days: 0 },
 ];
 
+function detailOf(l: Log, key: string): string | null {
+  const d = l.details as Record<string, unknown> | null;
+  const v = d && typeof d === "object" ? d[key] : null;
+  return v === null || v === undefined || v === "" ? null : String(v);
+}
+
+function saleNumberOf(l: Log): string | null {
+  return detailOf(l, "sale_number");
+}
+
+type SaleRow = {
+  id: string;
+  sale_number: string;
+  total: number;
+  item_count: number;
+  payment_method: string;
+  cashier_email: string | null;
+  created_at: string;
+};
+
+function SaleDialog({ saleNumber, onClose, L }: { saleNumber: string; onClose: () => void; L: (sq: string, en: string) => string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["audit-sale", saleNumber],
+    queryFn: async () => {
+      const { data: sale, error } = await supabase
+        .from("pos_sales")
+        .select("id,sale_number,total,item_count,payment_method,cashier_email,created_at")
+        .eq("sale_number", saleNumber)
+        .maybeSingle();
+      if (error) throw error;
+      if (!sale) return null;
+      const { data: items } = await supabase
+        .from("pos_sale_items")
+        .select("id,product_name,barcode,quantity,unit_price,subtotal")
+        .eq("sale_id", (sale as SaleRow).id);
+      return { sale: sale as SaleRow, items: items ?? [] };
+    },
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={onClose}>
+      <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">
+            {L("Porosia / Shitja", "Sale")} {saleNumber}
+          </h3>
+          <button onClick={onClose} className="rounded-full p-1 hover:bg-neutral-100">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        {isLoading ? (
+          <p className="py-6 text-sm text-neutral-500">…</p>
+        ) : !data ? (
+          <p className="py-6 text-sm text-neutral-500">{L("Shitja nuk u gjet.", "Sale not found.")}</p>
+        ) : (
+          <>
+            <div className="mt-3 grid gap-1 text-sm text-neutral-600 sm:grid-cols-2">
+              <div>{new Date(data.sale.created_at).toLocaleString()}</div>
+              <div>{data.sale.payment_method}</div>
+              <div>{data.sale.cashier_email ?? "—"}</div>
+              <div className="font-semibold text-neutral-900">
+                {Number(data.sale.total).toFixed(2)} € · {data.sale.item_count} {L("artikuj", "items")}
+              </div>
+            </div>
+            <ul className="mt-3 divide-y divide-neutral-100 text-sm">
+              {data.items.map((it: { id: string; product_name: string; quantity: number; subtotal: number }) => (
+                <li key={it.id} className="flex justify-between py-1.5">
+                  <span>
+                    {it.quantity} × {it.product_name}
+                  </span>
+                  <span>{Number(it.subtotal).toFixed(2)} €</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 export function AuditPanel() {
   const { lang } = useI18n();
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
@@ -52,6 +134,8 @@ export function AuditPanel() {
   const [preset, setPreset] = useState("all");
   const [range, setRange] = useState("7");
   const [open, setOpen] = useState<string | null>(null);
+  const [sale, setSale] = useState<string | null>(null);
+
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["admin-audit"],
@@ -92,8 +176,28 @@ export function AuditPanel() {
     { key: "action", label: L("Veprimi", "Action"), get: (r) => r.action },
     { key: "entity", label: L("Objekti", "Entity"), get: (r) => r.entity },
     { key: "entity_id", label: "ID", get: (r) => r.entity_id ?? "" },
+    { key: "sale", label: L("Shitja", "Sale"), get: (r) => saleNumberOf(r) ?? "" },
     { key: "details", label: L("Detajet", "Details"), get: (r) => JSON.stringify(r.details ?? {}) },
   ];
+
+  const scanRows = rows.filter((l) => l.action.startsWith("pos.scan"));
+  const scanColumns: Column<Log>[] = [
+    { key: "created_at", label: L("Data", "Date"), get: (r) => new Date(r.created_at).toLocaleString() },
+    { key: "actor", label: L("Përdoruesi", "User"), get: (r) => r.actor_email ?? "—" },
+    { key: "code", label: L("Kodi", "Code"), get: (r) => detailOf(r, "code") ?? "" },
+    { key: "product", label: L("Produkti", "Product"), get: (r) => detailOf(r, "product") ?? "" },
+    { key: "result", label: L("Rezultati", "Result"), get: (r) => scanLabel(r) },
+    { key: "sale", label: L("Shitja", "Sale"), get: (r) => saleNumberOf(r) ?? "" },
+  ];
+
+  function scanLabel(l: Log) {
+    if (l.action === "pos.scan") return L("Sukses", "Success");
+    if (l.action === "pos.scan_sold") return L("Shitur", "Sold");
+    if (l.action === "pos.scan_not_found") return L("Nuk u gjet", "Not found");
+    if (l.action === "pos.scan_invalid") return L("Barkod i pavlefshëm", "Invalid barcode");
+    return l.action;
+  }
+
 
   const inputCls =
     "rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-200";
@@ -136,6 +240,22 @@ export function AuditPanel() {
             labels={{ csv: "CSV", pdf: "PDF", empty: L("Nuk ka të dhëna", "Nothing to export") }}
           />
         </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-neutral-50 p-3">
+          <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            {L("Eksporto skanimet", "Export scans")} · {scanRows.length}
+          </span>
+          <ExportButtons
+            entity="pos_scans"
+            filename={`skanime-${new Date().toISOString().slice(0, 10)}`}
+            title={L("Historik skanimesh", "Scan history")}
+            subtitle={`${scanRows.length} ${L("skanime", "scans")}`}
+            columns={scanColumns}
+            rows={scanRows}
+            labels={{ csv: "CSV", pdf: "PDF", empty: L("Nuk ka skanime", "No scans") }}
+          />
+        </div>
+
 
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
           {PRESETS.map((p) => (
@@ -203,6 +323,17 @@ export function AuditPanel() {
                       <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${ACTION_TONE(l.action)}`}>
                         {l.action}
                       </span>
+                      {saleNumberOf(l) && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSale(saleNumberOf(l)!);
+                          }}
+                          className="ml-2 inline-flex items-center gap-1 rounded-full border border-neutral-300 px-2.5 py-0.5 text-xs font-semibold hover:bg-neutral-100"
+                        >
+                          <Receipt className="h-3 w-3" /> {L("Shiko porosinë", "View sale")}
+                        </button>
+                      )}
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell text-neutral-500">{l.entity}</td>
                     <td className="px-4 py-3 hidden lg:table-cell max-w-xs truncate font-mono text-xs text-neutral-500">
@@ -221,12 +352,21 @@ export function AuditPanel() {
                             <span className="font-semibold">ID:</span> {l.entity_id ?? "—"}
                           </div>
                         </div>
+                        {saleNumberOf(l) && (
+                          <button
+                            onClick={() => setSale(saleNumberOf(l)!)}
+                            className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-white"
+                          >
+                            <Receipt className="h-3.5 w-3.5" /> {L("Shiko porosinë", "View sale")} {saleNumberOf(l)}
+                          </button>
+                        )}
                         <pre className="mt-2 overflow-x-auto rounded-xl bg-white p-3 font-mono text-xs text-neutral-700">
                           {JSON.stringify(l.details ?? {}, null, 2)}
                         </pre>
                       </td>
                     </tr>
                   )}
+
                 </Fragment>
               ))}
               {rows.length === 0 && (
@@ -241,6 +381,9 @@ export function AuditPanel() {
           </table>
         </div>
       </div>
+
+      {sale && <SaleDialog saleNumber={sale} onClose={() => setSale(null)} L={L} />}
     </div>
+
   );
 }
