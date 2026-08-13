@@ -6,6 +6,10 @@ import { ProductCard, type Product } from "@/components/product-card";
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import heroNails1 from "@/assets/hero-nails-1.jpg";
+import heroNails2 from "@/assets/hero-nails-2.jpg";
+import heroNails3 from "@/assets/hero-nails-3.jpg";
+import heroNails4 from "@/assets/hero-nails-4.jpg";
 
 export const Route = createFileRoute("/")({
   component: Home,
