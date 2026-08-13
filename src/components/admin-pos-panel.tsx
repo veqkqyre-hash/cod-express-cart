@@ -49,16 +49,30 @@ export function PosPanel() {
   const [autoPrint, setAutoPrint] = useState(true);
   const [receiptWidth, setReceiptWidth] = useState<58 | 80>(80);
   const [cashier, setCashier] = useState("");
-  const [scanLog, setScanLog] = useState<{ id: string; code: string; ok: boolean; label: string; at: string }[]>([]);
+  type ScanEntry = {
+    id: string;
+    code: string;
+    ok: boolean;
+    label: string;
+    hint?: string;
+    qty?: number;
+    sale?: string;
+    at: string;
+  };
+  const [scanLog, setScanLog] = useState<ScanEntry[]>([]);
   useEffect(() => setCashier(getCashierName()), []);
   const scanRef = useRef<HTMLInputElement>(null);
   const { data: shift, refetch: refetchShift } = useCurrentShift();
 
-  function pushScan(code: string, ok: boolean, label: string) {
+  function pushScan(code: string, ok: boolean, label: string, hint?: string) {
     setScanLog((prev) =>
-      [{ id: `${Date.now()}-${Math.random()}`, code, ok, label, at: new Date().toLocaleTimeString() }, ...prev].slice(0, 12),
+      [
+        { id: `${Date.now()}-${Math.random()}`, code, ok, label, hint, at: new Date().toLocaleTimeString() },
+        ...prev,
+      ].slice(0, 40),
     );
   }
+
 
   /** Përkthe gabimet e serverit në mesazhe të qarta, pa e bllokuar arkën. */
   function scanErrorMessage(raw: string, code: string) {
