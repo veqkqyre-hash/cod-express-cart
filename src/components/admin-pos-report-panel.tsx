@@ -66,24 +66,71 @@ export function PosReportPanel() {
     },
   });
 
+  // Shitjet ONLINE (porositë e website-it) — i njëjti inventar, burim i dallueshëm
+  const { data: online } = useQuery({
+    queryKey: ["online-report", start.toISOString(), end.toISOString()],
+    queryFn: async () => {
+      const { data: orders, error } = await supabase
+        .from("orders")
+        .select("id,total,status,created_at")
+        .neq("status", "cancelled")
+        .gte("created_at", start.toISOString())
+        .lte("created_at", end.toISOString());
+      if (error) throw error;
+      const ids = (orders ?? []).map((o) => o.id);
+      let itemCount = 0;
+      let cost = 0;
+      if (ids.length > 0) {
+        const { data: oi } = await supabase
+          .from("order_items")
+          .select("product_id,quantity")
+          .in("order_id", ids);
+        itemCount = (oi ?? []).reduce((s, r) => s + Number(r.quantity), 0);
+        const pids = [...new Set((oi ?? []).map((r) => r.product_id).filter(Boolean))] as string[];
+        if (pids.length > 0) {
+          const { data: prods } = await supabase.from("products").select("id,cost_price").in("id", pids);
+          const costMap = new Map((prods ?? []).map((p) => [p.id, Number(p.cost_price)]));
+          cost = (oi ?? []).reduce(
+            (s, r) => s + (costMap.get(String(r.product_id)) ?? 0) * Number(r.quantity),
+            0,
+          );
+        }
+      }
+      return {
+        count: (orders ?? []).length,
+        revenue: (orders ?? []).reduce((s, o) => s + Number(o.total), 0),
+        itemCount,
+        cost,
+      };
+    },
+  });
+
   const rows = data ?? [];
-  const revenue = rows.reduce((s, r) => s + Number(r.total), 0);
-  const cost = rows.reduce((s, r) => s + Number(r.cost_total), 0);
-  const items = rows.reduce((s, r) => s + r.item_count, 0);
+  const posRevenue = rows.reduce((s, r) => s + Number(r.total), 0);
+  const posCost = rows.reduce((s, r) => s + Number(r.cost_total), 0);
+  const posItems = rows.reduce((s, r) => s + r.item_count, 0);
   const cash = rows.filter((r) => r.payment_method === "cash").reduce((s, r) => s + Number(r.total), 0);
   const card = rows.filter((r) => r.payment_method === "card").reduce((s, r) => s + Number(r.total), 0);
-  const other = revenue - cash - card;
+  const other = posRevenue - cash - card;
+  const onlineRevenue = online?.revenue ?? 0;
+  const onlineCost = online?.cost ?? 0;
+  const revenue = posRevenue + onlineRevenue;
+  const cost = posCost + onlineCost;
+  const items = posItems + (online?.itemCount ?? 0);
 
   const stats = [
-    { label: L("Numri i shitjeve", "Sales count"), value: String(rows.length) },
+    { label: L("Numri i shitjeve", "Sales count"), value: String(rows.length + (online?.count ?? 0)) },
+    { label: L("Shitje nga ARKA", "Register sales"), value: `${rows.length} · ${formatEur(posRevenue)}` },
+    { label: L("Shitje ONLINE", "Online sales"), value: `${online?.count ?? 0} · ${formatEur(onlineRevenue)}` },
     { label: L("Produkte të shitura", "Products sold"), value: String(items) },
-    { label: L("Xhiroja totale", "Total revenue"), value: formatEur(revenue) },
-    { label: L("Shitjet cash", "Cash sales"), value: formatEur(cash) },
-    { label: L("Shitjet card", "Card sales"), value: formatEur(card) },
-    { label: L("Tjetër", "Other"), value: formatEur(other) },
+    { label: L("TOTAL SHITJE", "TOTAL SALES"), value: formatEur(revenue) },
+    { label: L("Shitjet cash (arka)", "Cash sales (register)"), value: formatEur(cash) },
+    { label: L("Shitjet card (arka)", "Card sales (register)"), value: formatEur(card) },
+    { label: L("Tjetër (arka)", "Other (register)"), value: formatEur(other) },
     { label: L("Kostoja totale", "Total cost"), value: formatEur(cost) },
     { label: L("Fitimi total", "Total profit"), value: formatEur(revenue - cost) },
   ];
+
 
   const columns: Column<{ label: string; value: string }>[] = [
     { key: "label", label: L("Treguesi", "Metric"), get: (r) => r.label },

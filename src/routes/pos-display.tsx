@@ -32,9 +32,10 @@ function PosDisplay() {
       ch.onmessage = (e) => {
         const d = e.data as any;
         if (d?.type === "cart") {
-          setLines(d.lines ?? []);
+          const next = (d.lines ?? []) as Line[];
+          setLines(next);
           setTotal(Number(d.total ?? 0));
-          setDone(null);
+          if (next.length > 0) setDone(null);
         } else if (d?.type === "done") {
           setDone({ total: Number(d.total ?? 0), sale_number: String(d.sale_number ?? ""), change: d.change ?? null });
         }
