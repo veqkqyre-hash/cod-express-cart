@@ -19,6 +19,7 @@ import { ReportsPanel } from "@/components/admin-reports-panel";
 import { CustomerMessage } from "@/components/admin-customer-message";
 import { PagesPanel } from "@/components/admin-pages-panel";
 import { PosPanel } from "@/components/admin-pos-panel";
+import { DashboardCharts } from "@/components/admin-dashboard-charts";
 import { PosSalesPanel } from "@/components/admin-sales-history-panel";
 import { PosReportPanel } from "@/components/admin-pos-report-panel";
 import { OrderTimeline } from "@/components/order-timeline";
@@ -355,6 +356,8 @@ function Dashboard({ lang }: { lang: string }) {
         <StatCard icon={Package} label={L("Produkte", "Products")} value={String(stats?.products ?? 0)} tone="blue" />
         <StatCard icon={Users} label={L("Klientë", "Customers")} value={String(stats?.totalOrders ?? 0)} tone="amber" />
       </div>
+
+      <DashboardCharts lang={lang} />
 
       <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
         <div className="flex items-center justify-between p-5 border-b border-neutral-100">
