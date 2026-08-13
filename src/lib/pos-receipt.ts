@@ -52,8 +52,16 @@ export function printReceipt(sale: ReceiptSale, items: ReceiptItem[], width: 58 
   .tot{font-size:${width === 58 ? 13 : 15}px;font-weight:bold}
   .row{display:flex;justify-content:space-between;gap:6px}
 </style></head><body>
-<h1>${esc(STORE.name)}</h1>
-<div class="c muted">${esc(STORE.addr)}</div>
+${B.logo_url ? `<div class="c"><img src="${esc(B.logo_url)}" alt="" style="max-width:70%;max-height:18mm;object-fit:contain"></div>` : ""}
+<h1>${esc(B.business_name)}</h1>
+<div class="c muted">
+  ${esc([B.address, B.city].filter(Boolean).join(", "))}
+  ${B.phone ? `<br>Tel: ${esc(B.phone)}` : ""}
+  ${B.email ? `<br>${esc(B.email)}` : ""}
+  ${B.nui ? `<br>NUI / Nr. fiskal: ${esc(B.nui)}` : ""}
+  ${B.vat_number ? `<br>Nr. TVSH: ${esc(B.vat_number)}` : ""}
+</div>
+
 <hr>
 <div class="muted">
   <div class="row"><span>Nr. shitjes</span><b>${esc(sale.sale_number)}</b></div>
