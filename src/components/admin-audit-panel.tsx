@@ -241,6 +241,22 @@ export function AuditPanel() {
           />
         </div>
 
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-neutral-50 p-3">
+          <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            {L("Eksporto skanimet", "Export scans")} · {scanRows.length}
+          </span>
+          <ExportButtons
+            entity="pos_scans"
+            filename={`skanime-${new Date().toISOString().slice(0, 10)}`}
+            title={L("Historik skanimesh", "Scan history")}
+            subtitle={`${scanRows.length} ${L("skanime", "scans")}`}
+            columns={scanColumns}
+            rows={scanRows}
+            labels={{ csv: "CSV", pdf: "PDF", empty: L("Nuk ka skanime", "No scans") }}
+          />
+        </div>
+
+
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
           {PRESETS.map((p) => (
             <button
