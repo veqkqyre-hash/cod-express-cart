@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.create_pos_sale(jsonb, text, numeric, text) FROM anon, public;
+GRANT EXECUTE ON FUNCTION public.create_pos_sale(jsonb, text, numeric, text) TO authenticated, service_role;
