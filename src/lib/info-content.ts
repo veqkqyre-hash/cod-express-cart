@@ -54,8 +54,8 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
       {
         h_sq: "A mund të anuloj porosinë?",
         h_en: "Can I cancel my order?",
-        b_sq: "Po. Kontaktoni në +383 44 123 456 ose në WhatsApp para se porosia të dërgohet.",
-        b_en: "Yes. Call +383 44 123 456 or message us on WhatsApp before the order ships.",
+        b_sq: "Po. Kontaktoni me email ose në WhatsApp para se porosia të dërgohet.",
+        b_en: "Yes. Email us or message us on WhatsApp before the order ships.",
       },
       {
         h_sq: "Si e ndjek statusin e porosisë?",
@@ -120,8 +120,8 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
       {
         h_sq: "Si të kthej një produkt",
         h_en: "How to return",
-        b_sq: "1. Shkruani në hello@dreamstudio-ks.com ose telefononi +383 44 123 456 me numrin e porosisë.\n2. Ekipi ju konfirmon kthimin dhe organizon marrjen e pakos.\n3. Rimbursimi bëhet brenda 7 ditëve pune pas pranimit të produktit.",
-        b_en: "1. Email hello@dreamstudio-ks.com or call +383 44 123 456 with your order number.\n2. Our team confirms the return and arranges pickup.\n3. Refund is issued within 7 working days after we receive the item.",
+        b_sq: "1. Shkruani në hello@dreamstudio-ks.com  me numrin e porosisë.\n2. Ekipi ju konfirmon kthimin dhe organizon marrjen e pakos.\n3. Rimbursimi bëhet brenda 7 ditëve pune pas pranimit të produktit.",
+        b_en: "1. Email hello@dreamstudio-ks.com  with your order number.\n2. Our team confirms the return and arranges pickup.\n3. Refund is issued within 7 working days after we receive the item.",
       },
       {
         h_sq: "Produkt i dëmtuar",
@@ -198,8 +198,8 @@ export const INFO_DEFAULTS: Record<InfoSlug, InfoPageData> = {
       {
         h_sq: "Kontakti",
         h_en: "Contact",
-        b_sq: "Dreame Beauty Cosmetics L.L.C. · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com",
-        b_en: "Dreame Beauty Cosmetics L.L.C. · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · +383 44 123 456 · hello@dreamstudio-ks.com",
+        b_sq: "Dreame Beauty Cosmetics L.L.C. · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · hello@dreamstudio-ks.com",
+        b_en: "Dreame Beauty Cosmetics L.L.C. · Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · hello@dreamstudio-ks.com",
       },
     ],
   },

@@ -16,7 +16,6 @@ export type ReceiptSale = {
 const STORE = {
   name: "Dreame Beauty Cosmetics L.L.C.",
   addr: "Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë",
-  phone: "+383 44 123 456",
 };
 
 function esc(s: unknown) {
@@ -55,7 +54,7 @@ export function printReceipt(sale: ReceiptSale, items: ReceiptItem[], width: 58 
   .row{display:flex;justify-content:space-between;gap:6px}
 </style></head><body>
 <h1>${esc(STORE.name)}</h1>
-<div class="c muted">${esc(STORE.addr)}<br>${esc(STORE.phone)}</div>
+<div class="c muted">${esc(STORE.addr)}</div>
 <hr>
 <div class="muted">
   <div class="row"><span>Nr. shitjes</span><b>${esc(sale.sale_number)}</b></div>

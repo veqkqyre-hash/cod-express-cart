@@ -264,12 +264,6 @@ function Hero() {
             >
               {tr("shopCategories")}
             </a>
-            <a
-              href={`tel:${tr("contactPhone").replace(/\s/g, "")}`}
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--pink)] bg-white px-6 py-3 sm:px-8 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-black transition hover:bg-[var(--pink)] hover:text-white"
-            >
-              <Phone className="h-4 w-4" /> {tr("contactPhone")}
-            </a>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 sm:gap-x-7 sm:gap-y-3 pt-2 sm:pt-4 text-[11px] sm:text-xs text-white/80">
             <div className="flex items-center gap-1.5 sm:gap-2"><Truck className="h-4 w-4 text-[var(--pink)]" /> {tr("freeShippingBanner")}</div>

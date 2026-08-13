@@ -38,7 +38,6 @@ export const t: Dict = {
   orderConfirmed: { sq: "Porosia u Konfirmua!", en: "Order Confirmed!" },
   orderNumber: { sq: "Numri i Porosisë", en: "Order Number" },
   thankYou: { sq: "Faleminderit për porosinë. Do t'ju kontaktojmë së shpejti.", en: "Thank you for your order. We will contact you soon." },
-  contactPhone: { sq: "+383 44 123 456", en: "+383 44 123 456" },
   admin: { sq: "Admin", en: "Admin" },
   logout: { sq: "Dilni", en: "Logout" },
   login: { sq: "Kyçu", en: "Sign In" },

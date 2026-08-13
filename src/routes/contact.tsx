@@ -9,7 +9,7 @@ import { Mail, Phone, MapPin, Clock, Send, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
   component: Contact,
-  head: () => metaFor("/contact", "Kontakti", "Kontaktoni Dreame Beauty Cosmetics L.L.C. — Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë. Telefon +383 44 123 456."),
+  head: () => metaFor("/contact", "Kontakti", "Kontaktoni Dreame Beauty Cosmetics L.L.C. — Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë."),
 });
 
 const schema = z.object({
@@ -107,7 +107,6 @@ function Contact() {
           <aside className="lg:col-span-2 space-y-4">
             {[
               { icon: MapPin, title: L("Adresa", "Address"), value: "Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë" },
-              { icon: Phone, title: L("Telefoni", "Phone"), value: "+383 44 123 456" },
               { icon: Mail, title: "Email", value: "hello@dreamstudio-ks.com" },
               { icon: Clock, title: L("Orari", "Hours"), value: L("Hën–Sht: 09:00 – 19:00", "Mon–Sat: 09:00 – 19:00") },
             ].map((c, i) => (
@@ -122,12 +121,12 @@ function Contact() {
               </div>
             ))}
             <a
-              href="https://wa.me/38344123456"
+              href="mailto:hello@dreamstudio-ks.com"
               target="_blank"
               rel="noopener"
               className="flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-5 py-3 text-sm font-medium text-white hover:bg-green-700"
             >
-              <MessageCircle className="h-4 w-4" /> {L("Shkruaj në WhatsApp", "Chat on WhatsApp")}
+              <MessageCircle className="h-4 w-4" /> {L("Shkruaj në email", "Email us")}
             </a>
           </aside>
         </div>
