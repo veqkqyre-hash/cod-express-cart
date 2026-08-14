@@ -234,12 +234,23 @@ export function SiteHeader() {
                 <Link to="/" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("home")}</Link>
                 <Link to="/shop" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("shop")}</Link>
                 <Link to="/wishlist" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("wishlist")}</Link>
+                <Link to="/blog" className="py-2 font-medium" onClick={() => setOpen(false)}>Blog</Link>
+                <Link to="/contact" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("contact")}</Link>
+                {infoLinks.map((l) => (
+                  <Link key={l.to} to={l.to} className="py-2 text-muted-foreground" onClick={() => setOpen(false)}>{l.label}</Link>
+                ))}
                 {signedIn ? (
                   <Link to="/account" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("myOrders")}</Link>
                 ) : (
                   <Link to="/auth" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("login")}</Link>
                 )}
+                {isStaff && (
+                  <Link to="/admin" className="mt-2 rounded-full bg-black px-4 py-2 text-center text-xs font-semibold text-white" onClick={() => setOpen(false)}>
+                    {L("Paneli i adminit", "Admin panel")}
+                  </Link>
+                )}
               </nav>
+
               <div className="pt-2 border-t border-border">
                 <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">{tr("categories")}</div>
                 <div className="grid grid-cols-2 gap-1.5">
