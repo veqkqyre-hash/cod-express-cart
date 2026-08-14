@@ -272,8 +272,8 @@ function Admin() {
           )}
           {canSee(nav) && (
             <>
-              {nav === "dashboard" && <Dashboard lang={lang} />}
-              {nav === "orders" && <OrdersView lang={lang} tr={tr} />}
+              {nav === "dashboard" && <Dashboard lang={lang} onNav={(k) => { if (canSee(k)) { setNav(k); } else { toast.error(L("Roli i juaj nuk ka akses.", "Your role has no access.")); } }} />}
+              {nav === "orders" && <OrdersView lang={lang} tr={tr} role={role!} />}
               {nav === "sales" && <SalesView lang={lang} />}
               {nav === "stats" && <StatsView lang={lang} />}
               {nav === "products" && <ProductsPanel />}
@@ -330,7 +330,7 @@ function StatCard({ icon: Icon, label, value, sub, tone = "pink" }: { icon: any;
   );
 }
 
-function Dashboard({ lang }: { lang: string }) {
+function Dashboard({ lang, onNav }: { lang: string; onNav: (k: NavKey) => void }) {
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const { data: stats } = useQuery({
     queryKey: ["admin-dashboard-stats"],
@@ -382,11 +382,43 @@ function Dashboard({ lang }: { lang: string }) {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={ShoppingBag} label={L("Porosi totale", "Total orders")} value={String(stats?.totalOrders ?? 0)} sub={`${stats?.todayOrders ?? 0} ${L("sot", "today")}`} tone="pink" />
-        <StatCard icon={Euro} label={L("Të ardhura", "Revenue")} value={formatEur(stats?.revenue ?? 0)} sub={`${formatEur(stats?.revenueToday ?? 0)} ${L("sot", "today")}`} tone="green" />
-        <StatCard icon={Package} label={L("Produkte", "Products")} value={String(stats?.products ?? 0)} tone="blue" />
-        <StatCard icon={Users} label={L("Klientë", "Customers")} value={String(stats?.totalOrders ?? 0)} tone="amber" />
+        <button type="button" onClick={() => onNav("orders")} className="text-left">
+          <StatCard icon={ShoppingBag} label={L("Porosi totale", "Total orders")} value={String(stats?.totalOrders ?? 0)} sub={`${stats?.todayOrders ?? 0} ${L("sot", "today")}`} tone="pink" />
+        </button>
+        <button type="button" onClick={() => onNav("sales")} className="text-left">
+          <StatCard icon={Euro} label={L("Të ardhura", "Revenue")} value={formatEur(stats?.revenue ?? 0)} sub={`${formatEur(stats?.revenueToday ?? 0)} ${L("sot", "today")}`} tone="green" />
+        </button>
+        <button type="button" onClick={() => onNav("products")} className="text-left">
+          <StatCard icon={Package} label={L("Produkte", "Products")} value={String(stats?.products ?? 0)} tone="blue" />
+        </button>
+        <button type="button" onClick={() => onNav("customers")} className="text-left">
+          <StatCard icon={Users} label={L("Klientë", "Customers")} value={String(stats?.totalOrders ?? 0)} tone="amber" />
+        </button>
       </div>
+
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">{L("Lidhje të shpejta", "Quick links")}</div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {([
+            ["orders", L("Porositë", "Orders")],
+            ["pos", L("ARKA / SHITJE", "POS")],
+            ["inventory", L("Inventari", "Inventory")],
+            ["products", L("Produktet", "Products")],
+            ["reviews", L("Vlerësimet", "Reviews")],
+            ["messages", L("Mesazhet", "Messages")],
+            ["reports", L("Raporte", "Reports")],
+          ] as [NavKey, string][]).map(([k, label]) => (
+            <button
+              key={k}
+              onClick={() => onNav(k)}
+              className="rounded-full border border-neutral-200 px-4 py-2 text-sm font-medium hover:bg-neutral-50"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
 
       {alerts && (alerts.lowStock.length > 0 || alerts.pendingReviews > 0 || alerts.unreadMessages > 0 || alerts.stockRequests > 0) && (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
@@ -395,18 +427,19 @@ function Dashboard({ lang }: { lang: string }) {
           </div>
           <div className="mt-3 flex flex-wrap gap-2 text-xs font-medium">
             {alerts.pendingReviews > 0 && (
-              <span className="rounded-full bg-white px-3 py-1.5 shadow-sm">{alerts.pendingReviews} {L("vlerësime në pritje", "reviews pending")}</span>
+              <button onClick={() => onNav("reviews")} className="rounded-full bg-white px-3 py-1.5 shadow-sm hover:bg-amber-100">{alerts.pendingReviews} {L("vlerësime në pritje", "reviews pending")}</button>
             )}
             {alerts.unreadMessages > 0 && (
-              <span className="rounded-full bg-white px-3 py-1.5 shadow-sm">{alerts.unreadMessages} {L("mesazhe të palexuara", "unread messages")}</span>
+              <button onClick={() => onNav("messages")} className="rounded-full bg-white px-3 py-1.5 shadow-sm hover:bg-amber-100">{alerts.unreadMessages} {L("mesazhe të palexuara", "unread messages")}</button>
             )}
             {alerts.stockRequests > 0 && (
-              <span className="rounded-full bg-white px-3 py-1.5 shadow-sm">{alerts.stockRequests} {L("kërkesa për stok", "back-in-stock requests")}</span>
+              <button onClick={() => onNav("newsletter")} className="rounded-full bg-white px-3 py-1.5 shadow-sm hover:bg-amber-100">{alerts.stockRequests} {L("kërkesa për stok", "back-in-stock requests")}</button>
             )}
             {alerts.lowStock.length > 0 && (
-              <span className="rounded-full bg-white px-3 py-1.5 shadow-sm">{alerts.lowStock.length} {L("produkte me stok të ulët", "products low on stock")}</span>
+              <button onClick={() => onNav("inventory")} className="rounded-full bg-white px-3 py-1.5 shadow-sm hover:bg-amber-100">{alerts.lowStock.length} {L("produkte me stok të ulët", "products low on stock")}</button>
             )}
           </div>
+
           {alerts.lowStock.length > 0 && (
             <ul className="mt-3 grid gap-1 text-sm text-amber-900 sm:grid-cols-2 lg:grid-cols-3">
               {alerts.lowStock.slice(0, 9).map((p) => (
@@ -425,11 +458,13 @@ function Dashboard({ lang }: { lang: string }) {
       <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm">
         <div className="flex items-center justify-between p-5 border-b border-neutral-100">
           <h2 className="font-display text-lg">{L("Porositë e fundit", "Recent orders")}</h2>
-          <span className="text-sm text-[var(--pink-deep,#e91e63)]">{L("Të gjitha", "View all")} →</span>
+          <button onClick={() => onNav("orders")} className="text-sm font-medium text-[var(--pink-deep,#e91e63)] hover:underline">
+            {L("Të gjitha porositë", "All orders")} →
+          </button>
         </div>
         <div className="divide-y divide-neutral-100">
           {(recentOrders ?? []).map((o) => (
-            <div key={o.id} className="flex items-center justify-between px-5 py-3 text-sm">
+            <button key={o.id} onClick={() => onNav("orders")} className="w-full flex items-center justify-between px-5 py-3 text-sm text-left hover:bg-neutral-50">
               <div>
                 <div className="font-medium">{o.customer_name}</div>
                 <div className="text-xs text-neutral-500">{o.order_number} · {new Date(o.created_at).toLocaleDateString()}</div>
@@ -438,19 +473,23 @@ function Dashboard({ lang }: { lang: string }) {
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLOR[o.status]}`}>{o.status}</span>
                 <span className="font-medium text-[var(--pink-deep,#e91e63)]">{formatEur(Number(o.total))}</span>
               </div>
-            </div>
+            </button>
           ))}
           {recentOrders && recentOrders.length === 0 && (
             <div className="px-5 py-8 text-center text-sm text-neutral-500">{L("Asnjë porosi", "No orders")}</div>
           )}
         </div>
       </div>
+
     </div>
   );
 }
 
-function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
+function OrdersView({ lang, tr, role }: { lang: string; tr: (k: any) => string; role: Role }) {
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
+  const canUpdate = role === "admin" || role === "manager";
+  const canCancel = canUpdate;
+  const canDelete = role === "admin";
   const [status, setStatus] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [search, setSearch] = useState("");
@@ -494,6 +533,7 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
   function clearFilters() { setStatus(""); setCity(""); setSearch(""); setFrom(""); setTo(""); }
 
   async function updateStatus(id: string, newStatus: string) {
+    if (!canUpdate) return toast.error(L("Nuk keni leje për ndryshim statusi.", "You are not allowed to change status."));
     const prev = (orders ?? []).find((o) => o.id === id);
     const { error } = await supabase.from("orders").update({ status: newStatus as any }).eq("id", id);
     if (error) toast.error(error.message);
@@ -505,6 +545,20 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
       refetch();
     }
   }
+
+  async function deleteOrder(id: string) {
+    if (!canDelete) return toast.error(L("Vetëm admini mund të fshijë porosi.", "Only an admin can delete orders."));
+    const prev = (orders ?? []).find((o) => o.id === id);
+    if (!confirm(L(`Fshi porosinë ${prev?.order_number}? Nuk kthehet.`, `Delete order ${prev?.order_number}? This cannot be undone.`))) return;
+    await supabase.from("order_items").delete().eq("order_id", id);
+    const { error } = await supabase.from("orders").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(L("Porosia u fshi", "Order deleted"));
+    logAction("order.deleted", "orders", id, { order_number: prev?.order_number });
+    setOpenId(null);
+    refetch();
+  }
+
 
   const exportColumns: Column<Order>[] = [
     { key: "order_number", label: L("Nr. porosisë", "Order #"), get: (o) => o.order_number },
@@ -553,7 +607,17 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
 
   return (
     <div>
+      <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+        <span className="rounded-full bg-neutral-900 px-3 py-1 font-semibold uppercase tracking-wide text-white">
+          {role === "admin" ? L("Admin", "Admin") : role === "manager" ? L("Menaxher", "Manager") : L("Editor", "Editor")}
+        </span>
+        <span className="rounded-full bg-green-50 px-3 py-1 font-medium text-green-800">{L("Shiko", "View")}</span>
+        <span className={`rounded-full px-3 py-1 font-medium ${canUpdate ? "bg-green-50 text-green-800" : "bg-neutral-100 text-neutral-400 line-through"}`}>{L("Përditëso statusin", "Update status")}</span>
+        <span className={`rounded-full px-3 py-1 font-medium ${canCancel ? "bg-green-50 text-green-800" : "bg-neutral-100 text-neutral-400 line-through"}`}>{L("Anulo", "Cancel")}</span>
+        <span className={`rounded-full px-3 py-1 font-medium ${canDelete ? "bg-green-50 text-green-800" : "bg-neutral-100 text-neutral-400 line-through"}`}>{L("Fshi", "Delete")}</span>
+      </div>
       <div className="mb-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+
         <div className="flex flex-wrap gap-3">
           <input
             type="search"
@@ -620,6 +684,7 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
                 <th className="px-4 py-3 hidden sm:table-cell">{tr("date")}</th>
                 <th className="px-4 py-3">{tr("total")}</th>
                 <th className="px-4 py-3">{tr("status")}</th>
+                <th className="px-4 py-3 text-right">{L("Veprime", "Actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -637,17 +702,40 @@ function OrdersView({ lang, tr }: { lang: string; tr: (k: any) => string }) {
                   <td className="px-4 py-3">
                     <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLOR[o.status]}`}>{tr(o.status as any)}</span>
                   </td>
+                  <td className="px-4 py-3 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                    <button onClick={() => setOpenId(o.id)} className="text-xs font-medium text-[var(--pink-deep,#e91e63)] hover:underline">
+                      {L("Shiko", "View")}
+                    </button>
+                    {canCancel && o.status !== "cancelled" && (
+                      <button onClick={() => updateStatus(o.id, "cancelled")} className="ml-3 text-xs font-medium text-amber-700 hover:underline">
+                        {L("Anulo", "Cancel")}
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button onClick={() => deleteOrder(o.id)} className="ml-3 text-xs font-medium text-red-600 hover:underline">
+                        {L("Fshi", "Delete")}
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={7} className="px-4 py-12 text-center text-neutral-500">{lang === "sq" ? "Asnjë porosi" : "No orders"}</td></tr>
+                <tr><td colSpan={8} className="px-4 py-12 text-center text-neutral-500">{lang === "sq" ? "Asnjë porosi" : "No orders"}</td></tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {openOrder && <OrderModal order={openOrder} onClose={() => setOpenId(null)} onStatus={(st) => updateStatus(openOrder.id, st)} />}
+      {openOrder && (
+        <OrderModal
+          order={openOrder}
+          onClose={() => setOpenId(null)}
+          onStatus={(st) => updateStatus(openOrder.id, st)}
+          canUpdate={canUpdate}
+          onDelete={canDelete ? () => deleteOrder(openOrder.id) : undefined}
+        />
+      )}
     </div>
   );
 }
@@ -850,7 +938,7 @@ function InventoryView({ lang }: { lang: string }) {
 }
 
 
-function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () => void; onStatus: (s: string) => void }) {
+function OrderModal({ order, onClose, onStatus, canUpdate = true, onDelete }: { order: Order; onClose: () => void; onStatus: (s: string) => void; canUpdate?: boolean; onDelete?: () => void }) {
   const { tr, lang } = useI18n();
   const { data: items } = useQuery({
     queryKey: ["order-items", order.id],
@@ -933,14 +1021,32 @@ function OrderModal({ order, onClose, onStatus }: { order: Order; onClose: () =>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 no-print">
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">{tr("updateStatus")}:</label>
-              <select defaultValue={order.status} onChange={(e) => onStatus(e.target.value)} className="rounded-full border border-input bg-background px-3 py-1.5 text-sm">
+              <select
+                defaultValue={order.status}
+                disabled={!canUpdate}
+                onChange={(e) => onStatus(e.target.value)}
+                className="rounded-full border border-input bg-background px-3 py-1.5 text-sm disabled:opacity-50"
+              >
                 {STATUSES.map((s) => <option key={s} value={s}>{tr(s as any)}</option>)}
               </select>
+              {!canUpdate && (
+                <span className="text-xs text-muted-foreground">
+                  {lang === "sq" ? "Vetëm shikim" : "View only"}
+                </span>
+              )}
             </div>
-            <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90">
-              <Printer className="h-4 w-4" /> {tr("printInvoice")}
-            </button>
+            <div className="flex items-center gap-2">
+              {onDelete && (
+                <button onClick={onDelete} className="inline-flex items-center gap-2 rounded-full border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50">
+                  {lang === "sq" ? "Fshi porosinë" : "Delete order"}
+                </button>
+              )}
+              <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90">
+                <Printer className="h-4 w-4" /> {tr("printInvoice")}
+              </button>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
