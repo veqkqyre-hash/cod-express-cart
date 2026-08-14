@@ -1021,14 +1021,32 @@ function OrderModal({ order, onClose, onStatus, canUpdate = true, onDelete }: { 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 no-print">
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">{tr("updateStatus")}:</label>
-              <select defaultValue={order.status} onChange={(e) => onStatus(e.target.value)} className="rounded-full border border-input bg-background px-3 py-1.5 text-sm">
+              <select
+                defaultValue={order.status}
+                disabled={!canUpdate}
+                onChange={(e) => onStatus(e.target.value)}
+                className="rounded-full border border-input bg-background px-3 py-1.5 text-sm disabled:opacity-50"
+              >
                 {STATUSES.map((s) => <option key={s} value={s}>{tr(s as any)}</option>)}
               </select>
+              {!canUpdate && (
+                <span className="text-xs text-muted-foreground">
+                  {lang === "sq" ? "Vetëm shikim" : "View only"}
+                </span>
+              )}
             </div>
-            <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90">
-              <Printer className="h-4 w-4" /> {tr("printInvoice")}
-            </button>
+            <div className="flex items-center gap-2">
+              {onDelete && (
+                <button onClick={onDelete} className="inline-flex items-center gap-2 rounded-full border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50">
+                  {lang === "sq" ? "Fshi porosinë" : "Delete order"}
+                </button>
+              )}
+              <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90">
+                <Printer className="h-4 w-4" /> {tr("printInvoice")}
+              </button>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
