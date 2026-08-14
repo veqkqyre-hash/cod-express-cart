@@ -43,6 +43,7 @@ export function SiteHeader() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const infoLinks = [
     { to: "/faq" as const, label: L("Pyetjet e shpeshta", "FAQ") },
     { to: "/shipping" as const, label: L("Transporti", "Shipping") },
@@ -50,6 +51,7 @@ export function SiteHeader() {
     { to: "/privacy" as const, label: L("Privatësia", "Privacy") },
     { to: "/terms" as const, label: L("Kushtet", "Terms") },
   ];
+
 
 
   const { data: categories } = useQuery({
