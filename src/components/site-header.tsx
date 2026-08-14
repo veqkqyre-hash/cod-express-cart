@@ -16,15 +16,41 @@ export function SiteHeader() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
+  const [isStaff, setIsStaff] = useState(false);
   const [q, setQ] = useState("");
   const megaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setSignedIn(!!data.user));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setSignedIn(!!session?.user));
+    async function checkStaff(userId?: string) {
+      if (!userId) return setIsStaff(false);
+      const [a, m, ed] = await Promise.all([
+        supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
+        supabase.rpc("has_role", { _user_id: userId, _role: "manager" }),
+        supabase.rpc("has_role", { _user_id: userId, _role: "editor" }),
+      ]);
+      setIsStaff(Boolean(a.data || m.data || ed.data));
+    }
+    supabase.auth.getUser().then(({ data }) => {
+      setSignedIn(!!data.user);
+      checkStaff(data.user?.id);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setSignedIn(!!session?.user);
+      checkStaff(session?.user?.id);
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  const infoLinks = [
+    { to: "/faq" as const, label: L("Pyetjet e shpeshta", "FAQ") },
+    { to: "/shipping" as const, label: L("Transporti", "Shipping") },
+    { to: "/returns" as const, label: L("Kthimet", "Returns") },
+    { to: "/privacy" as const, label: L("Privatësia", "Privacy") },
+    { to: "/terms" as const, label: L("Kushtet", "Terms") },
+  ];
+
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
