@@ -233,6 +233,30 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_subscribers: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string
+          id: string
+          lang: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          lang?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          lang?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
@@ -381,6 +405,101 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      pos_refund_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          refund_id: string
+          subtotal: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name: string
+          quantity: number
+          refund_id: string
+          subtotal?: number
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          refund_id?: string
+          subtotal?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_refund_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_refund_items_refund_id_fkey"
+            columns: ["refund_id"]
+            isOneToOne: false
+            referencedRelation: "pos_refunds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_refunds: {
+        Row: {
+          cashier_email: string | null
+          cashier_id: string | null
+          created_at: string
+          id: string
+          item_count: number
+          reason: string | null
+          refund_number: string
+          sale_id: string | null
+          sale_number: string | null
+          total: number
+        }
+        Insert: {
+          cashier_email?: string | null
+          cashier_id?: string | null
+          created_at?: string
+          id?: string
+          item_count?: number
+          reason?: string | null
+          refund_number?: string
+          sale_id?: string | null
+          sale_number?: string | null
+          total?: number
+        }
+        Update: {
+          cashier_email?: string | null
+          cashier_id?: string | null
+          created_at?: string
+          id?: string
+          item_count?: number
+          reason?: string | null
+          refund_number?: string
+          sale_id?: string | null
+          sale_number?: string | null
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_refunds_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sales"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pos_sale_items: {
         Row: {
@@ -558,6 +677,50 @@ export type Database = {
         }
         Relationships: []
       }
+      product_reviews: {
+        Row: {
+          approved: boolean
+          author_name: string
+          body: string | null
+          created_at: string
+          id: string
+          product_id: string
+          rating: number
+          title: string | null
+          user_id: string | null
+        }
+        Insert: {
+          approved?: boolean
+          author_name: string
+          body?: string | null
+          created_at?: string
+          id?: string
+          product_id: string
+          rating?: number
+          title?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          approved?: boolean
+          author_name?: string
+          body?: string | null
+          created_at?: string
+          id?: string
+          product_id?: string
+          rating?: number
+          title?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           active: boolean
@@ -673,6 +836,41 @@ export type Database = {
           value?: Json
         }
         Relationships: []
+      }
+      stock_alerts: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          notified: boolean
+          product_id: string | null
+          product_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          notified?: boolean
+          product_id?: string | null
+          product_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          notified?: boolean
+          product_id?: string | null
+          product_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_alerts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -811,6 +1009,10 @@ export type Database = {
         Returns: Json
       }
       pos_scan: { Args: { _code: string }; Returns: Json }
+      refund_pos_sale: {
+        Args: { _items?: Json; _reason?: string; _sale_id: string }
+        Returns: Json
+      }
       revoke_admin: { Args: { _user_id: string }; Returns: undefined }
       revoke_role: {
         Args: {

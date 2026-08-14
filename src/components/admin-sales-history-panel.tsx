@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cashierDisplay } from "@/lib/cashier";
 import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
-import { Printer, X } from "lucide-react";
+import { Printer, X, Undo2 } from "lucide-react";
 import { printReceipt } from "@/lib/pos-receipt";
 import { ExportButtons } from "@/components/admin-export";
 import type { Column } from "@/lib/export";
 import { Panel, Empty } from "@/components/admin-ui";
 import { loadBusinessInfo } from "@/lib/store-info";
+import { toast } from "sonner";
 
 
 type Sale = {
@@ -121,6 +122,8 @@ export function PosSalesPanel() {
 }
 
 function SaleModal({ sale, onClose, L }: { sale: Sale; onClose: () => void; L: (sq: string, en: string) => string }) {
+  const qc = useQueryClient();
+  const [refunding, setRefunding] = useState(false);
   const { data: items } = useQuery({
     queryKey: ["pos-sale-items", sale.id],
     queryFn: async () => {
@@ -192,6 +195,27 @@ function SaleModal({ sale, onClose, L }: { sale: Sale; onClose: () => void; L: (
               className="rounded-full border border-neutral-300 px-4 py-2 text-sm"
             >
               58mm
+            </button>
+            <button
+              disabled={refunding}
+              onClick={async () => {
+                const reason = prompt(L("Arsyeja e kthimit (opsionale):", "Refund reason (optional):"));
+                if (reason === null) return;
+                setRefunding(true);
+                const { error } = await supabase.rpc("refund_pos_sale", {
+                  _sale_id: sale.id,
+                  _reason: reason.trim() || undefined,
+                });
+                setRefunding(false);
+                if (error) return toast.error(error.message);
+                toast.success(L("Kthimi u regjistrua, stoku u kthye.", "Refund saved, stock restored."));
+                qc.invalidateQueries({ queryKey: ["pos-refunds"] });
+                qc.invalidateQueries({ queryKey: ["products"] });
+                onClose();
+              }}
+              className="ml-auto inline-flex items-center gap-2 rounded-full border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
+            >
+              <Undo2 className="h-4 w-4" /> {L("KTHIM", "REFUND")}
             </button>
           </div>
         </div>
