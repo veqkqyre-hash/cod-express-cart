@@ -30,7 +30,7 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Store",
-          name: "Dreame Beauty Cosmetics L.L.C.",
+          name: "Dreame Beauty Cosmetics",
           description:
             "Produkte profesionale për thonj: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesë në dorëzim në tërë Kosovën.",
 

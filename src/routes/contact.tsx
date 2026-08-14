@@ -9,7 +9,7 @@ import { Mail, MapPin, Clock, Send, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
   component: Contact,
-  head: () => metaFor("/contact", "Kontakti", "Kontaktoni Dreame Beauty Cosmetics L.L.C. — Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë."),
+  head: () => metaFor("/contact", "Kontakti", "Kontaktoni Dreame Beauty Cosmetics — Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë."),
 });
 
 const schema = z.object({

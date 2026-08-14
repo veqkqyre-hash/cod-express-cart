@@ -8,8 +8,8 @@ export const Route = createFileRoute("/blog/$slug")({
   component: Post,
   head: ({ params }) => {
     const url = `https://cod-express-cart.lovable.app/blog/${params.slug}`;
-    const title = "Artikull — Dreame Beauty Cosmetics L.L.C.";
-    const desc = "Këshilla dhe trende profesionale për sallone bukurie nga Dreame Beauty Cosmetics L.L.C.";
+    const title = "Artikull — Dreame Beauty Cosmetics";
+    const desc = "Këshilla dhe trende profesionale për sallone bukurie nga Dreame Beauty Cosmetics";
     return {
       meta: [
         { title },

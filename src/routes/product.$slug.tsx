@@ -13,10 +13,10 @@ export const Route = createFileRoute("/product/$slug")({
   component: ProductPage,
   head: ({ params }) => ({
     meta: [
-      { title: `${params.slug.replace(/-/g, " ")} — Dreame Beauty Cosmetics L.L.C.` },
-      { name: "description", content: "Produkt profesional për sallone bukurie nga Dreame Beauty Cosmetics L.L.C., me pagesë në dorëzim në tërë Kosovën." },
-      { property: "og:title", content: `${params.slug.replace(/-/g, " ")} — Dreame Beauty Cosmetics L.L.C.` },
-      { property: "og:description", content: "Produkt profesional për sallone bukurie nga Dreame Beauty Cosmetics L.L.C., me pagesë në dorëzim." },
+      { title: `${params.slug.replace(/-/g, " ")} — Dreame Beauty Cosmetics` },
+      { name: "description", content: "Produkt profesional për sallone bukurie nga Dreame Beauty Cosmetics, me pagesë në dorëzim në tërë Kosovën." },
+      { property: "og:title", content: `${params.slug.replace(/-/g, " ")} — Dreame Beauty Cosmetics` },
+      { property: "og:description", content: "Produkt profesional për sallone bukurie nga Dreame Beauty Cosmetics, me pagesë në dorëzim." },
       { property: "og:type", content: "product" },
       { property: "og:url", content: `https://cod-express-cart.lovable.app/product/${params.slug}` },
       { name: "twitter:card", content: "summary_large_image" },
@@ -114,7 +114,7 @@ function ProductPage() {
             image: product.image_url ?? undefined,
             sku: product.sku ?? undefined,
             gtin: product.barcode ?? undefined,
-            brand: { "@type": "Brand", name: "Dreame Beauty Cosmetics L.L.C." },
+            brand: { "@type": "Brand", name: "Dreame Beauty Cosmetics" },
             offers: {
               "@type": "Offer",
               price: Number(product.price).toFixed(2),
