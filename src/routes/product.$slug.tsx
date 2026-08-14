@@ -6,6 +6,8 @@ import { useI18n } from "@/lib/i18n";
 import { useCart, formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
+import { ProductReviews, Stars, useReviews } from "@/components/product-reviews";
+import { StockAlertForm } from "@/components/newsletter-signup";
 
 export const Route = createFileRoute("/product/$slug")({
   component: ProductPage,
@@ -39,6 +41,10 @@ function ProductPage() {
     },
   });
 
+  const { data: reviews } = useReviews(product?.id);
+  const approved = (reviews ?? []).filter((r) => r.approved);
+  const avgRating = approved.length ? approved.reduce((s, r) => s + r.rating, 0) / approved.length : 0;
+
   if (isLoading) return <div className="container-app py-20 text-center text-muted-foreground">…</div>;
   if (!product) return null;
 
@@ -54,6 +60,12 @@ function ProductPage() {
         </div>
         <div>
           <h1 className="font-display text-3xl sm:text-4xl">{name}</h1>
+          {approved.length > 0 && (
+            <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+              <Stars value={avgRating} size={16} />
+              <span>{avgRating.toFixed(1)} · {approved.length} {lang === "sq" ? "vlerësime" : "reviews"}</span>
+            </div>
+          )}
           <div className="mt-4 font-display text-3xl text-primary">{formatEur(Number(product.price))}</div>
           {desc && <p className="mt-6 text-muted-foreground leading-relaxed">{desc}</p>}
 
@@ -80,12 +92,42 @@ function ProductPage() {
             </button>
           </div>
 
+          {product.stock === 0 && <StockAlertForm productId={product.id} productName={name} />}
+
           <div className="mt-8 rounded-2xl border border-border bg-accent/40 p-5">
             <div className="font-medium">{tr("cod")}</div>
             <div className="text-sm text-muted-foreground mt-1">{tr("codDesc")}</div>
           </div>
         </div>
       </div>
+
+      <ProductReviews productId={product.id} />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name,
+            description: desc ?? undefined,
+            image: product.image_url ?? undefined,
+            sku: product.sku ?? undefined,
+            gtin: product.barcode ?? undefined,
+            brand: { "@type": "Brand", name: "Dreame Beauty Cosmetics L.L.C." },
+            offers: {
+              "@type": "Offer",
+              price: Number(product.price).toFixed(2),
+              priceCurrency: "EUR",
+              availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+              url: `https://dreamebeautycosmetics.com/product/${product.slug}`,
+            },
+            ...(approved.length > 0
+              ? { aggregateRating: { "@type": "AggregateRating", ratingValue: avgRating.toFixed(1), reviewCount: approved.length } }
+              : {}),
+          }),
+        }}
+      />
     </div>
   );
 }

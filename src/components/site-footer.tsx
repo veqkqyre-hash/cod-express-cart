@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Youtube, Mail, MapPin, CreditCard, Truck, ShieldCheck, Headphones } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { NewsletterSignup } from "@/components/newsletter-signup";
 
 export function SiteFooter() {
   const { tr, lang } = useI18n();
@@ -81,6 +82,7 @@ export function SiteFooter() {
               <li className="flex items-start gap-2.5"><MapPin className="mt-0.5 h-4 w-4 text-[var(--pink)] shrink-0" /> Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë</li>
               <li className="flex items-center gap-2.5"><Mail className="h-4 w-4 text-[var(--pink)] shrink-0" /> info@dreamebeautycosmetics.com</li>
             </ul>
+            <div className="mt-6"><NewsletterSignup dark /></div>
           </div>
         </div>
 

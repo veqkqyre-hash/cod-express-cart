@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet, Clock,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet, Clock, Star, Mail, Undo2, AlertTriangle,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
@@ -23,6 +23,9 @@ import { DashboardCharts } from "@/components/admin-dashboard-charts";
 import { PosSalesPanel } from "@/components/admin-sales-history-panel";
 import { PosReportPanel } from "@/components/admin-pos-report-panel";
 import { ShiftsPanel } from "@/components/admin-shift-panel";
+import { ReviewsPanel } from "@/components/admin-reviews-panel";
+import { NewsletterPanel } from "@/components/admin-newsletter-panel";
+import { RefundsPanel } from "@/components/admin-refunds-panel";
 import { OrderTimeline } from "@/components/order-timeline";
 import { printOrders } from "@/lib/bulk-print";
 import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
@@ -65,13 +68,14 @@ const STATUS_COLOR: Record<string, string> = {
 type NavKey =
   | "dashboard" | "pos" | "possales" | "posreport" | "shifts" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
-  | "messages" | "pages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins";
+  | "messages" | "pages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins"
+  | "reviews" | "newsletter" | "refunds";
 
 type Role = "admin" | "manager" | "editor";
 
 // Which sections each role can open (admin sees everything)
-const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports", "pos", "possales", "posreport", "shifts"];
-const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products", "pages"];
+const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports", "pos", "possales", "posreport", "shifts", "refunds"];
+const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products", "pages", "reviews"];
 
 function Admin() {
   const { tr, lang } = useI18n();
@@ -162,6 +166,9 @@ function Admin() {
     { key: "shipping", label: L("Transporti", "Shipping"), icon: Truck },
     { key: "customers", label: L("Klientët", "Customers"), icon: Users },
     { key: "marketing", label: L("Marketing", "Marketing"), icon: Ticket },
+    { key: "newsletter", label: L("Newsletter", "Newsletter"), icon: Mail },
+    { key: "reviews", label: L("Vlerësimet", "Reviews"), icon: Star },
+    { key: "refunds", label: L("Kthimet", "Refunds"), icon: Undo2 },
     { key: "homepage", label: L("Ballina", "Homepage"), icon: Home },
     { key: "blog", label: L("Blog", "Blog"), icon: Newspaper },
     { key: "messages", label: L("Mesazhet", "Messages"), icon: Inbox },
@@ -180,10 +187,10 @@ function Admin() {
 
   // Grupimi i menusë: ARKA lart, pjesa tjetër e adminit poshtë sipas seksioneve
   const navGroups: { title: string; keys: NavKey[] }[] = [
-    { title: L("ARKA / DYQANI", "REGISTER / STORE"), keys: ["pos", "possales", "posreport", "shifts"] },
+    { title: L("ARKA / DYQANI", "REGISTER / STORE"), keys: ["pos", "possales", "posreport", "refunds", "shifts"] },
     { title: L("SHITJET ONLINE", "ONLINE SALES"), keys: ["dashboard", "orders", "sales", "stats", "notifications"] },
     { title: L("KATALOGU", "CATALOG"), keys: ["products", "inventory", "catalog", "shipping"] },
-    { title: L("KLIENTËT & MARKETINGU", "CUSTOMERS & MARKETING"), keys: ["customers", "marketing", "messages"] },
+    { title: L("KLIENTËT & MARKETINGU", "CUSTOMERS & MARKETING"), keys: ["customers", "marketing", "newsletter", "reviews", "messages"] },
     { title: L("PËRMBAJTJA", "CONTENT"), keys: ["homepage", "blog", "pages"] },
     { title: L("SISTEMI", "SYSTEM"), keys: ["visitors", "reports", "audit", "settings", "admins"] },
   ];
@@ -289,6 +296,9 @@ function Admin() {
               {nav === "audit" && <AuditPanel />}
               {nav === "settings" && <SettingsPanel />}
               {nav === "admins" && <AdminsPanel />}
+              {nav === "reviews" && <ReviewsPanel />}
+              {nav === "newsletter" && <NewsletterPanel />}
+              {nav === "refunds" && <RefundsPanel />}
             </>
           )}
         </main>
@@ -343,6 +353,24 @@ function Dashboard({ lang }: { lang: string }) {
     },
   });
 
+  const { data: alerts } = useQuery({
+    queryKey: ["admin-dashboard-alerts"],
+    queryFn: async () => {
+      const [low, reviews, msgs, stock] = await Promise.all([
+        supabase.from("products").select("id,name_sq,stock").eq("active", true).lte("stock", 5).order("stock").limit(20),
+        supabase.from("product_reviews").select("id", { count: "exact", head: true }).eq("approved", false),
+        supabase.from("messages").select("id", { count: "exact", head: true }).eq("read", false),
+        supabase.from("stock_alerts").select("id", { count: "exact", head: true }).eq("notified", false),
+      ]);
+      return {
+        lowStock: (low.data ?? []) as { id: string; name_sq: string; stock: number }[],
+        pendingReviews: reviews.count ?? 0,
+        unreadMessages: msgs.count ?? 0,
+        stockRequests: stock.count ?? 0,
+      };
+    },
+  });
+
   const { data: recentOrders } = useQuery({
     queryKey: ["admin-dashboard-recent"],
     queryFn: async () => {
@@ -359,6 +387,38 @@ function Dashboard({ lang }: { lang: string }) {
         <StatCard icon={Package} label={L("Produkte", "Products")} value={String(stats?.products ?? 0)} tone="blue" />
         <StatCard icon={Users} label={L("Klientë", "Customers")} value={String(stats?.totalOrders ?? 0)} tone="amber" />
       </div>
+
+      {alerts && (alerts.lowStock.length > 0 || alerts.pendingReviews > 0 || alerts.unreadMessages > 0 || alerts.stockRequests > 0) && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <div className="flex items-center gap-2 font-semibold text-amber-900">
+            <AlertTriangle className="h-4 w-4" /> {L("Kërkon vëmendje", "Needs attention")}
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs font-medium">
+            {alerts.pendingReviews > 0 && (
+              <span className="rounded-full bg-white px-3 py-1.5 shadow-sm">{alerts.pendingReviews} {L("vlerësime në pritje", "reviews pending")}</span>
+            )}
+            {alerts.unreadMessages > 0 && (
+              <span className="rounded-full bg-white px-3 py-1.5 shadow-sm">{alerts.unreadMessages} {L("mesazhe të palexuara", "unread messages")}</span>
+            )}
+            {alerts.stockRequests > 0 && (
+              <span className="rounded-full bg-white px-3 py-1.5 shadow-sm">{alerts.stockRequests} {L("kërkesa për stok", "back-in-stock requests")}</span>
+            )}
+            {alerts.lowStock.length > 0 && (
+              <span className="rounded-full bg-white px-3 py-1.5 shadow-sm">{alerts.lowStock.length} {L("produkte me stok të ulët", "products low on stock")}</span>
+            )}
+          </div>
+          {alerts.lowStock.length > 0 && (
+            <ul className="mt-3 grid gap-1 text-sm text-amber-900 sm:grid-cols-2 lg:grid-cols-3">
+              {alerts.lowStock.slice(0, 9).map((p) => (
+                <li key={p.id} className="flex justify-between gap-2 rounded-lg bg-white/70 px-3 py-1.5">
+                  <span className="truncate">{p.name_sq}</span>
+                  <span className={`font-semibold ${p.stock === 0 ? "text-red-600" : ""}`}>{p.stock}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       <DashboardCharts lang={lang} />
 
