@@ -109,8 +109,28 @@ export function SiteHeader() {
             <a href="#brands" className="hover:text-[var(--pink-deep)] transition-colors">{tr("brands")}</a>
             <Link to="/blog" className="hover:text-[var(--pink-deep)] transition-colors">Blog</Link>
             <Link to="/contact" className="hover:text-[var(--pink-deep)] transition-colors">{tr("contact")}</Link>
+            <div className="relative" onMouseEnter={() => setInfoOpen(true)} onMouseLeave={() => setInfoOpen(false)}>
+              <button className="inline-flex items-center gap-1 hover:text-[var(--pink-deep)] transition-colors">
+                Info <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+              {infoOpen && (
+                <div className="absolute left-0 top-full z-50 min-w-44 rounded-xl border border-border bg-background p-2 shadow-elev">
+                  {infoLinks.map((l) => (
+                    <Link key={l.to} to={l.to} onClick={() => setInfoOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-[var(--pink-soft)]">
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
             {signedIn && <Link to="/account" className="hover:text-[var(--pink-deep)] transition-colors">{tr("myOrders")}</Link>}
+            {isStaff && (
+              <Link to="/admin" className="rounded-full bg-black px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90">
+                {L("Paneli i adminit", "Admin panel")}
+              </Link>
+            )}
           </nav>
+
 
           {/* Search */}
           <form onSubmit={onSearchSubmit} className="ml-auto hidden md:flex flex-1 max-w-sm items-center gap-2 rounded-full border border-border bg-[var(--pink-soft)]/50 px-4 py-2 focus-within:border-[var(--pink-deep)] transition">
