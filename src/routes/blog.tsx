@@ -7,7 +7,7 @@ import { CalendarDays, ArrowRight, Newspaper } from "lucide-react";
 
 export const Route = createFileRoute("/blog")({
   component: Blog,
-  head: () => metaFor("/blog", "Blogu", "Këshilla profesionale për sallone bukurie, trendet e flokëve, grimit dhe thonjve — Dreame Beauty Cosmetics L.L.C."),
+  head: () => metaFor("/blog", "Blogu", "Këshilla profesionale për sallone bukurie, trendet e flokëve, grimit dhe thonjve — Dreame Beauty Cosmetics"),
 });
 
 function Blog() {

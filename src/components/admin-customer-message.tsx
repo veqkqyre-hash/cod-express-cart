@@ -14,28 +14,28 @@ type Order = {
 
 const TEXT: Record<string, { sq: (o: Order) => string; en: (o: Order) => string }> = {
   pending: {
-    sq: (o) => `Përshëndetje ${o.customer_name}! Porosia ${o.order_number} (${Number(o.total).toFixed(2)} €) u pranua në Dreame Beauty Cosmetics L.L.C. Ju kontaktojmë për konfirmim. Pagesa bëhet në dorëzim.`,
-    en: (o) => `Hello ${o.customer_name}! Order ${o.order_number} (${Number(o.total).toFixed(2)} €) was received at Dreame Beauty Cosmetics L.L.C. We'll confirm shortly. Payment on delivery.`,
+    sq: (o) => `Përshëndetje ${o.customer_name}! Porosia ${o.order_number} (${Number(o.total).toFixed(2)} €) u pranua në Dreame Beauty Cosmetics Ju kontaktojmë për konfirmim. Pagesa bëhet në dorëzim.`,
+    en: (o) => `Hello ${o.customer_name}! Order ${o.order_number} (${Number(o.total).toFixed(2)} €) was received at Dreame Beauty Cosmetics We'll confirm shortly. Payment on delivery.`,
   },
   confirmed: {
-    sq: (o) => `Përshëndetje ${o.customer_name}! Porosia ${o.order_number} u konfirmua. Totali ${Number(o.total).toFixed(2)} € paguhet me para në dorë kur ta merrni. Faleminderit — Dreame Beauty Cosmetics L.L.C.`,
-    en: (o) => `Hello ${o.customer_name}! Order ${o.order_number} is confirmed. Total ${Number(o.total).toFixed(2)} € payable in cash on delivery. Thank you — Dreame Beauty Cosmetics L.L.C.`,
+    sq: (o) => `Përshëndetje ${o.customer_name}! Porosia ${o.order_number} u konfirmua. Totali ${Number(o.total).toFixed(2)} € paguhet me para në dorë kur ta merrni. Faleminderit — Dreame Beauty Cosmetics`,
+    en: (o) => `Hello ${o.customer_name}! Order ${o.order_number} is confirmed. Total ${Number(o.total).toFixed(2)} € payable in cash on delivery. Thank you — Dreame Beauty Cosmetics`,
   },
   processing: {
-    sq: (o) => `Përshëndetje ${o.customer_name}! Porosia ${o.order_number} është në përgatitje dhe dërgohet së shpejti. — Dreame Beauty Cosmetics L.L.C.`,
-    en: (o) => `Hello ${o.customer_name}! Order ${o.order_number} is being prepared and ships soon. — Dreame Beauty Cosmetics L.L.C.`,
+    sq: (o) => `Përshëndetje ${o.customer_name}! Porosia ${o.order_number} është në përgatitje dhe dërgohet së shpejti. — Dreame Beauty Cosmetics`,
+    en: (o) => `Hello ${o.customer_name}! Order ${o.order_number} is being prepared and ships soon. — Dreame Beauty Cosmetics`,
   },
   shipped: {
-    sq: (o) => `Përshëndetje ${o.customer_name}! Porosia ${o.order_number} është dërguar drejt ${o.city}. Përgatitni ${Number(o.total).toFixed(2)} € për pagesë në dorëzim. — Dreame Beauty Cosmetics L.L.C.`,
-    en: (o) => `Hello ${o.customer_name}! Order ${o.order_number} has shipped to ${o.city}. Please have ${Number(o.total).toFixed(2)} € ready for cash on delivery. — Dreame Beauty Cosmetics L.L.C.`,
+    sq: (o) => `Përshëndetje ${o.customer_name}! Porosia ${o.order_number} është dërguar drejt ${o.city}. Përgatitni ${Number(o.total).toFixed(2)} € për pagesë në dorëzim. — Dreame Beauty Cosmetics`,
+    en: (o) => `Hello ${o.customer_name}! Order ${o.order_number} has shipped to ${o.city}. Please have ${Number(o.total).toFixed(2)} € ready for cash on delivery. — Dreame Beauty Cosmetics`,
   },
   delivered: {
-    sq: (o) => `Faleminderit ${o.customer_name}! Porosia ${o.order_number} u dorëzua. Shpresojmë të kënaqeni — Dreame Beauty Cosmetics L.L.C.`,
-    en: (o) => `Thank you ${o.customer_name}! Order ${o.order_number} was delivered. Hope you love it — Dreame Beauty Cosmetics L.L.C.`,
+    sq: (o) => `Faleminderit ${o.customer_name}! Porosia ${o.order_number} u dorëzua. Shpresojmë të kënaqeni — Dreame Beauty Cosmetics`,
+    en: (o) => `Thank you ${o.customer_name}! Order ${o.order_number} was delivered. Hope you love it — Dreame Beauty Cosmetics`,
   },
   cancelled: {
-    sq: (o) => `Përshëndetje ${o.customer_name}. Porosia ${o.order_number} është anuluar. Për çdo pyetje jemi në dispozicion. — Dreame Beauty Cosmetics L.L.C.`,
-    en: (o) => `Hello ${o.customer_name}. Order ${o.order_number} has been cancelled. Contact us for any questions. — Dreame Beauty Cosmetics L.L.C.`,
+    sq: (o) => `Përshëndetje ${o.customer_name}. Porosia ${o.order_number} është anuluar. Për çdo pyetje jemi në dispozicion. — Dreame Beauty Cosmetics`,
+    en: (o) => `Hello ${o.customer_name}. Order ${o.order_number} has been cancelled. Contact us for any questions. — Dreame Beauty Cosmetics`,
   },
 };
 

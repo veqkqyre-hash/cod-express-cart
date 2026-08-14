@@ -51,7 +51,7 @@ export function printPdf<T>(opts: {
   .foot{margin-top:14px;font-size:12px;font-weight:bold}
   @page{size:A4;margin:14mm}
 </style></head><body>
-<h1>Dreame Beauty Cosmetics L.L.C.</h1>
+<h1>Dreame Beauty Cosmetics</h1>
 <div class="addr">Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë · info@dreamebeautycosmetics.com</div>
 <div class="doc"><h2>${esc(title)}</h2>
 <div class="meta">${esc(subtitle ?? "")}${subtitle ? " · " : ""}${new Date().toLocaleString()}</div></div>

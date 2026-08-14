@@ -10,10 +10,10 @@ export const Route = createFileRoute("/wishlist")({
   component: WishlistPage,
   head: () => ({
     meta: [
-      { title: "Lista e dëshirave — Dreame Beauty Cosmetics L.L.C." },
-      { name: "description", content: "Produktet e ruajtura që doni t'i porositni më vonë nga Dreame Beauty Cosmetics L.L.C." },
-      { property: "og:title", content: "Lista e dëshirave — Dreame Beauty Cosmetics L.L.C." },
-      { property: "og:description", content: "Produktet e ruajtura që doni t'i porositni më vonë nga Dreame Beauty Cosmetics L.L.C." },
+      { title: "Lista e dëshirave — Dreame Beauty Cosmetics" },
+      { name: "description", content: "Produktet e ruajtura që doni t'i porositni më vonë nga Dreame Beauty Cosmetics" },
+      { property: "og:title", content: "Lista e dëshirave — Dreame Beauty Cosmetics" },
+      { property: "og:description", content: "Produktet e ruajtura që doni t'i porositni më vonë nga Dreame Beauty Cosmetics" },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://cod-express-cart.lovable.app/wishlist" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -639,7 +639,7 @@ export function SettingsPanel() {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={L("Emri i biznesit", "Business name")} name="business_name" defaultValue={data?.business_name ?? data?.store_name ?? "Dreame Beauty Cosmetics L.L.C."} />
+          <Field label={L("Emri i biznesit", "Business name")} name="business_name" defaultValue={data?.business_name ?? data?.store_name ?? "Dreame Beauty Cosmetics"} />
           <Field label={L("NUI / Numri fiskal", "Business / fiscal number")} name="nui" defaultValue={data?.nui ?? ""} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">

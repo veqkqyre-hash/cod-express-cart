@@ -16,7 +16,7 @@ export const STORE_SETTINGS_KEY = "store";
 const CACHE_KEY = "dbc-business-info";
 
 const DEFAULTS: BusinessInfo = {
-  business_name: "Dreame Beauty Cosmetics L.L.C.",
+  business_name: "Dreame Beauty Cosmetics",
   nui: "",
   vat_number: "",
   address: "Rr. Nëna Terezë",

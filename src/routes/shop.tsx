@@ -15,9 +15,9 @@ export const Route = createFileRoute("/shop")({
   component: Shop,
   head: () => ({
     meta: [
-      { title: "Dyqani — Dreame Beauty Cosmetics L.L.C." },
+      { title: "Dyqani — Dreame Beauty Cosmetics" },
       { name: "description", content: "Blej produkte profesionale për thonj në Dreame Beauty Cosmetics: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesa në dorëzim." },
-      { property: "og:title", content: "Dyqani — Dreame Beauty Cosmetics L.L.C." },
+      { property: "og:title", content: "Dyqani — Dreame Beauty Cosmetics" },
       { property: "og:description", content: "Blej produkte profesionale për thonj në Dreame Beauty Cosmetics: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesa në dorëzim." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://cod-express-cart.lovable.app/shop" },
