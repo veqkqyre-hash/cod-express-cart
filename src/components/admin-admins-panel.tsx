@@ -48,6 +48,18 @@ export function AdminsPanel() {
     refetch();
   }
 
+  async function changeRole(row: StaffRow, newRole: StaffRole) {
+    if (newRole === row.role) return;
+    setBusy(true);
+    // Revoke old role, then grant the new one
+    const { error: e1 } = await supabase.rpc("revoke_role", { _user_id: row.user_id, _role: row.role });
+    const { error: e2 } = e1 ? { error: e1 } : await supabase.rpc("grant_role_by_email", { _email: row.email, _role: newRole });
+    setBusy(false);
+    if (e2) return toast.error(e2.message);
+    toast.success(L("Roli u ndryshua", "Role changed"));
+    refetch();
+  }
+
   async function revoke(row: StaffRow) {
     if (!confirm(tr("deleteConfirm"))) return;
     const { error } = await supabase.rpc("revoke_role", { _user_id: row.user_id, _role: row.role });
@@ -116,9 +128,22 @@ export function AdminsPanel() {
                 <tr key={`${a.user_id}-${a.role}`} className="border-t border-neutral-100">
                   <td className="px-4 py-3 font-medium">{a.email}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${ROLE_META[a.role]?.tone ?? ""}`}>
-                      <Icon className="h-3.5 w-3.5" /> {a.role}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${ROLE_META[a.role]?.tone ?? ""}`}>
+                        <Icon className="h-3.5 w-3.5" /> {a.role}
+                      </span>
+                      <select
+                        value={a.role}
+                        disabled={busy}
+                        onChange={(e) => changeRole(a, e.target.value as StaffRole)}
+                        aria-label={L("Ndrysho rolin", "Change role")}
+                        className="rounded-full border border-neutral-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-pink-200 disabled:opacity-50"
+                      >
+                        {(Object.keys(ROLE_META) as StaffRole[]).map((r) => (
+                          <option key={r} value={r}>{r}</option>
+                        ))}
+                      </select>
+                    </div>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-neutral-500">{new Date(a.created_at).toLocaleDateString()}</td>
                   <td className="px-4 py-3 text-right">
