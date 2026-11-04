@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { Plus, Pencil, Trash2, X, ImagePlus, Loader2 } from "lucide-react";
 
 type ProductRow = {
   id: string;
@@ -204,7 +204,7 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
             </div>
           </div>
 
-          <FieldA label={tr("imageUrl")} name="image_url" defaultValue={product?.image_url ?? ""} />
+          <ImageField lang={lang} defaultValue={product?.image_url ?? ""} />
           <FieldA label="Slug" name="slug" defaultValue={product?.slug ?? ""} />
 
           <div>
