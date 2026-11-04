@@ -1,2 +1,25 @@
-.github/workflows/test-ssh.yml
-4.
+
+name: Test SSH cPanel
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-connection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test SSH connection
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          port: ${{ secrets.CPANEL_PORT }}
+          key: ${{ secrets.CPANEL_SSH_KEY }}
+          passphrase: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
+          script: |
+            echo "SSH CONNECTION SUCCESSFUL"
+            whoami
+            pwd
