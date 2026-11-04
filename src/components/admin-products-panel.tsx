@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { Plus, Pencil, Trash2, X, ImagePlus, Loader2 } from "lucide-react";
 
 type ProductRow = {
   id: string;
@@ -204,7 +204,7 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
             </div>
           </div>
 
-          <FieldA label={tr("imageUrl")} name="image_url" defaultValue={product?.image_url ?? ""} />
+          <ImageField lang={lang} defaultValue={product?.image_url ?? ""} />
           <FieldA label="Slug" name="slug" defaultValue={product?.slug ?? ""} />
 
           <div>
@@ -228,6 +228,71 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+/** Foto e produktit: ngarkim file-i në storage ose URL manuale. */
+function ImageField({ lang, defaultValue }: { lang: string; defaultValue: string }) {
+  const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
+  const [url, setUrl] = useState(defaultValue);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error(L("Zgjidhni një file fotoje (JPG, PNG, WebP).", "Choose an image file (JPG, PNG, WebP)."));
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error(L("Fotoja është mbi 10 MB.", "The image is over 10 MB."));
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file, { cacheControl: "31536000", upsert: false });
+    setUploading(false);
+    if (error) {
+      toast.error(L("Ngarkimi dështoi: ", "Upload failed: ") + error.message);
+      return;
+    }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setUrl(data.publicUrl);
+    toast.success(L("Fotoja u ngarkua", "Image uploaded"));
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  return (
+    <div>
+      <label className="mb-1.5 block text-sm font-medium">{L("Foto e produktit", "Product image")}</label>
+      <div className="flex items-start gap-3">
+        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
+          {url ? <img src={url} alt="" className="h-full w-full object-cover" /> : <div className="grid h-full w-full place-items-center text-muted-foreground"><ImagePlus className="h-6 w-6" /></div>}
+        </div>
+        <div className="flex-1 space-y-2">
+          <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
+          <button
+            type="button"
+            disabled={uploading}
+            onClick={() => fileRef.current?.click()}
+            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted disabled:opacity-50"
+          >
+            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+            {uploading ? L("Duke ngarkuar…", "Uploading…") : L("Ngarko foto", "Upload photo")}
+          </button>
+          <input
+            name="image_url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder={L("ose vendos URL të fotos", "or paste an image URL")}
+            autoComplete="off"
+            className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
       </div>
     </div>
   );
