@@ -16,21 +16,22 @@ jobs:
       - name: Download source
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: npm ci
+        run: bun ci
 
       - name: Build website
-        run: npm run build
+        run: bun run build
 
       - name: Inspect build output
         if: success()
         run: |
           echo "Build completed"
           find .output -maxdepth 3 -type d 2>/dev/null || true
-          test -f .output/public/index.html && echo "STATIC INDEX FOUND" || echo "STATIC INDEX NOT FOUND"
+          if [ -f .output/public/index.html ]; then
+            echo "STATIC INDEX FOUND"
+          else
+            echo "STATIC INDEX NOT FOUND"
+          fi
