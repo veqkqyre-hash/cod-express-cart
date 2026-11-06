@@ -1,0 +1,36 @@
+
+name: Test Build Dreame Beauty
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Download source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build website
+        run: npm run build
+
+      - name: Inspect build output
+        if: success()
+        run: |
+          echo "Build completed"
+          find .output -maxdepth 3 -type d 2>/dev/null || true
+          test -f .output/public/index.html && echo "STATIC INDEX FOUND" || echo "STATIC INDEX NOT FOUND"
