@@ -1,0 +1,33 @@
+
+name: Test FTPS cPanel
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-ftps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - name: Test secure FTPS connection
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          set -eu
+          echo "Testing FTPS connection..."
+
+          curl --fail --silent --show-error \
+            --ssl-reqd \
+            --connect-timeout 15 \
+            --max-time 60 \
+            --user "$FTP_USERNAME:$FTP_PASSWORD" \
+            --list-only \
+            "ftp://$FTP_SERVER:21/"
+
+          echo "FTPS CONNECTION SUCCESSFUL"
