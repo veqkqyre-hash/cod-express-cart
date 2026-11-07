@@ -1,0 +1,43 @@
+name: Sync Lovable main to cPanel staging branch
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-cpanel-deploy
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out latest main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Fast-forward cpanel-deploy without rewriting history
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main cpanel-deploy
+          TARGET=$(git rev-parse origin/cpanel-deploy)
+          SOURCE=$(git rev-parse origin/main)
+          if ! git merge-base --is-ancestor "$TARGET" "$SOURCE"; then
+            echo "::error::cpanel-deploy diverged from main; refusing to overwrite branch"
+            exit 1
+          fi
+          if [ "$TARGET" = "$SOURCE" ]; then
+            echo "Already up to date"
+            exit 0
+          fi
+          git push origin "$SOURCE":refs/heads/cpanel-deploy
+          echo "Synced cpanel-deploy with main"
