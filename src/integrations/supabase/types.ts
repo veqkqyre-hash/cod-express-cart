@@ -562,6 +562,8 @@ export type Database = {
           change_amount: number | null
           cost_total: number
           created_at: string
+          customer_name: string | null
+          discount: number
           id: string
           item_count: number
           note: string | null
@@ -577,6 +579,8 @@ export type Database = {
           change_amount?: number | null
           cost_total?: number
           created_at?: string
+          customer_name?: string | null
+          discount?: number
           id?: string
           item_count?: number
           note?: string | null
@@ -592,6 +596,8 @@ export type Database = {
           change_amount?: number | null
           cost_total?: number
           created_at?: string
+          customer_name?: string | null
+          discount?: number
           id?: string
           item_count?: number
           note?: string | null
@@ -954,15 +960,27 @@ export type Database = {
         Args: { _counted_cash?: number; _note?: string }
         Returns: Json
       }
-      create_pos_sale: {
-        Args: {
-          _items: Json
-          _note?: string
-          _paid_amount?: number
-          _payment_method?: string
-        }
-        Returns: Json
-      }
+      create_pos_sale:
+        | {
+            Args: {
+              _items: Json
+              _note?: string
+              _paid_amount?: number
+              _payment_method?: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _customer_name?: string
+              _discount?: number
+              _items: Json
+              _note?: string
+              _paid_amount?: number
+              _payment_method?: string
+            }
+            Returns: Json
+          }
       current_pos_shift: { Args: never; Returns: Json }
       delete_pos_shift: { Args: { _id: string }; Returns: undefined }
       get_order_by_number: { Args: { _order_number: string }; Returns: Json }
