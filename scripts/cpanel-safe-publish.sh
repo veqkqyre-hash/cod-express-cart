@@ -148,16 +148,22 @@ else
 fi
 echo "Backup saved: $backup"
 
-# Install hashed assets FIRST. HTML remains unchanged until assets are ready.
+# Install compiled JS/CSS/fonts/images and other public static files FIRST.
+# Never overwrite server configuration, PHP, secrets or Apache rules.
 while IFS= read -r -d '' file; do
   rel="${file#"$SRC"/}"
+  case "$rel" in
+    */index.html|index.html|BUILD-METADATA.json|_headers) continue ;;
+    *.php|*.env|.htaccess|api/*|.git/*|.*)
+      echo "STOP: prohibited generated file $rel"; exit 1 ;;
+  esac
   target="$LIVE/$rel"
   mkdir -p "$(dirname "$target")"
-  tmp="$target.next-$$"
+  tmp="$target.next-$"
   cp -- "$file" "$tmp"
   chmod 644 "$tmp"
   mv -f -- "$tmp" "$target"
-done < <(find "$SRC/assets" -type f -print0)
+done < <(find "$SRC" -type f -print0)
 
 # Install HTML LAST, each file atomically; never change existing PHP or .htaccess.
 for file in "${pages[@]}"; do
@@ -170,7 +176,7 @@ for file in "${pages[@]}"; do
   mv -f -- "$tmp" "$target"
 done
 
-echo "PUBLISHED: 19 HTML routes + hashed assets; existing PHP, .htaccess, secrets and database untouched."
+echo "PUBLISHED: 19 HTML routes + public assets; existing PHP, .htaccess, secrets and database untouched."
 
 if [[ "$MODE" == "--activate" ]]; then
   cron_next="$(mktemp /home/swisskle/.dreame-cron-after.XXXXXX)"
