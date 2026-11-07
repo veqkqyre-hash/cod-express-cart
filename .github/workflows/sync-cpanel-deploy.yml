@@ -58,7 +58,7 @@ jobs:
           set -euo pipefail
           find cpanel-php -name '*.php' -print0 | xargs -0 -r -n 1 php -l
 
-      - name: Publish checked files into cpanel-deploy branch (staging ONLY)
+      - name: Check cPanel deploy script syntax\n        run: bash -n scripts/cpanel-safe-publish.sh\n\n      - name: Publish checked files into cpanel-deploy branch (staging ONLY)
         shell: bash
         run: |
           set -euo pipefail
