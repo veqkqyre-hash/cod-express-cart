@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet, Clock, Star, Mail, Undo2, AlertTriangle,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet, Clock, Star, Mail, Undo2, AlertTriangle, ClipboardList, LifeBuoy,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
@@ -27,6 +27,9 @@ import { ShiftsPanel } from "@/components/admin-shift-panel";
 import { ReviewsPanel } from "@/components/admin-reviews-panel";
 import { NewsletterPanel } from "@/components/admin-newsletter-panel";
 import { RefundsPanel } from "@/components/admin-refunds-panel";
+import { TasksPanel } from "@/components/admin-tasks-panel";
+import { HelpPanel } from "@/components/admin-help-panel";
+import { AdminGlobalSearch } from "@/components/admin-global-search";
 import { OrderTimeline } from "@/components/order-timeline";
 import { printOrders } from "@/lib/bulk-print";
 import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
@@ -70,13 +73,13 @@ type NavKey =
   | "dashboard" | "pos" | "possales" | "posreport" | "shifts" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
   | "messages" | "pages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins"
-  | "reviews" | "newsletter" | "refunds";
+  | "reviews" | "newsletter" | "refunds" | "tasks" | "help";
 
 type Role = "admin" | "manager" | "editor";
 
 // Which sections each role can open (admin sees everything)
-const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports", "pos", "possales", "posreport", "shifts", "refunds"];
-const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products", "pages", "reviews"];
+const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports", "pos", "possales", "posreport", "shifts", "refunds", "tasks", "help"];
+const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products", "pages", "reviews", "tasks", "help"];
 
 function Admin() {
   const { tr, lang } = useI18n();
