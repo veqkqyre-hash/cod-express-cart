@@ -11,12 +11,45 @@ import { listRegisteredUsers, deleteRegisteredUser } from "@/lib/admin-users.fun
 export function CustomersPanel() {
   const { lang } = useI18n();
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
-  const fetchUsers = useServerFn(listRegisteredUsers);
-  const removeUser = useServerFn(deleteRegisteredUser);
+  const fetchUsersServer = useServerFn(listRegisteredUsers);
+  const removeUserServer = useServerFn(deleteRegisteredUser);
+  const useCpanelPhp = typeof window !== "undefined" &&
+    (window.location.hostname === "dreamebeautycosmetics.com" ||
+     window.location.hostname === "www.dreamebeautycosmetics.com");
+
+  async function callCpanelPhp<T>(action: string, extra: Record<string, string> = {}): Promise<T> {
+    const { data: sessionData, error: authError } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (authError || !token) throw new Error("Please sign in again");
+    const response = await fetch("/api/customers.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ action, ...extra }),
+      cache: "no-store",
+    });
+    const result: unknown = await response.json().catch(() => null);
+    if (!response.ok) {
+      const message = result && typeof result === "object" && "error" in result &&
+        typeof result.error === "string" ? result.error : "Customer service unavailable";
+      throw new Error(message);
+    }
+    return result as T;
+  }
+
+  async function fetchUsers() {
+    if (!useCpanelPhp) return fetchUsersServer();
+    const result = await callCpanelPhp<Awaited<ReturnType<typeof fetchUsersServer>>>("list");
+    if (!Array.isArray(result)) throw new Error("Invalid customer response");
+    return result;
+  }
+  async function removeUser(userId: string) {
+    if (useCpanelPhp) return callCpanelPhp<{ ok: boolean }>("delete", { userId });
+    return removeUserServer({ data: { userId } });
+  }
 
   const { data: users, refetch, isLoading, error } = useQuery({
     queryKey: ["admin-registered-users"],
-    queryFn: () => fetchUsers(),
+    queryFn: fetchUsers,
   });
 
   const { data: guests } = useQuery({
@@ -37,7 +70,7 @@ export function CustomersPanel() {
   async function onDelete(id: string, email: string | null) {
     if (!confirm(L(`Fshij llogarinë ${email ?? ""}? Porositë ruhen.`, `Delete account ${email ?? ""}? Orders are kept.`))) return;
     try {
-      await removeUser({ data: { userId: id } });
+      await removeUser(id);
       toast.success(L("Klienti u fshi", "Customer deleted"));
       refetch();
     } catch (e: any) {
