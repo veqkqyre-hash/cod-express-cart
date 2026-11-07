@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
@@ -12,18 +14,19 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/shop")({
   validateSearch: (s) => searchSchema.parse(s),
+  loader: () => loadSeo("/shop"),
   component: Shop,
-  head: () => ({
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, {
     meta: [
       { title: "Dyqani — Dreame Beauty Cosmetics" },
       { name: "description", content: "Blej produkte profesionale për thonj në Dreame Beauty Cosmetics: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesa në dorëzim." },
       { property: "og:title", content: "Dyqani — Dreame Beauty Cosmetics" },
       { property: "og:description", content: "Blej produkte profesionale për thonj në Dreame Beauty Cosmetics: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesa në dorëzim." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://cod-express-cart.lovable.app/shop" },
+      { property: "og:url", content: "https://dreamebeautycosmetics.com/shop" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/shop" }],
+    links: [{ rel: "canonical", href: "https://dreamebeautycosmetics.com/shop" }],
   }),
 });
 

@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,8 +8,9 @@ import { metaFor } from "@/components/info-page";
 import { CalendarDays, ArrowRight, Newspaper } from "lucide-react";
 
 export const Route = createFileRoute("/blog")({
+  loader: () => loadSeo("/blog"),
   component: Blog,
-  head: () => metaFor("/blog", "Blogu", "Këshilla profesionale për sallone bukurie, trendet e flokëve, grimit dhe thonjve — Dreame Beauty Cosmetics"),
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, metaFor("/blog", "Blogu", "Këshilla profesionale për sallone bukurie, trendet e flokëve, grimit dhe thonjve — Dreame Beauty Cosmetics")),
 });
 
 function Blog() {

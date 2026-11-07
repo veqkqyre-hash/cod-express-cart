@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -7,18 +9,19 @@ import { formatEur } from "@/lib/cart";
 import { Package } from "lucide-react";
 
 export const Route = createFileRoute("/account")({
+  loader: () => loadSeo("/account"),
   component: Account,
-  head: () => ({
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, {
     meta: [
       { title: "Llogaria juaj — Dreame Beauty Cosmetics" },
       { name: "description", content: "Shiko porositë e tua dhe statusin e dërgesave në Dreame Beauty Cosmetics" },
       { property: "og:title", content: "Llogaria juaj — Dreame Beauty Cosmetics" },
       { property: "og:description", content: "Shiko porositë e tua dhe statusin e dërgesave në Dreame Beauty Cosmetics" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://cod-express-cart.lovable.app/account" },
+      { property: "og:url", content: "https://dreamebeautycosmetics.com/account" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/account" }],
+    links: [{ rel: "canonical", href: "https://dreamebeautycosmetics.com/account" }],
   }),
 });
 

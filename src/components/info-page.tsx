@@ -22,7 +22,7 @@ export function InfoBlock({ heading, children }: { heading: string; children: Re
 }
 
 export function metaFor(path: string, titleSq: string, descSq: string) {
-  const url = `https://cod-express-cart.lovable.app${path}`;
+  const url = `https://dreamebeautycosmetics.com${path}`;
   const title = `${titleSq} — Dreame Beauty Cosmetics`;
   return {
     meta: [

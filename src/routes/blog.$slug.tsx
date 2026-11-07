@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -5,12 +7,13 @@ import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, CalendarDays } from "lucide-react";
 
 export const Route = createFileRoute("/blog/$slug")({
+  loader: ({ params }) => loadSeo(`/blog/${params.slug}`),
   component: Post,
-  head: ({ params }) => {
-    const url = `https://cod-express-cart.lovable.app/blog/${params.slug}`;
+  head: ({ params, loaderData }) => {
+    const url = `https://dreamebeautycosmetics.com/blog/${params.slug}`;
     const title = "Artikull — Dreame Beauty Cosmetics";
     const desc = "Këshilla dhe trende profesionale për sallone bukurie nga Dreame Beauty Cosmetics";
-    return {
+    return applySeoHead(loaderData?.seo, {
       meta: [
         { title },
         { name: "description", content: desc },
@@ -23,7 +26,7 @@ export const Route = createFileRoute("/blog/$slug")({
         { name: "twitter:description", content: desc },
       ],
       links: [{ rel: "canonical", href: url }],
-    };
+    });
   },
 });
 

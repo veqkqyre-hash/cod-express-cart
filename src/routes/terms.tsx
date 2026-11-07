@@ -1,11 +1,14 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
 import { InfoPage, InfoBlock, metaFor } from "@/components/info-page";
 import { useInfoPage, INFO_DEFAULTS } from "@/lib/info-content";
 
 export const Route = createFileRoute("/terms")({
+  loader: () => loadSeo("/terms"),
   component: Terms,
-  head: () => metaFor("/terms", INFO_DEFAULTS.terms.title_sq, INFO_DEFAULTS.terms.meta_sq),
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, metaFor("/terms", INFO_DEFAULTS.terms.title_sq, INFO_DEFAULTS.terms.meta_sq)),
 });
 
 function Terms() {
