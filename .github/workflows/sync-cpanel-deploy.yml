@@ -1,4 +1,4 @@
-name: Sync Lovable main to cPanel staging branch
+name: Build and stage HTML for cPanel (does not deploy live)
 
 on:
   push:
@@ -10,34 +10,82 @@ permissions:
   contents: write
 
 concurrency:
-  group: sync-cpanel-deploy
+  group: stage-cpanel-deploy
   cancel-in-progress: false
 
 jobs:
-  sync:
+  build-and-stage:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: Check out latest main
+      - name: Checkout Lovable main
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Fast-forward cpanel-deploy without rewriting history
+      - name: Set up Bun (build runs on GitHub, NOT cPanel)
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install exact dependencies
+        run: bun ci
+
+      - name: Build Nitro site
+        run: bun run build
+
+      - name: Export 19 HTML routes for Apache/PHP
+        run: node --env-file=.env scripts/build-static-preview.mjs
+
+      - name: Verify production HTML pages and assets
         shell: bash
         run: |
           set -euo pipefail
-          git fetch origin main cpanel-deploy
-          TARGET=$(git rev-parse origin/cpanel-deploy)
-          SOURCE=$(git rev-parse origin/main)
-          if ! git merge-base --is-ancestor "$TARGET" "$SOURCE"; then
-            echo "::error::cpanel-deploy diverged from main; refusing to overwrite branch"
+          test -s static-preview/index.html
+          test -s static-preview/admin/index.html
+          test -s static-preview/checkout/index.html
+          test -s static-preview/pos-display/index.html
+          test -d static-preview/assets
+          test "$(find static-preview -name index.html | wc -l)" -ge 19
+          test -s static-preview/BUILD-METADATA.json
+          if grep -rl -E 'sb_secret_|SUPABASE_SERVICE_ROLE_KEY|PRIVATE KEY' static-preview --include='*.html' --include='*.js'; then
+            echo "::error::Possible private secret in generated site"
             exit 1
           fi
-          if [ "$TARGET" = "$SOURCE" ]; then
-            echo "Already up to date"
+
+      - name: Check PHP bridge syntax
+        run: |
+          set -euo pipefail
+          find cpanel-php -name '*.php' -print0 | xargs -0 -r -n 1 php -l
+
+      - name: Publish checked files into cpanel-deploy branch (staging ONLY)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/dreame-stage-release
+          cp -a static-preview/. /tmp/dreame-stage-release/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main cpanel-deploy
+          if [ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]; then
+            echo "A newer main commit exists. A later run will stage it."
             exit 0
           fi
-          git push origin "$SOURCE":refs/heads/cpanel-deploy
-          echo "Synced cpanel-deploy with main"
+          git switch -C cpanel-deploy origin/cpanel-deploy
+          git merge --no-edit origin/main
+          mkdir -p cpanel-site
+          cp -a /tmp/dreame-stage-release/. cpanel-site/
+          # This branch stays fast-forwardable for the existing cPanel git pull cron.
+          git add cpanel-site
+          if ! git diff --cached --quiet; then
+            git commit -m "Stage static HTML from Lovable main ${GITHUB_SHA}"
+          fi
+          git push origin cpanel-deploy
+          echo "Staged cpanel-site/ (live site NOT changed)."
+
+      - name: Upload stage archive for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpanel-static-site-staging
+          path: static-preview/
+          retention-days: 7
