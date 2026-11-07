@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet, Clock, Star, Mail, Undo2, AlertTriangle, ClipboardList, LifeBuoy,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet, Clock, Star, Mail, Undo2, AlertTriangle, ClipboardList, LifeBuoy, HardDrive,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
@@ -30,6 +30,7 @@ import { RefundsPanel } from "@/components/admin-refunds-panel";
 import { TasksPanel } from "@/components/admin-tasks-panel";
 import { HelpPanel } from "@/components/admin-help-panel";
 import { SeoPanel } from "@/components/admin-seo-panel";
+import { BackupsPanel } from "@/components/admin-backups-panel";
 import { AdminGlobalSearch } from "@/components/admin-global-search";
 import { OrderTimeline } from "@/components/order-timeline";
 import { printOrders } from "@/lib/bulk-print";
@@ -81,7 +82,7 @@ type NavKey =
   | "dashboard" | "pos" | "possales" | "posreport" | "shifts" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
   | "messages" | "pages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins"
-  | "reviews" | "newsletter" | "refunds" | "tasks" | "help" | "seo";
+  | "reviews" | "newsletter" | "refunds" | "tasks" | "help" | "seo" | "backups";
 
 type Role = "admin" | "manager" | "editor";
 
@@ -194,6 +195,7 @@ function Admin() {
     { key: "reports", label: L("Raporte", "Reports"), icon: CalendarDays },
     { key: "audit", label: L("Regjistri i aktivitetit", "Activity log"), icon: ScrollText },
     { key: "settings", label: L("Cilësimet", "Settings"), icon: Settings },
+    { key: "backups", label: "Backup & Restore", icon: HardDrive },
     { key: "admins", label: L("Rolet & Adminët", "Roles & Admins"), icon: Users },
   ];
 
@@ -210,7 +212,7 @@ function Admin() {
     { title: L("KLIENTËT & MARKETINGU", "CUSTOMERS & MARKETING"), keys: ["customers", "marketing", "newsletter", "reviews", "messages"] },
     { title: L("PËRMBAJTJA", "CONTENT"), keys: ["homepage", "blog", "pages", "seo"] },
     { title: L("PUNA & NDIHMA", "WORK & HELP"), keys: ["tasks", "help"] },
-    { title: L("SISTEMI", "SYSTEM"), keys: ["visitors", "reports", "audit", "settings", "admins"] },
+    { title: L("SISTEMI", "SYSTEM"), keys: ["visitors", "reports", "audit", "settings", "backups", "admins"] },
   ];
   const groupedNav = navGroups
     .map((g) => ({ title: g.title, items: g.keys.map((k) => navItems.find((n) => n.key === k)).filter(Boolean) as typeof navItems }))
@@ -330,6 +332,7 @@ function Admin() {
               {nav === "tasks" && <TasksPanel role={role!} userId={currentUserId} />}
               {nav === "help" && <HelpPanel />}
               {nav === "seo" && <SeoPanel />}
+              {nav === "backups" && role === "admin" && <BackupsPanel role={role} />}
             </>
           )}
         </main>
