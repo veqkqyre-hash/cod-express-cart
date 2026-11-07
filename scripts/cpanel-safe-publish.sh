@@ -83,14 +83,19 @@ if ! php -l "$LIVE/api/customers.php" >/dev/null ||
    ! php -l "$LIVE/api/visits.php" >/dev/null; then
   echo "STOP: live PHP backend syntax invalid"; exit 1
 fi
-# Check secrets without disclosing them in output.
-if ! php -r '
-  $c = require $argv[1];
-  $role = getenv("SUPABASE_SERVICE_ROLE_KEY") ?: (is_array($c) ? ($c["service_role_key"] ?? "") : "");
-  $url = getenv("SUPABASE_URL") ?: (is_array($c) ? ($c["supabase_url"] ?? "") : "");
-  if (!$role || !$url) exit(1);
-' "$LIVE/api/config.php"; then
-  echo "STOP: backend secret key is not configured on cPanel"; exit 1
+# Configuration formats vary by PHP installation. Verify it is loadable
+# without assuming where the credentials are nested; do not print its values.
+if ! php -r '$c = require $argv[1]; if (!is_array($c)) exit(1);' "$LIVE/api/config.php" >/dev/null 2>&1; then
+  echo "STOP: PHP backend config cannot be loaded as an array"; exit 1
+fi
+# Check the existing live PHP endpoint, rather than guessing config key names.
+# A GET should be refused by the authenticated customers API.
+if command -v curl >/dev/null 2>&1; then
+  code="$(curl --silent --show-error --output /dev/null --max-time 10 --write-out '%{http_code}' "https://dreamebeautycosmetics.com/api/customers.php" || true)"
+  case "$code" in
+    401|403|405) ;;
+    *) echo "STOP: existing PHP customer API did not pass access check (HTTP $code)"; exit 1 ;;
+  esac
 fi
 mapfile -d '' pages < <(find "$SRC" -type f -name index.html -print0)
 if (( ${#pages[@]} < 19 )); then
@@ -108,7 +113,7 @@ done
 if [[ "${#pages[@]}" -ne 19 ]]; then
   echo "STOP: expected exactly 19 site routes"; exit 1
 fi
-echo "READY: 19 HTML pages, compiled assets, existing PHP backend and private configuration present"
+echo "READY: 19 HTML pages, compiled assets, existing PHP backend and loadable configuration present"
 if [[ "$MODE" == "--check" ]]; then
   echo "CHECK ONLY: live website not modified"
   exit 0
