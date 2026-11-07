@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { backupPermissions, snapshotEvidence, isRestoreConfirmed, formatBytes, RESTORE_CONFIRM_WORD, type BackupRole } from "@/lib/backup-capabilities";
-import { listSnapshots, createFullDbBackup, downloadSnapshot, restoreSnapshot, verifySnapshot, type SnapshotRow } from "@/lib/db-backup";
+import { listSnapshots, createFullDbBackup, downloadSnapshot, restoreSnapshot, finishSnapshot, type SnapshotRow } from "@/lib/db-backup";
 import { websiteStatus, websiteCreate, websiteDownloadLink, type WebsiteStatus } from "@/lib/website-backup";
 
 const fmtDate = (s: string) => new Date(s).toLocaleString("sq-AL", { timeZone: "Europe/Belgrade" });
@@ -54,7 +54,7 @@ export function BackupsPanel({ role }: { role: BackupRole }) {
   }
   async function onVerify(s: SnapshotRow) {
     setBusy("Duke verifikuar…");
-    try { const r = await verifySnapshot(s.id); r.status === "verified" ? toast.success("Backup-i është i plotë dhe i paprekur.") : toast.error("Verifikimi dështoi."); }
+    try { const r = await finishSnapshot(s.id, setBusy); r.status === "verified" ? toast.success("Backup-i është i plotë dhe i paprekur.") : toast.error("Verifikimi dështoi."); }
     catch (e) { toast.error(errMsg(e)); }
     setBusy(null); void loadSnaps();
   }

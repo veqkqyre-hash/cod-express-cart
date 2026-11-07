@@ -32,9 +32,13 @@ export async function createFullDbBackup(onProgress?: (msg: string) => void) {
   onProgress?.("Duke ruajtur databazën…");
   const { data, error } = await supabase.rpc("create_db_backup", { _kind: "manual" });
   if (error) throw error;
-  const id = (data as unknown as { id: string }).id;
-  const { data: row, error: e2 } = await supabase.from("backup_snapshots").select("photos_manifest").eq("id", id).single();
-  if (e2) throw e2;
+  return finishSnapshot((data as unknown as { id: string }).id, onProgress);
+}
+
+/** Copies the snapshot's photos into the private backups folder (skips ones already copied), then verifies server-side. */
+export async function finishSnapshot(id: string, onProgress?: (msg: string) => void) {
+  const { data: row, error } = await supabase.from("backup_snapshots").select("photos_manifest").eq("id", id).single();
+  if (error) throw error;
   const manifest = (row?.photos_manifest ?? []) as { name: string }[];
   await copyPhotosToBackup(id, manifest, (d, t) => onProgress?.(`Duke kopjuar fotot ${d}/${t}…`));
   onProgress?.("Duke verifikuar…");
@@ -73,6 +77,8 @@ export async function restoreSnapshot(s: SnapshotRow, confirmWord: string, onPro
   onProgress?.("Duke rikthyer databazën…");
   const { data, error } = await supabase.rpc("restore_db_backup", { _id: s.id, _confirm: confirmWord });
   if (error) throw error;
+  const pre = (data as unknown as { pre_restore_backup: string }).pre_restore_backup;
+  if (pre) await finishSnapshot(pre, onProgress);
   let restored = 0, existing = 0;
   for (const p of s.photos_manifest) {
     const { error: ce } = await supabase.storage.from("backups").copy(`${s.id}/photos/${p.name}`, p.name, { destinationBucket: "product-images" });
