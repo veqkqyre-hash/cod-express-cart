@@ -97,7 +97,10 @@ if command -v curl >/dev/null 2>&1; then
     *) echo "STOP: existing PHP customer API did not pass access check (HTTP $code)"; exit 1 ;;
   esac
 fi
-mapfile -d '' pages < <(find "$SRC" -type f -name index.html -print0)
+page_list="$(mktemp /home/swisskle/.dreame-pages.XXXXXX)"
+trap 'rm -f "$page_list"' EXIT
+find "$SRC" -type f -name index.html -print0 > "$page_list"
+mapfile -d '' -t pages < "$page_list"
 if (( ${#pages[@]} < 19 )); then
   echo "STOP: release has fewer than 19 HTML routes"; exit 1
 fi
@@ -154,6 +157,9 @@ fi
 echo "Backup saved: $backup"
 
 # Install compiled JS/CSS/fonts/images and other public static files FIRST.
+asset_list="$(mktemp /home/swisskle/.dreame-assets.XXXXXX)"
+trap 'rm -f "$page_list" "$asset_list"' EXIT
+find "$SRC" -type f -print0 > "$asset_list"
 # Never overwrite server configuration, PHP, secrets or Apache rules.
 while IFS= read -r -d '' file; do
   rel="${file#"$SRC"/}"
@@ -168,7 +174,7 @@ while IFS= read -r -d '' file; do
   cp -- "$file" "$tmp"
   chmod 644 "$tmp"
   mv -f -- "$tmp" "$target"
-done < <(find "$SRC" -type f -print0)
+done < "$asset_list"
 
 # Install HTML LAST, each file atomically; never change existing PHP or .htaccess.
 for file in "${pages[@]}"; do
