@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   LogOut, Printer, X, Package, LayoutGrid, TrendingUp, BarChart3, Boxes,
   Tag, ShoppingCart, Truck, Users, Ticket, Home, Newspaper, Inbox, Settings,
-  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet, Clock, Star, Mail, Undo2, AlertTriangle,
+  Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet, Clock, Star, Mail, Undo2, AlertTriangle, ClipboardList, LifeBuoy,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
 import { AdminsPanel } from "@/components/admin-admins-panel";
@@ -27,6 +27,9 @@ import { ShiftsPanel } from "@/components/admin-shift-panel";
 import { ReviewsPanel } from "@/components/admin-reviews-panel";
 import { NewsletterPanel } from "@/components/admin-newsletter-panel";
 import { RefundsPanel } from "@/components/admin-refunds-panel";
+import { TasksPanel } from "@/components/admin-tasks-panel";
+import { HelpPanel } from "@/components/admin-help-panel";
+import { AdminGlobalSearch } from "@/components/admin-global-search";
 import { OrderTimeline } from "@/components/order-timeline";
 import { printOrders } from "@/lib/bulk-print";
 import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
@@ -70,13 +73,13 @@ type NavKey =
   | "dashboard" | "pos" | "possales" | "posreport" | "shifts" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
   | "messages" | "pages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins"
-  | "reviews" | "newsletter" | "refunds";
+  | "reviews" | "newsletter" | "refunds" | "tasks" | "help";
 
 type Role = "admin" | "manager" | "editor";
 
 // Which sections each role can open (admin sees everything)
-const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports", "pos", "possales", "posreport", "shifts", "refunds"];
-const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products", "pages", "reviews"];
+const MANAGER_NAV: NavKey[] = ["dashboard", "orders", "inventory", "products", "notifications", "sales", "stats", "visitors", "reports", "pos", "possales", "posreport", "shifts", "refunds", "tasks", "help"];
+const EDITOR_NAV: NavKey[] = ["dashboard", "homepage", "blog", "messages", "catalog", "products", "pages", "reviews", "tasks", "help"];
 
 function Admin() {
   const { tr, lang } = useI18n();
@@ -84,6 +87,7 @@ function Admin() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [role, setRole] = useState<Role | null>(null);
   const [currentEmail, setCurrentEmail] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [claiming, setClaiming] = useState(false);
   const [nav, setNav] = useState<NavKey>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -92,6 +96,7 @@ function Admin() {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) { setIsAdmin(false); setRole(null); return; }
     setCurrentEmail(userData.user.email ?? null);
+    setCurrentUserId(userData.user.id);
     // Server-side role checks (security definer) — cannot be spoofed client-side
     const uid = userData.user.id;
     const [adminRes, managerRes, editorRes] = await Promise.all([
@@ -170,6 +175,8 @@ function Admin() {
     { key: "newsletter", label: L("Newsletter", "Newsletter"), icon: Mail },
     { key: "reviews", label: L("Vlerësimet", "Reviews"), icon: Star },
     { key: "refunds", label: L("Kthimet", "Refunds"), icon: Undo2 },
+    { key: "tasks", label: L("Detyrat", "Tasks"), icon: ClipboardList },
+    { key: "help", label: L("Ndihma", "Help"), icon: LifeBuoy },
     { key: "homepage", label: L("Ballina", "Homepage"), icon: Home },
     { key: "blog", label: L("Blog", "Blog"), icon: Newspaper },
     { key: "messages", label: L("Mesazhet", "Messages"), icon: Inbox },
@@ -193,6 +200,7 @@ function Admin() {
     { title: L("KATALOGU", "CATALOG"), keys: ["products", "inventory", "catalog", "shipping"] },
     { title: L("KLIENTËT & MARKETINGU", "CUSTOMERS & MARKETING"), keys: ["customers", "marketing", "newsletter", "reviews", "messages"] },
     { title: L("PËRMBAJTJA", "CONTENT"), keys: ["homepage", "blog", "pages"] },
+    { title: L("PUNA & NDIHMA", "WORK & HELP"), keys: ["tasks", "help"] },
     { title: L("SISTEMI", "SYSTEM"), keys: ["visitors", "reports", "audit", "settings", "admins"] },
   ];
   const groupedNav = navGroups
@@ -257,6 +265,16 @@ function Admin() {
             </button>
             <h1 className="font-display text-xl lg:text-2xl truncate">{currentLabel}</h1>
           </div>
+          <AdminGlobalSearch
+            lang={lang}
+            sections={navItems.map((n) => ({ key: n.key, label: n.label }))}
+            canSee={(k) => canSee(k as NavKey)}
+            onSelect={(k) => {
+              const key = k as NavKey;
+              if (canSee(key)) setNav(key);
+              else toast.error(L("Roli i juaj nuk ka akses.", "Your role has no access."));
+            }}
+          />
           <div className="flex items-center gap-1">
             {canSee("notifications") && <NotificationsBell onOpen={() => setNav("notifications")} />}
             <a href="/" target="_blank" rel="noreferrer" className="grid h-9 w-9 place-items-center rounded-lg text-neutral-600 hover:bg-neutral-100" title={L("Shiko faqen", "View site")}>
@@ -300,6 +318,8 @@ function Admin() {
               {nav === "reviews" && <ReviewsPanel />}
               {nav === "newsletter" && <NewsletterPanel />}
               {nav === "refunds" && <RefundsPanel />}
+              {nav === "tasks" && <TasksPanel role={role!} userId={currentUserId} />}
+              {nav === "help" && <HelpPanel />}
             </>
           )}
         </main>

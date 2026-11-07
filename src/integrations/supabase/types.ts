@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_tasks: {
+        Row: {
+          assigned_email: string | null
+          assigned_to: string | null
+          created_at: string
+          created_by: string | null
+          created_by_email: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_email?: string | null
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_email?: string | null
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
