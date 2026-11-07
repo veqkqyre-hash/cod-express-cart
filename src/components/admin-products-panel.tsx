@@ -5,7 +5,8 @@ import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { GalleryField } from "@/components/admin-gallery-field";
-import { Plus, Pencil, Trash2, X, ImagePlus, Loader2 } from "lucide-react";
+import { generateProductDescription } from "@/lib/ai-image.functions";
+import { Plus, Pencil, Trash2, X, ImagePlus, Loader2, Sparkles } from "lucide-react";
 
 type ProductRow = {
   id: string;
@@ -216,6 +217,7 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
           />
           <FieldA label="Slug" name="slug" defaultValue={product?.slug ?? ""} />
 
+          <AiDescriptionButton lang={lang} />
           <div>
             <label className="mb-1.5 block text-sm font-medium">{tr("descriptionLabel")} (SQ)</label>
             <textarea name="description_sq" rows={2} defaultValue={product?.description_sq ?? ""} className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm" />
