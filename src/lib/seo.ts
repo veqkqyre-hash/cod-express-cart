@@ -35,13 +35,13 @@ export function productGaps(product: { image_url?: string | null; images?: strin
   };
 }
 
-type Head = { meta?: Array<Record<string, string>>; links?: Array<Record<string, string>>; scripts?: Array<{ type: string; children: string }> };
+type Head = { meta?: Array<Record<string, string | undefined>>; links?: Array<Record<string, string>>; scripts?: Array<{ type: string; children: string }> };
 export function applySeoHead(seo: SeoEntry | undefined, original: Head): Head {
   if (!seo) return original;
   const meta = [...(original.meta ?? [])];
   const set = (key: "name" | "property" | "title", value: string, content?: string) => {
     const index = meta.findIndex((item) => item[key] === value || (key === "title" && "title" in item));
-    const tag = key === "title" ? { title: value } : { [key]: value, content: content ?? "" };
+    const tag: Record<string, string | undefined> = key === "title" ? { title: value } : { [key]: value, content: content ?? "" };
     if (index < 0) meta.push(tag); else meta[index] = tag;
   };
   if (seo.title) set("title", seo.title);
