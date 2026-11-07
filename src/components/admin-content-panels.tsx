@@ -649,7 +649,7 @@ export function SettingsPanel() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={L("Adresa", "Address")} name="address" defaultValue={data?.address ?? "Rr. Nëna Terezë"} />
-          <Field label={L("Logoja (URL)", "Logo (URL)")} name="logo_url" defaultValue={data?.logo_url ?? ""} placeholder="https://…" />
+          <ImageUploadField label={L("Logoja", "Logo")} name="logo_url" defaultValue={data?.logo_url ?? ""} folder="logo" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={L("Telefoni", "Phone")} name="phone" defaultValue={data?.phone ?? ""} />
