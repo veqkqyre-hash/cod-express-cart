@@ -5,7 +5,8 @@ import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { GalleryField } from "@/components/admin-gallery-field";
-import { Plus, Pencil, Trash2, X, ImagePlus, Loader2 } from "lucide-react";
+import { generateProductDescription } from "@/lib/ai-image.functions";
+import { Plus, Pencil, Trash2, X, ImagePlus, Loader2, Sparkles } from "lucide-react";
 
 type ProductRow = {
   id: string;
@@ -216,6 +217,7 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
           />
           <FieldA label="Slug" name="slug" defaultValue={product?.slug ?? ""} />
 
+          <AiDescriptionButton lang={lang} />
           <div>
             <label className="mb-1.5 block text-sm font-medium">{tr("descriptionLabel")} (SQ)</label>
             <textarea name="description_sq" rows={2} defaultValue={product?.description_sq ?? ""} className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm" />
@@ -239,6 +241,48 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
         </form>
       </div>
     </div>
+  );
+}
+
+/** Buton që gjeneron përshkrimin SQ/EN me AI nga emri i produktit dhe i mbush fushat. */
+function AiDescriptionButton({ lang }: { lang: string }) {
+  const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
+  const [busy, setBusy] = useState(false);
+
+  async function onGenerate() {
+    const name =
+      document.querySelector<HTMLInputElement>('input[name="name_sq"]')?.value.trim() ||
+      document.querySelector<HTMLInputElement>('input[name="name_en"]')?.value.trim() ||
+      "";
+    if (name.length < 2) {
+      toast.error(L("Shkruani së pari emrin e produktit.", "Enter the product name first."));
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await generateProductDescription({ data: { name } });
+      const sq = document.querySelector<HTMLTextAreaElement>('textarea[name="description_sq"]');
+      const en = document.querySelector<HTMLTextAreaElement>('textarea[name="description_en"]');
+      if (sq) sq.value = res.sq;
+      if (en) en.value = res.en;
+      toast.success(L("Përshkrimi u gjenerua — kontrollojeni para ruajtjes.", "Description generated — review it before saving."));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : L("Gjenerimi dështoi.", "Generation failed."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onGenerate}
+      disabled={busy}
+      className="inline-flex items-center gap-2 self-start rounded-full border border-border px-4 py-2 text-sm hover:bg-muted disabled:opacity-50"
+    >
+      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+      {busy ? L("Duke gjeneruar…", "Generating…") : L("Gjenero përshkrimin me AI (SQ + EN)", "Generate description with AI (SQ + EN)")}
+    </button>
   );
 }
 
