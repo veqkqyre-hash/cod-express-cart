@@ -54,7 +54,7 @@ export const generateProductDescription = createServerFn({ method: "POST" })
     const { generateResponse, GatewayError } = await import("@lovable.dev/ai-gateway");
     try {
       const res = await generateResponse({
-        model: "openai/gpt-6-astra",
+        model: "openai/gpt-6.1-terra",
         instructions:
           "You write short e-commerce product descriptions for a nail care / beauty cosmetics shop in Kosovo. Return JSON only.",
         input: `Write a product description for "${data.name}" (a nail care / beauty cosmetics product). Return JSON: {"sq": "...", "en": "..."} — "sq" in Albanian, "en" in English. Each 1-2 sentences, friendly sales tone, no emojis, no prices, no invented brand claims.`,
@@ -72,13 +72,20 @@ export const generateProductDescription = createServerFn({ method: "POST" })
           },
         },
       });
-      const text = (res as { output_text?: string }).output_text ?? "";
+      const r = res as { output_text?: string; output?: Array<{ type?: string; content?: Array<{ type?: string; text?: string }> }> };
+      const text =
+        r.output_text ??
+        (r.output ?? [])
+          .filter((o) => o.type === "message")
+          .flatMap((o) => o.content ?? [])
+          .map((c) => c.text ?? "")
+          .join("");
       const parsed = JSON.parse(text) as { sq?: string; en?: string };
       if (!parsed.sq || !parsed.en) throw new Error("empty");
       return { sq: parsed.sq, en: parsed.en };
     } catch (e) {
       if (e instanceof GatewayError) {
-        console.error("AI text error", e.code, e.ids);
+        console.error("AI text error", e.code, e.httpStatus, e.message, e.ids);
         if (e.code === "payment_required" || e.httpStatus === 402) throw new Error("Kreditet e AI kanë mbaruar.");
         if (e.httpStatus === 429) throw new Error("Shumë kërkesa, provoni pas pak.");
       }
