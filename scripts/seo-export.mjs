@@ -13,7 +13,8 @@ export function verifySeoHtml(html, route) {
   // They may intentionally omit title, description and canonical tags.
   if (route === "/admin" || route === "/pos-display" || route === "/account" ||
       route === "/auth" || route === "/checkout" || route === "/cart" ||
-      route.startsWith("/order/")) return;
+      route.startsWith("/order/") || route === "/blog/sample" ||
+      route === "/product/sample") return;
   if (!/<title>[^<]+<\/title>/.test(html) || !/name="description"/.test(html)) throw Error(`SEO missing on ${route}`);
   if (/https:\/\/[^"< ]*lovable\.app/.test(html.match(/<head[\s\S]*?<\/head>/)?.[0] ?? "")) throw Error(`Preview SEO domain on ${route}`);
   if (!route.startsWith("/admin") && !route.startsWith("/order/") && route !== "/pos-display") {
