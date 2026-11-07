@@ -8,6 +8,13 @@
       "when": 1793808511086,
       "tag": "0000_product_images_storage_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794084053339,
+      "tag": "0001_pos_sale_discount_customer",
+      "breakpoints": true
     }
   ]
 }

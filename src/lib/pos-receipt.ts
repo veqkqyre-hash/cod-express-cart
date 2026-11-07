@@ -12,6 +12,8 @@ export type ReceiptSale = {
   change_amount?: number | null;
   cashier_email?: string | null;
   cashier_name?: string | null;
+  discount?: number | null;
+  customer_name?: string | null;
 };
 
 
@@ -67,10 +69,13 @@ ${B.logo_url ? `<div class="c"><img src="${esc(B.logo_url)}" alt="" style="max-w
   <div class="row"><span>Nr. shitjes</span><b>${esc(sale.sale_number)}</b></div>
   <div class="row"><span>Data</span><span>${d.toLocaleDateString()} ${d.toLocaleTimeString()}</span></div>
   ${cashier ? `<div class="row"><span>Arkëtari</span><span>${esc(cashier)}</span></div>` : ""}
+  ${sale.customer_name ? `<div class="row"><span>Klienti</span><span>${esc(sale.customer_name)}</span></div>` : ""}
 </div>
 <hr>
 <table>${rows}</table>
 <hr>
+${sale.discount != null && Number(sale.discount) > 0 ? `<div class="row"><span>Nëntotali</span><span>${money(Number(sale.total) + Number(sale.discount))}</span></div>
+<div class="row"><span>Zbritja</span><span>-${money(Number(sale.discount))}</span></div>` : ""}
 <div class="row tot"><span>TOTAL</span><span>${money(sale.total)}</span></div>
 <div class="muted" style="margin-top:4px">
   <div class="row"><span>Pagesa</span><span>${esc(method)}</span></div>
