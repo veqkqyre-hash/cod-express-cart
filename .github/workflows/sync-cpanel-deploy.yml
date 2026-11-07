@@ -58,7 +58,10 @@ jobs:
           set -euo pipefail
           find cpanel-php -name '*.php' -print0 | xargs -0 -r -n 1 php -l
 
-      - name: Check cPanel deploy script syntax\n        run: bash -n scripts/cpanel-safe-publish.sh\n\n      - name: Publish checked files into cpanel-deploy branch (staging ONLY)
+      - name: Check cPanel deploy script syntax
+        run: bash -n scripts/cpanel-safe-publish.sh
+
+      - name: Publish checked files into cpanel-deploy branch (staging ONLY)
         shell: bash
         run: |
           set -euo pipefail
@@ -73,6 +76,7 @@ jobs:
           fi
           git switch -C cpanel-deploy origin/cpanel-deploy
           git merge --no-edit origin/main
+          rm -rf cpanel-site
           mkdir -p cpanel-site
           cp -a /tmp/dreame-stage-release/. cpanel-site/
           # This branch stays fast-forwardable for the existing cPanel git pull cron.
