@@ -106,7 +106,12 @@ function Home() {
     <div className="overflow-x-hidden">
       <Hero />
       <Marquee />
-      <FeaturedCategories categories={categories.data ?? []} lang={lang} />
+      <ProductSection
+        eyebrow={tr("newArrivals")}
+        title={tr("newArrivalsTitle")}
+        subtitle={tr("newArrivalsSub")}
+        products={newArrivals.data ?? []}
+      />
       <PromoDuo />
       <ProductSection
         eyebrow={tr("bestSellers")}
@@ -115,12 +120,7 @@ function Home() {
         products={featured.data ?? []}
       />
       <PromoWide />
-      <ProductSection
-        eyebrow={tr("newArrivals")}
-        title={tr("newArrivalsTitle")}
-        subtitle={tr("newArrivalsSub")}
-        products={newArrivals.data ?? []}
-      />
+      <FeaturedCategories categories={categories.data ?? []} lang={lang} />
       <TopBrands />
       <WhyChooseUs />
       <Reviews />
