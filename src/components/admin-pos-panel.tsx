@@ -32,12 +32,41 @@ type Line = { product: PosProduct; qty: number };
 
 export const POS_CHANNEL = "dream-studio-pos";
 
-function broadcast(payload: unknown) {
+let lastPayload: unknown = null;
+let displayWin: Window | null = null;
+let channel: BroadcastChannel | null = null;
+function getChannel() {
+  if (channel) return channel;
   try {
-    new BroadcastChannel(POS_CHANNEL).postMessage(payload);
+    channel = new BroadcastChannel(POS_CHANNEL);
+    channel.onmessage = (e) => {
+      if ((e.data as any)?.type === "hello" && lastPayload) channel?.postMessage(lastPayload);
+    };
   } catch {
-    /* unsupported browser — customer screen simply stays idle */
+    channel = null;
   }
+  return channel;
+}
+if (typeof window !== "undefined") {
+  // customer screen opened via window.open asks for the current state
+  window.addEventListener("message", (e) => {
+    if (e.origin !== window.location.origin) return;
+    if ((e.data as any)?.type === "hello" && (e.data as any)?.channel === POS_CHANNEL) {
+      displayWin = e.source as Window;
+      if (lastPayload) displayWin?.postMessage({ channel: POS_CHANNEL, ...(lastPayload as object) }, window.location.origin);
+    }
+  });
+}
+export function openCustomerDisplay() {
+  displayWin = window.open("/pos-display", "pos-display", "width=1000,height=750");
+}
+function broadcast(payload: unknown) {
+  lastPayload = payload;
+  try { getChannel()?.postMessage(payload); } catch { /* ignore */ }
+  try { localStorage.setItem(POS_CHANNEL, JSON.stringify({ ...(payload as object), at: Date.now() })); } catch { /* ignore */ }
+  try {
+    if (displayWin && !displayWin.closed) displayWin.postMessage({ channel: POS_CHANNEL, ...(payload as object) }, window.location.origin);
+  } catch { /* ignore */ }
 }
 
 export function PosPanel() {
@@ -159,10 +188,12 @@ export function PosPanel() {
   useEffect(() => {
     broadcast({
       type: "cart",
-      lines: lines.map((l) => ({ name: nameOf(l.product), qty: l.qty, price: Number(l.product.price) })),
+      lines: lines.map((l) => ({ name: nameOf(l.product), qty: l.qty, price: Number(l.product.price), image: l.product.image_url })),
+      subtotal,
+      discount: discountNum,
       total,
     });
-  }, [lines, total, lang]);
+  }, [lines, total, discountNum, lang]);
 
   // scanner input should always be focused
   useEffect(() => {
@@ -672,7 +703,7 @@ export function PosPanel() {
         </div>
 
         <button
-          onClick={() => window.open("/pos-display", "pos-display", "width=900,height=700")}
+          onClick={openCustomerDisplay}
           className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-medium hover:bg-neutral-50"
         >
           <Monitor className="h-4 w-4" /> {L("Hap ekranin e klientit", "Open customer screen")}
