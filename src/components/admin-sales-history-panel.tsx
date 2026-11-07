@@ -59,12 +59,22 @@ export function PosSalesPanel() {
     },
   });
 
-  const rows = sales ?? [];
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const rows = (sales ?? []).filter((s) => {
+    const d = s.created_at.slice(0, 10);
+    return (!from || d >= from) && (!to || d <= to);
+  });
   const columns: Column<Sale>[] = [
     { key: "sale_number", label: L("Nr.", "No."), get: (s) => s.sale_number },
     { key: "date", label: L("Data", "Date"), get: (s) => new Date(s.created_at).toLocaleString() },
     { key: "items", label: L("Artikuj", "Items"), get: (s) => s.item_count },
+    { key: "subtotal", label: L("Nëntotali", "Subtotal"), get: (s) => (Number(s.total) + Number(s.discount ?? 0)).toFixed(2) },
+    { key: "discount", label: L("Zbritja", "Discount"), get: (s) => Number(s.discount ?? 0).toFixed(2) },
     { key: "total", label: L("Totali", "Total"), get: (s) => Number(s.total).toFixed(2) },
+    { key: "cost", label: L("Kosto", "Cost"), get: (s) => Number(s.cost_total ?? 0).toFixed(2) },
+    { key: "profit", label: L("Fitimi", "Profit"), get: (s) => (Number(s.total) - Number(s.cost_total ?? 0)).toFixed(2) },
+    { key: "customer", label: L("Klienti", "Customer"), get: (s) => s.customer_name ?? "" },
     { key: "method", label: L("Pagesa", "Payment"), get: (s) => s.payment_method },
     { key: "cashier", label: L("Përdoruesi", "User"), get: (s) => cashierDisplay(s.cashier_email) },
   ];
@@ -72,11 +82,13 @@ export function PosSalesPanel() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="text-sm text-neutral-600">
-          {rows.length} {L("shitje", "sales")} · {formatEur(rows.reduce((s, r) => s + Number(r.total), 0))}
+        <div className="flex flex-wrap items-center gap-2 text-sm text-neutral-600">
+          <label className="flex items-center gap-1">{L("Nga", "From")}<input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="rounded border px-2 py-1" /></label>
+          <label className="flex items-center gap-1">{L("Deri", "To")}<input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="rounded border px-2 py-1" /></label>
+          <span>{rows.length} {L("shitje", "sales")} · {formatEur(rows.reduce((s, r) => s + Number(r.total), 0))} · {L("fitimi", "profit")} {formatEur(rows.reduce((s, r) => s + Number(r.total) - Number(r.cost_total ?? 0), 0))}</span>
         </div>
         <ExportButtons
-          filename="pos-shitjet"
+          filename={`pos-shitjet${from ? "-" + from : ""}${to ? "_" + to : ""}`}
           title={L("Historia e shitjeve", "Sales history")}
           columns={columns}
           rows={rows}
