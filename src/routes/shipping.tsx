@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,8 +9,9 @@ import { useInfoPage, INFO_DEFAULTS } from "@/lib/info-content";
 import { formatEur } from "@/lib/cart";
 
 export const Route = createFileRoute("/shipping")({
+  loader: () => loadSeo("/shipping"),
   component: Shipping,
-  head: () => metaFor("/shipping", INFO_DEFAULTS.shipping.title_sq, INFO_DEFAULTS.shipping.meta_sq),
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, metaFor("/shipping", INFO_DEFAULTS.shipping.title_sq, INFO_DEFAULTS.shipping.meta_sq)),
 });
 
 function Shipping() {

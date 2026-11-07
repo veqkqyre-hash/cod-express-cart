@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,18 +9,19 @@ import { ProductCard, type Product } from "@/components/product-card";
 import { Heart } from "lucide-react";
 
 export const Route = createFileRoute("/wishlist")({
+  loader: () => loadSeo("/wishlist"),
   component: WishlistPage,
-  head: () => ({
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, {
     meta: [
       { title: "Lista e dëshirave — Dreame Beauty Cosmetics" },
       { name: "description", content: "Produktet e ruajtura që doni t'i porositni më vonë nga Dreame Beauty Cosmetics" },
       { property: "og:title", content: "Lista e dëshirave — Dreame Beauty Cosmetics" },
       { property: "og:description", content: "Produktet e ruajtura që doni t'i porositni më vonë nga Dreame Beauty Cosmetics" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://cod-express-cart.lovable.app/wishlist" },
+      { property: "og:url", content: "https://dreamebeautycosmetics.com/wishlist" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/wishlist" }],
+    links: [{ rel: "canonical", href: "https://dreamebeautycosmetics.com/wishlist" }],
   }),
 });
 

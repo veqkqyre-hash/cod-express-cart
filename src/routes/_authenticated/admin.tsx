@@ -189,7 +189,7 @@ function Admin() {
     { key: "blog", label: L("Blog", "Blog"), icon: Newspaper },
     { key: "messages", label: L("Mesazhet", "Messages"), icon: Inbox },
     { key: "pages", label: L("Faqet informative", "Info pages"), icon: FileText },
-    { key: "seo", label: "SEO Manager", icon: Search },
+    { key: "seo", label: "SEO Manager", icon: Globe },
     { key: "visitors", label: L("Vizitorët", "Visitors"), icon: Globe },
     { key: "reports", label: L("Raporte", "Reports"), icon: CalendarDays },
     { key: "audit", label: L("Regjistri i aktivitetit", "Activity log"), icon: ScrollText },

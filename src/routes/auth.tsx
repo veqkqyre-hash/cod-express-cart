@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -5,18 +7,19 @@ import { useI18n } from "@/lib/i18n";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
+  loader: () => loadSeo("/auth"),
   component: AuthPage,
-  head: () => ({
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, {
     meta: [
       { title: "Kyçu ose regjistrohu — Dreame Beauty Cosmetics" },
       { name: "description", content: "Krijo llogari në Dreame Beauty Cosmetics për të porositur produkte profesionale për sallon me pagesë në dorëzim." },
       { property: "og:title", content: "Kyçu ose regjistrohu — Dreame Beauty Cosmetics" },
       { property: "og:description", content: "Krijo llogari në Dreame Beauty Cosmetics për të porositur produkte profesionale për sallon me pagesë në dorëzim." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://cod-express-cart.lovable.app/auth" },
+      { property: "og:url", content: "https://dreamebeautycosmetics.com/auth" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/auth" }],
+    links: [{ rel: "canonical", href: "https://dreamebeautycosmetics.com/auth" }],
   }),
 });
 

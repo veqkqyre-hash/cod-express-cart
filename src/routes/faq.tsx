@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
@@ -6,8 +8,9 @@ import { useInfoPage, INFO_DEFAULTS } from "@/lib/info-content";
 import { ChevronDown, HelpCircle } from "lucide-react";
 
 export const Route = createFileRoute("/faq")({
+  loader: () => loadSeo("/faq"),
   component: Faq,
-  head: () => metaFor("/faq", INFO_DEFAULTS.faq.title_sq, INFO_DEFAULTS.faq.meta_sq),
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, metaFor("/faq", INFO_DEFAULTS.faq.title_sq, INFO_DEFAULTS.faq.meta_sq)),
 });
 
 function Faq() {

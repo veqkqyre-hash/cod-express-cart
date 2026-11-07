@@ -1,21 +1,24 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useCart, formatEur } from "@/lib/cart";
 
 export const Route = createFileRoute("/cart")({
+  loader: () => loadSeo("/cart"),
   component: CartPage,
-  head: () => ({
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, {
     meta: [
       { title: "Shporta — Dreame Beauty Cosmetics" },
       { name: "description", content: "Shiko produktet në shportën tuaj në Dreame Beauty Cosmetics dhe vazhdo drejt porosisë me pagesë në dorëzim." },
       { property: "og:title", content: "Shporta — Dreame Beauty Cosmetics" },
       { property: "og:description", content: "Shiko produktet në shportën tuaj në Dreame Beauty Cosmetics dhe vazhdo drejt porosisë me pagesë në dorëzim." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://cod-express-cart.lovable.app/cart" },
+      { property: "og:url", content: "https://dreamebeautycosmetics.com/cart" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/cart" }],
+    links: [{ rel: "canonical", href: "https://dreamebeautycosmetics.com/cart" }],
   }),
 });
 

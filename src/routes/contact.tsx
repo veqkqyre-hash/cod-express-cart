@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
@@ -8,8 +10,9 @@ import { toast } from "sonner";
 import { Mail, MapPin, Clock, Send, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
+  loader: () => loadSeo("/contact"),
   component: Contact,
-  head: () => metaFor("/contact", "Kontakti", "Kontaktoni Dreame Beauty Cosmetics — Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë."),
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, metaFor("/contact", "Kontakti", "Kontaktoni Dreame Beauty Cosmetics — Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë.")),
 });
 
 const schema = z.object({
