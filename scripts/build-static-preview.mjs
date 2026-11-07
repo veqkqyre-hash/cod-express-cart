@@ -26,6 +26,9 @@ await cp(pub, dest, { recursive: true });
 
 // Nitro's cloudflare-module entry exports fetch(). It is NOT a Node.js HTTP listener.
 // No Node.js process is needed on cPanel; worker runs ONLY in GitHub Actions during export.
+// SSR handlers read server names; GitHub's existing env-file supplies public VITE names.
+process.env.SUPABASE_URL ||= process.env.VITE_SUPABASE_URL;
+process.env.SUPABASE_PUBLISHABLE_KEY ||= process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const worker = (await import(pathToFileURL(entry).href)).default;
 if (!worker || typeof worker.fetch !== "function") {
   throw Error("Nitro export has no fetch(request, env, ctx)");
