@@ -1,0 +1,36 @@
+name: cPanel compatibility preview (never live deploy)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cpanel-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun ci
+      - run: bun run build
+      - name: Export static routes for verification
+        run: node scripts/build-static-preview.mjs
+      - name: Detect server-only calls that block production deployment
+        run: |
+          if grep -R -q '/_serverFn' static-preview/assets --include='*.js'; then
+            echo "::warning::TanStack server functions are present. Do NOT publish this preview."
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cpanel-compat-preview
+          path: static-preview/
+          retention-days: 7
+          include-hidden-files: true
