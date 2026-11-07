@@ -50,6 +50,8 @@ export function PosPanel() {
   const [term, setTerm] = useState("");
   const [method, setMethod] = useState<"cash" | "card" | "other">("cash");
   const [paid, setPaid] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [customerName, setCustomerName] = useState("");
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState<{ sale: ReceiptSale; items: { name: string; qty: number; price: number }[] } | null>(null);
   const [autoPrint, setAutoPrint] = useState(true);
@@ -147,7 +149,9 @@ export function PosPanel() {
     },
   });
 
-  const total = lines.reduce((s, l) => s + Number(l.product.price) * l.qty, 0);
+  const subtotal = lines.reduce((s, l) => s + Number(l.product.price) * l.qty, 0);
+  const discountNum = Math.min(Math.max(Number(discount) || 0, 0), subtotal);
+  const total = Math.max(0, subtotal - discountNum);
   const count = lines.reduce((s, l) => s + l.qty, 0);
   const change = method === "cash" && paid !== "" ? Number(paid) - total : null;
 
@@ -269,6 +273,8 @@ export function PosPanel() {
       _items: lines.map((l) => ({ product_id: l.product.id, quantity: l.qty })) as never,
       _payment_method: method,
       ...(method === "cash" && paid !== "" ? { _paid_amount: Number(paid) } : {}),
+      _discount: discountNum,
+      _customer_name: customerName.trim() || null,
     });
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -295,6 +301,8 @@ export function PosPanel() {
 
     setLines([]);
     setPaid("");
+    setDiscount("");
+    setCustomerName("");
     setTerm("");
     refetch();
     refetchShift();
