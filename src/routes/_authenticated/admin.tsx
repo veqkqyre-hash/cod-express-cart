@@ -21,6 +21,7 @@ import { PagesPanel } from "@/components/admin-pages-panel";
 import { PosPanel } from "@/components/admin-pos-panel";
 import { DashboardCharts } from "@/components/admin-dashboard-charts";
 import { PosSalesPanel } from "@/components/admin-sales-history-panel";
+import { StockRefillsPanel } from "@/components/admin-stock-refills-panel";
 import { PosReportPanel } from "@/components/admin-pos-report-panel";
 import { ShiftsPanel } from "@/components/admin-shift-panel";
 import { ReviewsPanel } from "@/components/admin-reviews-panel";
@@ -933,6 +934,7 @@ function InventoryView({ lang }: { lang: string }) {
           </tbody>
         </table>
       </div>
+      <StockRefillsPanel lang={lang} />
     </div>
   );
 }

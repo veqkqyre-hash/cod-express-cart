@@ -15,6 +15,13 @@
       "when": 1794084053339,
       "tag": "0001_pos_sale_discount_customer",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794084235519,
+      "tag": "0002_stock_refills_log",
+      "breakpoints": true
     }
   ]
 }

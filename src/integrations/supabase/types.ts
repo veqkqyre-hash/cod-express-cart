@@ -878,6 +878,39 @@ export type Database = {
           },
         ]
       }
+      stock_refills: {
+        Row: {
+          added: number
+          created_at: string
+          id: string
+          new_stock: number
+          old_stock: number
+          product_id: string
+          product_name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          added: number
+          created_at?: string
+          id?: string
+          new_stock: number
+          old_stock: number
+          product_id: string
+          product_name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          added?: number
+          created_at?: string
+          id?: string
+          new_stock?: number
+          old_stock?: number
+          product_id?: string
+          product_name?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
