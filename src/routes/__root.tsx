@@ -59,14 +59,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Dreame Beauty Cosmetics — Nail Supplies Wholesale & Retail" },
-      { name: "description", content: "Dreame Beauty Cosmetics: professional nail supplies — gel polish, acrylic, drills, UV/LED lamps, tips, nail art and pedicure. Wholesale & retail, Cash on Delivery across Kosovo." },
-      { property: "og:title", content: "Dreame Beauty Cosmetics — Nail Supplies Wholesale & Retail" },
-      { property: "og:description", content: "Professional nail supplies delivered to your door. Wholesale & retail, pay on delivery." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Dreame Beauty Cosmetics" },
-      { name: "twitter:description", content: "Professional nail supplies. Wholesale & retail. Cash on Delivery." },
+      { property: "og:site_name", content: "Dreame Beauty Cosmetics" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

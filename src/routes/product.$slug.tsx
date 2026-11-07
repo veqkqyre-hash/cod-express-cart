@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -10,18 +12,19 @@ import { ProductReviews, Stars, useReviews } from "@/components/product-reviews"
 import { StockAlertForm } from "@/components/newsletter-signup";
 
 export const Route = createFileRoute("/product/$slug")({
+  loader: ({ params }) => loadSeo(`/product/${params.slug}`),
   component: ProductPage,
-  head: ({ params }) => ({
+  head: ({ params, loaderData }) => applySeoHead(loaderData?.seo, {
     meta: [
       { title: `${params.slug.replace(/-/g, " ")} — Dreame Beauty Cosmetics` },
       { name: "description", content: "Produkt profesional për sallone bukurie nga Dreame Beauty Cosmetics, me pagesë në dorëzim në tërë Kosovën." },
       { property: "og:title", content: `${params.slug.replace(/-/g, " ")} — Dreame Beauty Cosmetics` },
       { property: "og:description", content: "Produkt profesional për sallone bukurie nga Dreame Beauty Cosmetics, me pagesë në dorëzim." },
       { property: "og:type", content: "product" },
-      { property: "og:url", content: `https://cod-express-cart.lovable.app/product/${params.slug}` },
+      { property: "og:url", content: `https://dreamebeautycosmetics.com/product/${params.slug}` },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: `https://cod-express-cart.lovable.app/product/${params.slug}` }],
+    links: [{ rel: "canonical", href: `https://dreamebeautycosmetics.com/product/${params.slug}` }],
   }),
 });
 

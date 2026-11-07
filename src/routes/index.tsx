@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,18 +14,19 @@ import heroNails3 from "@/assets/hero-nails-3.jpg";
 import heroNails4 from "@/assets/hero-nails-4.jpg";
 
 export const Route = createFileRoute("/")({
+  loader: () => loadSeo("/"),
   component: Home,
-  head: () => ({
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, {
     meta: [
       { title: "Dreame Beauty Cosmetics — Produkte për Thonj, Shumicë & Pakicë" },
       { name: "description", content: "Produkte profesionale për thonj: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesë në dorëzim në tërë Kosovën." },
       { property: "og:title", content: "Dreame Beauty Cosmetics — Produkte për Thonj, Shumicë & Pakicë" },
       { property: "og:description", content: "Gel lak, akrilik, freza, lampa UV/LED, tipsa, nail art dhe pedikyr — shumicë dhe pakicë, pagesë në dorëzim." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://cod-express-cart.lovable.app/" },
+      { property: "og:url", content: "https://dreamebeautycosmetics.com/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://dreamebeautycosmetics.com/" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -34,7 +37,7 @@ export const Route = createFileRoute("/")({
           description:
             "Produkte profesionale për thonj: gel lak, akrilik, gel ndërtues, freza, lampa UV/LED, tipsa, nail art dhe pedikyr. Shumicë e pakicë, pagesë në dorëzim në tërë Kosovën.",
 
-          url: "https://cod-express-cart.lovable.app/",
+          url: "https://dreamebeautycosmetics.com/",
           email: "info@dreamebeautycosmetics.com",
           priceRange: "€€",
           currenciesAccepted: "EUR",

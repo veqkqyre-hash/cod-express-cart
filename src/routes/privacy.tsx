@@ -1,11 +1,14 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
 import { InfoPage, InfoBlock, metaFor } from "@/components/info-page";
 import { useInfoPage, INFO_DEFAULTS } from "@/lib/info-content";
 
 export const Route = createFileRoute("/privacy")({
+  loader: () => loadSeo("/privacy"),
   component: Privacy,
-  head: () => metaFor("/privacy", INFO_DEFAULTS.privacy.title_sq, INFO_DEFAULTS.privacy.meta_sq),
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, metaFor("/privacy", INFO_DEFAULTS.privacy.title_sq, INFO_DEFAULTS.privacy.meta_sq)),
 });
 
 function Privacy() {

@@ -29,6 +29,7 @@ import { NewsletterPanel } from "@/components/admin-newsletter-panel";
 import { RefundsPanel } from "@/components/admin-refunds-panel";
 import { TasksPanel } from "@/components/admin-tasks-panel";
 import { HelpPanel } from "@/components/admin-help-panel";
+import { SeoPanel } from "@/components/admin-seo-panel";
 import { AdminGlobalSearch } from "@/components/admin-global-search";
 import { OrderTimeline } from "@/components/order-timeline";
 import { printOrders } from "@/lib/bulk-print";
@@ -41,7 +42,14 @@ import {
   ShippingPanel, SettingsPanel,
 } from "@/components/admin-content-panels";
 
-export const Route = createFileRoute("/_authenticated/admin")({ component: Admin });
+export const Route = createFileRoute("/_authenticated/admin")({ component: Admin, head: () => ({ meta: [
+  { title: "Admin — Dreame Beauty Cosmetics" },
+  { name: "description", content: "Paneli i administrimit të Dreame Beauty Cosmetics." },
+  { property: "og:title", content: "Admin — Dreame Beauty Cosmetics" },
+  { property: "og:description", content: "Paneli i administrimit të Dreame Beauty Cosmetics." },
+  { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  { name: "robots", content: "noindex, nofollow" },
+] }) });
 
 type Order = {
   id: string;
@@ -73,7 +81,7 @@ type NavKey =
   | "dashboard" | "pos" | "possales" | "posreport" | "shifts" | "sales" | "stats" | "products" | "inventory" | "catalog"
   | "orders" | "shipping" | "customers" | "marketing" | "homepage" | "blog"
   | "messages" | "pages" | "notifications" | "audit" | "visitors" | "reports" | "settings" | "admins"
-  | "reviews" | "newsletter" | "refunds" | "tasks" | "help";
+  | "reviews" | "newsletter" | "refunds" | "tasks" | "help" | "seo";
 
 type Role = "admin" | "manager" | "editor";
 
@@ -181,6 +189,7 @@ function Admin() {
     { key: "blog", label: L("Blog", "Blog"), icon: Newspaper },
     { key: "messages", label: L("Mesazhet", "Messages"), icon: Inbox },
     { key: "pages", label: L("Faqet informative", "Info pages"), icon: FileText },
+    { key: "seo", label: "SEO Manager", icon: Globe },
     { key: "visitors", label: L("Vizitorët", "Visitors"), icon: Globe },
     { key: "reports", label: L("Raporte", "Reports"), icon: CalendarDays },
     { key: "audit", label: L("Regjistri i aktivitetit", "Activity log"), icon: ScrollText },
@@ -199,7 +208,7 @@ function Admin() {
     { title: L("SHITJET ONLINE", "ONLINE SALES"), keys: ["dashboard", "orders", "sales", "stats", "notifications"] },
     { title: L("KATALOGU", "CATALOG"), keys: ["products", "inventory", "catalog", "shipping"] },
     { title: L("KLIENTËT & MARKETINGU", "CUSTOMERS & MARKETING"), keys: ["customers", "marketing", "newsletter", "reviews", "messages"] },
-    { title: L("PËRMBAJTJA", "CONTENT"), keys: ["homepage", "blog", "pages"] },
+    { title: L("PËRMBAJTJA", "CONTENT"), keys: ["homepage", "blog", "pages", "seo"] },
     { title: L("PUNA & NDIHMA", "WORK & HELP"), keys: ["tasks", "help"] },
     { title: L("SISTEMI", "SYSTEM"), keys: ["visitors", "reports", "audit", "settings", "admins"] },
   ];
@@ -320,6 +329,7 @@ function Admin() {
               {nav === "refunds" && <RefundsPanel />}
               {nav === "tasks" && <TasksPanel role={role!} userId={currentUserId} />}
               {nav === "help" && <HelpPanel />}
+              {nav === "seo" && <SeoPanel />}
             </>
           )}
         </main>

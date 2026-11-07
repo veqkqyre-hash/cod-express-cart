@@ -1,3 +1,5 @@
+import { loadSeo } from "@/lib/seo-loader";
+import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -9,18 +11,19 @@ import { Banknote, Tag, X as XIcon, Truck } from "lucide-react";
 import { useShipping, validateCoupon } from "@/lib/checkout-extras";
 
 export const Route = createFileRoute("/checkout")({
+  loader: () => loadSeo("/checkout"),
   component: Checkout,
-  head: () => ({
+  head: ({ loaderData }) => applySeoHead(loaderData?.seo, {
     meta: [
       { title: "Përfundo porosinë — Dreame Beauty Cosmetics" },
       { name: "description", content: "Plotëso të dhënat e dërgesës dhe porosit me pagesë në dorëzim (COD) në Dreame Beauty Cosmetics" },
       { property: "og:title", content: "Përfundo porosinë — Dreame Beauty Cosmetics" },
       { property: "og:description", content: "Plotëso të dhënat e dërgesës dhe porosit me pagesë në dorëzim (COD) në Dreame Beauty Cosmetics" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://cod-express-cart.lovable.app/checkout" },
+      { property: "og:url", content: "https://dreamebeautycosmetics.com/checkout" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://cod-express-cart.lovable.app/checkout" }],
+    links: [{ rel: "canonical", href: "https://dreamebeautycosmetics.com/checkout" }],
   }),
 });
 
