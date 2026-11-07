@@ -72,7 +72,14 @@ export const generateProductDescription = createServerFn({ method: "POST" })
           },
         },
       });
-      const text = (res as { output_text?: string }).output_text ?? "";
+      const r = res as { output_text?: string; output?: Array<{ type?: string; content?: Array<{ type?: string; text?: string }> }> };
+      const text =
+        r.output_text ??
+        (r.output ?? [])
+          .filter((o) => o.type === "message")
+          .flatMap((o) => o.content ?? [])
+          .map((c) => c.text ?? "")
+          .join("");
       const parsed = JSON.parse(text) as { sq?: string; en?: string };
       if (!parsed.sq || !parsed.en) throw new Error("empty");
       return { sq: parsed.sq, en: parsed.en };
