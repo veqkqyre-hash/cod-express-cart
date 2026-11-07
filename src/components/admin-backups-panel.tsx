@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Archive, Database, HardDrive, ShieldCheck, LockKeyhole } from "lucide-react";
+import { Archive, Database, HardDrive, ShieldCheck, LockKeyhole, Plus, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { backupPermissions, WEBSITE_BACKUP_EVIDENCE, DATABASE_BACKUP_EVIDENCE, type BackupRole } from "@/lib/backup-capabilities";
 
@@ -13,6 +13,11 @@ export function BackupsPanel({ role }: { role: BackupRole }) {
       <div><h2 className="text-xl font-semibold">Backup & Restore</h2><p className="mt-1 text-sm text-muted-foreground">Website-i dhe databaza ruhen veçmas.</p></div>
       <span className="inline-flex items-center gap-2 text-sm text-muted-foreground"><ShieldCheck className="h-4 w-4" /> Vetëm administratori</span>
     </header>
+    <div className="flex flex-wrap items-center gap-3">
+      <span title="Nuk është konfiguruar shërbimi për backup komplet."><Button disabled={!website.create || !database.create}><Plus /> Krijo backup komplet</Button></span>
+      <span title="Duhet një backup real, i verifikuar, para rikthimit."><Button variant="outline" disabled={!website.restore || !database.restore}><RotateCcw /> Rikthe backup</Button></span>
+      <span className="text-sm text-muted-foreground">Nuk është konfiguruar</span>
+    </div>
     <div className="grid gap-6 lg:grid-cols-2">
       <section className="space-y-4 border-t border-border pt-5">
         <div className="flex items-start gap-3"><HardDrive className="mt-1 h-5 w-5 text-primary" /><div><h3 className="font-semibold">Backup i website-it</h3><p className="text-sm text-muted-foreground">HTML, CSS, JavaScript dhe asetet në cPanel</p></div></div>
