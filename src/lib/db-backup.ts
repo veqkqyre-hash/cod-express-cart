@@ -30,7 +30,7 @@ async function copyPhotosToBackup(id: string, manifest: { name: string }[], onPr
 
 export async function createFullDbBackup(onProgress?: (msg: string) => void) {
   onProgress?.("Duke ruajtur databazën…");
-  const { data, error } = await supabase.rpc("create_db_backup" as never, { _kind: "manual" } as never);
+  const { data, error } = await supabase.rpc("create_db_backup", { _kind: "manual" });
   if (error) throw error;
   const id = (data as unknown as { id: string }).id;
   const { data: row, error: e2 } = await supabase.from("backup_snapshots").select("photos_manifest").eq("id", id).single();
@@ -42,7 +42,7 @@ export async function createFullDbBackup(onProgress?: (msg: string) => void) {
 }
 
 export async function verifySnapshot(id: string) {
-  const { data, error } = await supabase.rpc("verify_db_backup" as never, { _id: id } as never);
+  const { data, error } = await supabase.rpc("verify_db_backup", { _id: id });
   if (error) throw error;
   return data as unknown as { status: string; checksum_ok: boolean; missing_tables: number; missing_photos: number };
 }
@@ -71,7 +71,7 @@ export async function signedPhotoLink(id: string, name: string) {
 /** Non-destructive restore: database rows are upserted server-side, missing photos are copied back. */
 export async function restoreSnapshot(s: SnapshotRow, confirmWord: string, onProgress?: (msg: string) => void) {
   onProgress?.("Duke rikthyer databazën…");
-  const { data, error } = await supabase.rpc("restore_db_backup" as never, { _id: s.id, _confirm: confirmWord } as never);
+  const { data, error } = await supabase.rpc("restore_db_backup", { _id: s.id, _confirm: confirmWord });
   if (error) throw error;
   let restored = 0, existing = 0;
   for (const p of s.photos_manifest) {
