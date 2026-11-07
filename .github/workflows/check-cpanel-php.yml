@@ -1,0 +1,29 @@
+name: Check PHP cPanel backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cpanel-php/**'
+      - '.github/workflows/check-cpanel-php.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify PHP syntax
+        run: |
+          set -euo pipefail
+          find cpanel-php -name '*.php' -print0 | xargs -0 -r -n 1 php -l
+      - name: Ensure no production credentials are committed to PHP package
+        run: |
+          set -euo pipefail
+          if grep -R -E 'sb_secret_|service_role_key[[:space:]]*=>[[:space:]]*[^ ]' cpanel-php; then
+            echo "::error::Potential secrets in cPanel PHP package"
+            exit 1
+          fi
