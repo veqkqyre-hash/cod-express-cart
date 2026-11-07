@@ -6,6 +6,7 @@ import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { Pencil, Trash2, Mail, MailOpen } from "lucide-react";
 import { AddButton, Check, Empty, Field, FormActions, Modal, Panel, TextArea } from "@/components/admin-ui";
+import { ImageUploadField } from "@/components/admin-image-field";
 import { loadBusinessInfo } from "@/lib/store-info";
 
 
@@ -110,7 +111,7 @@ export function CatalogPanel() {
               <Field label="Slug" name="slug" defaultValue={cat?.slug} />
               <Field label={L("Radhitja", "Sort order")} name="sort_order" type="number" defaultValue={cat?.sort_order ?? 0} />
             </div>
-            <Field label={L("Foto (URL)", "Image URL")} name="image_url" defaultValue={cat?.image_url ?? ""} />
+            <ImageUploadField label={L("Foto", "Image")} name="image_url" defaultValue={cat?.image_url} folder="categories" />
             <FormActions cancelLabel={L("Anulo", "Cancel")} saveLabel={L("Ruaj", "Save")} onCancel={() => setEditing(null)} />
           </form>
         </Modal>
@@ -308,7 +309,7 @@ export function HomepagePanel() {
             </div>
             <TextArea label={L("Nëntitulli (SQ)", "Subtitle (SQ)")} name="subtitle_sq" defaultValue={s?.subtitle_sq} rows={2} />
             <TextArea label={L("Nëntitulli (EN)", "Subtitle (EN)")} name="subtitle_en" defaultValue={s?.subtitle_en} rows={2} />
-            <Field label={L("Foto (URL)", "Image URL")} name="image_url" defaultValue={s?.image_url ?? ""} />
+            <ImageUploadField label={L("Foto", "Image")} name="image_url" defaultValue={s?.image_url} folder="slides" />
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={L("Linku", "Link")} name="link_url" defaultValue={s?.link_url ?? "/shop"} />
               <Field label={L("Radhitja", "Sort order")} name="sort_order" type="number" defaultValue={s?.sort_order ?? 0} />
@@ -412,7 +413,7 @@ export function BlogPanel() {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Slug" name="slug" defaultValue={p?.slug ?? ""} />
-              <Field label={L("Foto (URL)", "Cover image URL")} name="cover_image" defaultValue={p?.cover_image ?? ""} />
+              <ImageUploadField label={L("Foto kryesore", "Cover image")} name="cover_image" defaultValue={p?.cover_image} folder="blog" />
             </div>
             <TextArea label={L("Përmbledhja (SQ)", "Excerpt (SQ)")} name="excerpt_sq" defaultValue={p?.excerpt_sq} rows={2} />
             <TextArea label={L("Përmbledhja (EN)", "Excerpt (EN)")} name="excerpt_en" defaultValue={p?.excerpt_en} rows={2} />
