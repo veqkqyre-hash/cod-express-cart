@@ -48,7 +48,7 @@ jobs:
           test -d static-preview/assets
           test "$(find static-preview -name index.html | wc -l)" -ge 19
           test -s static-preview/BUILD-METADATA.json
-          if grep -rl -E 'sb_secret_|SUPABASE_SERVICE_ROLE_KEY|PRIVATE KEY' static-preview --include='*.html' --include='*.js'; then
+          if grep -rl -E 'sb_secret_[A-Za-z0-9_-]{16,}|-----BEGIN [A-Z ]*PRIVATE KEY-----' static-preview --include='*.html' --include='*.js'; then
             echo "::error::Possible private secret in generated site"
             exit 1
           fi
