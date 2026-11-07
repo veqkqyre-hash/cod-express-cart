@@ -55,9 +55,7 @@ function ProductPage() {
     <div className="container-app py-10">
       <Link to="/shop" className="text-sm text-muted-foreground hover:text-primary">← {tr("shop")}</Link>
       <div className="mt-6 grid gap-10 lg:grid-cols-2">
-        <div className="overflow-hidden rounded-2xl bg-muted aspect-square">
-          {product.image_url && <img src={product.image_url} alt={name} className="h-full w-full object-cover" />}
-        </div>
+        <ProductGallery images={(product.images?.length ? product.images : product.image_url ? [product.image_url] : [])} name={name} />
         <div>
           <h1 className="font-display text-3xl sm:text-4xl">{name}</h1>
           {approved.length > 0 && (
@@ -128,6 +126,27 @@ function ProductPage() {
           }),
         }}
       />
+    </div>
+  );
+}
+
+function ProductGallery({ images, name }: { images: string[]; name: string }) {
+  const [i, setI] = useState(0);
+  const cur = images[i] ?? images[0];
+  return (
+    <div>
+      <div className="overflow-hidden rounded-2xl bg-muted aspect-square">
+        {cur && <img src={cur} alt={name} className="h-full w-full object-cover" />}
+      </div>
+      {images.length > 1 && (
+        <div className="mt-3 grid grid-cols-5 gap-2">
+          {images.map((u, k) => (
+            <button key={u + k} type="button" onClick={() => setI(k)} className={`aspect-square overflow-hidden rounded-xl border-2 ${k === i ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"}`}>
+              <img src={u} alt={`${name} ${k + 1}`} className="h-full w-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
