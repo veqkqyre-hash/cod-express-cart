@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
+import { GalleryField } from "@/components/admin-gallery-field";
 import { Plus, Pencil, Trash2, X, ImagePlus, Loader2 } from "lucide-react";
 
 type ProductRow = {
@@ -16,6 +17,7 @@ type ProductRow = {
   description_en: string | null;
   price: number;
   image_url: string | null;
+  images?: string[] | null;
   stock: number;
   active: boolean;
   featured: boolean;
@@ -124,6 +126,8 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const nameEn = String(fd.get("name_en") || "").trim();
+    let gallery: string[] = [];
+    try { gallery = JSON.parse(String(fd.get("gallery_json") || "[]")); } catch { gallery = []; }
     const payload = {
       slug: String(fd.get("slug") || "").trim() || nameEn.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
       name_sq: String(fd.get("name_sq") || "").trim(),
@@ -135,7 +139,8 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
       barcode: String(fd.get("barcode") || "").trim() || null,
       sku: String(fd.get("sku") || "").trim() || null,
       stock: Number(fd.get("stock")),
-      image_url: String(fd.get("image_url") || "") || null,
+      images: gallery,
+      image_url: gallery[0] ?? null,
       category_id: String(fd.get("category_id") || "") || null,
       active: fd.get("active") === "on",
       featured: fd.get("featured") === "on",
@@ -204,7 +209,11 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
             </div>
           </div>
 
-          <ImageField lang={lang} defaultValue={product?.image_url ?? ""} />
+          <GalleryField
+            lang={lang}
+            initial={product?.images?.length ? product.images : product?.image_url ? [product.image_url] : []}
+            getName={() => (document.querySelector<HTMLInputElement>('input[name="name_en"]')?.value || document.querySelector<HTMLInputElement>('input[name="name_sq"]')?.value || "")}
+          />
           <FieldA label="Slug" name="slug" defaultValue={product?.slug ?? ""} />
 
           <div>
