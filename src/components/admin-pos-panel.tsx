@@ -462,6 +462,16 @@ export function PosPanel() {
                     <div className="text-xs text-neutral-500">
                       {formatEur(Number(p.price))} · {L("stok", "stock")} {p.stock}
                     </div>
+                    {p.stock > 0 && p.stock <= 3 && (
+                      <span className="mt-0.5 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+                        {L("Stok i ulët", "Low stock")}
+                      </span>
+                    )}
+                    {p.stock <= 0 && (
+                      <span className="mt-0.5 inline-block rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700">
+                        {L("Pa stok", "Out of stock")}
+                      </span>
+                    )}
                   </div>
                 </button>
               ))}
@@ -549,6 +559,39 @@ export function PosPanel() {
           </div>
           <div className="mt-1 text-right text-xs text-neutral-500">
             {count} {L("artikuj", "items")}
+            {discountNum > 0 && (
+              <span className="block">
+                {L("Nëntotali", "Subtotal")} {formatEur(subtotal)} · {L("zbritja", "discount")} -{formatEur(discountNum)}
+              </span>
+            )}
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                {L("Zbritja (€)", "Discount (€)")}
+              </label>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+                placeholder="0.00"
+                className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-neutral-900"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                {L("Klienti (opsionale)", "Customer (optional)")}
+              </label>
+              <input
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder={L("Emri i klientit", "Customer name")}
+                className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
+              />
+            </div>
           </div>
 
           <div className="mt-5 grid grid-cols-3 gap-2">

@@ -23,6 +23,8 @@ type Sale = {
   paid_amount: number | null;
   change_amount: number | null;
   cashier_email: string | null;
+  discount: number | null;
+  customer_name: string | null;
   created_at: string;
 };
 
@@ -164,8 +166,15 @@ function SaleModal({ sale, onClose, L }: { sale: Sale; onClose: () => void; L: (
           </table>
 
           <div className="mt-4 space-y-1 text-sm">
+            {sale.discount != null && Number(sale.discount) > 0 && (
+              <>
+                <Row label={L("Nëntotali", "Subtotal")} value={formatEur(Number(sale.total) + Number(sale.discount))} />
+                <Row label={L("Zbritja", "Discount")} value={`-${formatEur(Number(sale.discount))}`} />
+              </>
+            )}
             <Row label="TOTAL" value={formatEur(Number(sale.total))} bold />
             <Row label={L("Pagesa", "Payment")} value={sale.payment_method} />
+            {sale.customer_name && <Row label={L("Klienti", "Customer")} value={sale.customer_name} />}
             {sale.paid_amount != null && <Row label={L("Paguar", "Paid")} value={formatEur(Number(sale.paid_amount))} />}
             {sale.change_amount != null && <Row label={L("Kusuri", "Change")} value={formatEur(Number(sale.change_amount))} />}
             <Row label={L("Përdoruesi", "User")} value={cashierDisplay(sale.cashier_email)} />
