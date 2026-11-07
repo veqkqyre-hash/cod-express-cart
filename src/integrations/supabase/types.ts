@@ -92,6 +92,69 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_snapshots: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          created_by_email: string | null
+          data: Json
+          error: string | null
+          id: string
+          kind: string
+          photos_bytes: number
+          photos_count: number
+          photos_manifest: Json
+          photos_status: string
+          restored_at: string | null
+          restored_by_email: string | null
+          sha256: string
+          size_bytes: number
+          status: string
+          table_counts: Json
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          data: Json
+          error?: string | null
+          id?: string
+          kind?: string
+          photos_bytes?: number
+          photos_count?: number
+          photos_manifest?: Json
+          photos_status?: string
+          restored_at?: string | null
+          restored_by_email?: string | null
+          sha256: string
+          size_bytes?: number
+          status?: string
+          table_counts?: Json
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          data?: Json
+          error?: string | null
+          id?: string
+          kind?: string
+          photos_bytes?: number
+          photos_count?: number
+          photos_manifest?: Json
+          photos_status?: string
+          restored_at?: string | null
+          restored_by_email?: string | null
+          sha256?: string
+          size_bytes?: number
+          status?: string
+          table_counts?: Json
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           content_en: string | null
@@ -1036,11 +1099,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      backup_tables: { Args: never; Returns: string[] }
       claim_admin_if_none: { Args: never; Returns: Json }
       close_pos_shift: {
         Args: { _counted_cash?: number; _note?: string }
         Returns: Json
       }
+      create_db_backup: { Args: { _kind?: string }; Returns: Json }
       create_pos_sale:
         | {
             Args: {
@@ -1112,6 +1177,10 @@ export type Database = {
         Args: { _items?: Json; _reason?: string; _sale_id: string }
         Returns: Json
       }
+      restore_db_backup: {
+        Args: { _confirm: string; _id: string }
+        Returns: Json
+      }
       revoke_admin: { Args: { _user_id: string }; Returns: undefined }
       revoke_role: {
         Args: {
@@ -1120,6 +1189,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      verify_db_backup: { Args: { _id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user" | "manager" | "editor"
