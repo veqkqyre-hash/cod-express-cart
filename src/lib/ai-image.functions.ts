@@ -40,3 +40,48 @@ export const generateProductImage = createServerFn({ method: "POST" })
     const { data: pub } = supabase.storage.from("product-images").getPublicUrl(path);
     return { url: pub.publicUrl };
   });
+
+export const generateProductDescription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ name: z.string().trim().min(2).max(200) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const roles = await Promise.all(
+      (["admin", "manager", "editor"] as const).map((r) => supabase.rpc("has_role", { _user_id: userId, _role: r })),
+    );
+    if (!roles.some((r) => r.data === true)) throw new Error("Nuk keni leje");
+
+    const { generateResponse, GatewayError } = await import("@lovable.dev/ai-gateway");
+    try {
+      const res = await generateResponse({
+        model: "openai/gpt-6-astra",
+        instructions:
+          "You write short e-commerce product descriptions for a nail care / beauty cosmetics shop in Kosovo. Return JSON only.",
+        input: `Write a product description for "${data.name}" (a nail care / beauty cosmetics product). Return JSON: {"sq": "...", "en": "..."} — "sq" in Albanian, "en" in English. Each 1-2 sentences, friendly sales tone, no emojis, no prices, no invented brand claims.`,
+        text: {
+          format: {
+            type: "json_schema",
+            name: "product_description",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: { sq: { type: "string" }, en: { type: "string" } },
+              required: ["sq", "en"],
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+      const text = (res as { output_text?: string }).output_text ?? "";
+      const parsed = JSON.parse(text) as { sq?: string; en?: string };
+      if (!parsed.sq || !parsed.en) throw new Error("empty");
+      return { sq: parsed.sq, en: parsed.en };
+    } catch (e) {
+      if (e instanceof GatewayError) {
+        console.error("AI text error", e.code, e.ids);
+        if (e.code === "payment_required" || e.httpStatus === 402) throw new Error("Kreditet e AI kanë mbaruar.");
+        if (e.httpStatus === 429) throw new Error("Shumë kërkesa, provoni pas pak.");
+      }
+      throw new Error("Gjenerimi i përshkrimit dështoi.");
+    }
+  });
