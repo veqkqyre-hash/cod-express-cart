@@ -135,8 +135,15 @@ function ProductGallery({ images, name }: { images: string[]; name: string }) {
   const cur = images[i] ?? images[0];
   return (
     <div>
-      <div className="overflow-hidden rounded-2xl bg-muted aspect-square">
+      <div className="relative overflow-hidden rounded-2xl bg-muted aspect-square">
         {cur && <img src={cur} alt={name} className="h-full w-full object-cover" />}
+        {images.length > 1 && (
+          <>
+            <button type="button" aria-label="Prev" onClick={() => setI((i - 1 + images.length) % images.length)} className="absolute left-3 top-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full bg-background/90 text-xl shadow hover:bg-background">‹</button>
+            <button type="button" aria-label="Next" onClick={() => setI((i + 1) % images.length)} className="absolute right-3 top-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full bg-background/90 text-xl shadow hover:bg-background">›</button>
+            <span className="absolute bottom-3 right-3 rounded-full bg-background/90 px-2.5 py-1 text-xs shadow">{i + 1} / {images.length}</span>
+          </>
+        )}
       </div>
       {images.length > 1 && (
         <div className="mt-3 grid grid-cols-5 gap-2">
