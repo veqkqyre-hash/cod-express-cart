@@ -8,8 +8,14 @@ SRC="/home/swisskle/cpanel-deploy-stage/cpanel-site"
 LIVE="/home/swisskle/dreamebeautycosmetics.com"
 BACKUP_BASE="/home/swisskle/.dreame-html-backups"
 MODE="${1:---check}"
+GIT_CMD="/usr/bin/git -C /home/swisskle/cpanel-deploy-stage pull --ff-only origin cpanel-deploy"
+SYNC_LOG="/home/swisskle/cpanel-git-sync.log"
+DEPLOY_CMD="/bin/bash /home/swisskle/cpanel-deploy-stage/scripts/cpanel-safe-publish.sh --apply"
+DEPLOY_LOG="/home/swisskle/cpanel-auto-publish.log"
+CRON_SYNC="*/15 * * * * $GIT_CMD >> $SYNC_LOG 2>&1"
+CRON_PUBLISH="*/15 * * * * $GIT_CMD >> $SYNC_LOG 2>&1 && $DEPLOY_CMD >> $DEPLOY_LOG 2>&1"
 
-case "$MODE" in --check|--apply|--rollback) ;; *) echo "Usage: bash $0 --check|--apply|--rollback"; exit 2;; esac
+case "$MODE" in --check|--apply|--activate|--rollback) ;; *) echo "Usage: bash $0 --check|--apply|--activate|--rollback"; exit 2;; esac
 if [[ "$(id -un)" != "swisskle" ]]; then
   echo "STOP: run this under the cPanel account swisskle"; exit 1
 fi
@@ -24,6 +30,26 @@ if ! command -v flock >/dev/null 2>&1; then
 fi
 exec 9>"/home/swisskle/.dreame-publish.lock"
 flock -n 9 || { echo "STOP: another deployment is running"; exit 1; }
+
+# Reset the publish cron before rollback so it cannot reapply the update.
+if [[ "$MODE" == "--rollback" ]] && command -v crontab >/dev/null 2>&1; then
+  tmpcron="$(mktemp /home/swisskle/.dreame-cron.XXXXXX)"
+  trap 'rm -f "$tmpcron"' EXIT
+  crontab -l > "$tmpcron" 2>/dev/null || true
+  if grep -Fq 'cpanel-safe-publish.sh --apply' "$tmpcron"; then
+    nextcron="$(mktemp /home/swisskle/.dreame-cron-next.XXXXXX)"
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      if [[ "$line" == *'cpanel-safe-publish.sh --apply'* ]]; then
+        printf '%s\n' "$CRON_SYNC"
+      else
+        printf '%s\n' "$line"
+      fi
+    done < "$tmpcron" > "$nextcron"
+    crontab "$nextcron"
+    rm -f "$nextcron"
+    echo "Automatic publishing disabled; GitHub staging sync preserved"
+  fi
+fi
 
 if [[ "$MODE" == "--rollback" ]]; then
   last="$(find "$BACKUP_BASE" -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | sort -r | head -1)"
@@ -88,6 +114,24 @@ if [[ "$MODE" == "--check" ]]; then
   exit 0
 fi
 
+# Refuse live activation unless the existing Git sync cron is present exactly once.
+if [[ "$MODE" == "--activate" ]]; then
+  command -v crontab >/dev/null 2>&1 || { echo "STOP: crontab unavailable"; exit 1; }
+  cron_before="$(mktemp /home/swisskle/.dreame-cron-before.XXXXXX)"
+  crontab -l > "$cron_before" 2>/dev/null || true
+  count=0
+  while IFS= read -r cron_line || [[ -n "$cron_line" ]]; do
+    if [[ "$cron_line" != \#* && "$cron_line" == *"cpanel-deploy-stage pull --ff-only origin cpanel-deploy"* ]]; then
+      count=$((count+1))
+    fi
+  done < "$cron_before"
+  if (( count != 1 )); then
+    echo "STOP: expected exactly one existing Git sync Cron Job, found $count"
+    rm -f "$cron_before"
+    exit 1
+  fi
+fi
+
 # Backup HTML only; compiled assets are content-hashed and only new ones are added.
 stamp="$(date -u '+%Y%m%dT%H%M%SZ')-$$"
 backup="$BACKUP_BASE/$stamp"
@@ -127,4 +171,22 @@ for file in "${pages[@]}"; do
 done
 
 echo "PUBLISHED: 19 HTML routes + hashed assets; existing PHP, .htaccess, secrets and database untouched."
-echo "To undo HTML changes: bash $0 --rollback"
+
+if [[ "$MODE" == "--activate" ]]; then
+  cron_next="$(mktemp /home/swisskle/.dreame-cron-after.XXXXXX)"
+  while IFS= read -r cron_line || [[ -n "$cron_line" ]]; do
+    if [[ "$cron_line" != \#* && "$cron_line" == *"cpanel-deploy-stage pull --ff-only origin cpanel-deploy"* ]]; then
+      printf '%s\n' "$CRON_PUBLISH"
+    else
+      printf '%s\n' "$cron_line"
+    fi
+  done < "$cron_before" > "$cron_next"
+  if crontab "$cron_next"; then
+    echo "AUTO-PUBLISH ENABLED: Lovable -> GitHub Actions -> cpanel-deploy -> cPanel every 15 minutes"
+  else
+    echo "WARNING: initial HTML published, but could not activate the Cron Job."
+  fi
+  rm -f "$cron_before" "$cron_next"
+fi
+
+echo "To undo HTML changes and disable auto-publishing: bash $0 --rollback"
