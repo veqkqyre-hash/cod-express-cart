@@ -6,6 +6,7 @@
 import { cp, mkdir, writeFile, stat, rm, readFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { exportSitemap, verifySeoHtml } from "./seo-export.mjs";
 
 const dest = path.resolve("static-preview");
 const pub = path.resolve(".output/public");
@@ -30,12 +31,15 @@ if (!worker || typeof worker.fetch !== "function") {
   throw Error("Nitro export has no fetch(request, env, ctx)");
 }
 let count = 0;
+const workerEnv = {
+  ASSETS: { fetch: async () => new Response("Not Found", { status: 404 }) },
+  // Public-only build credentials; never pass a service-role key to the exporter.
+  SUPABASE_URL: process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+};
+const fetchPage = route => worker.fetch(new Request("https://dreamebeautycosmetics.com" + route), workerEnv, { waitUntil: () => {} });
 for (const route of paths) {
-  const response = await worker.fetch(
-    new Request("https://dreamebeautycosmetics.com" + route),
-    { ASSETS: { fetch: async () => new Response("Not Found", { status: 404 }) } },
-    { waitUntil: () => {} },
-  );
+  const response = await fetchPage(route);
   const html = await response.text();
   if (!response.ok || !/^\s*<!doctype html/i.test(html) ||
       /<h1[^>]*>Something went wrong<\/h1>/i.test(html)) {
@@ -46,9 +50,11 @@ for (const route of paths) {
   await mkdir(path.dirname(file), { recursive: true });
   // The production hostname must be used in SEO metadata (Lovable retains its preview URL).
   const normalized = html.replaceAll("https://cod-express-cart.lovable.app/", "https://dreamebeautycosmetics.com/");
+  verifySeoHtml(normalized, route);
   await writeFile(file, normalized);
   count++;
 }
+await exportSitemap(fetchPage, writeFile, dest);
 const homepage = await readFile(path.join(dest, "index.html"), "utf8");
 if (/sb_secret_|SUPABASE_SERVICE_ROLE_KEY|-----BEGIN .*PRIVATE KEY-----/.test(homepage)) {
   throw Error("Potential credential leak in homepage");
