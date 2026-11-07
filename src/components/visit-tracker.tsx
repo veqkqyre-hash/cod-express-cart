@@ -22,14 +22,24 @@ export function VisitTracker() {
   useEffect(() => {
     if (pathname.startsWith("/admin")) return;
     const t = setTimeout(() => {
-      logVisit({
-        data: {
-          path: pathname,
-          referrer: document.referrer || null,
-          language: navigator.language || null,
-          sessionId: sessionId(),
-        },
-      }).catch(() => {});
+      const data = {
+        path: pathname,
+        referrer: document.referrer || null,
+        language: navigator.language || null,
+        sessionId: sessionId(),
+      };
+      const onCpanel = window.location.hostname === "dreamebeautycosmetics.com" ||
+        window.location.hostname === "www.dreamebeautycosmetics.com";
+      if (onCpanel) {
+        fetch("/api/visits.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+          keepalive: true,
+        }).catch(() => {});
+      } else {
+        logVisit({ data }).catch(() => {});
+      }
     }, 300);
     return () => clearTimeout(t);
   }, [pathname]);
