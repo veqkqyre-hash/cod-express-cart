@@ -22,7 +22,7 @@ jobs:
       - run: bun ci
       - run: bun run build
       - name: Export static routes for verification
-        run: node scripts/build-static-preview.mjs
+        run: node --env-file=.env scripts/build-static-preview.mjs
       - name: Detect server-only calls that block production deployment
         run: |
           if grep -R -q '/_serverFn' static-preview/assets --include='*.js'; then
