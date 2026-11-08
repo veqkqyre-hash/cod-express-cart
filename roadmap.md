@@ -2,7 +2,7 @@
 
 ## Backup & Restore
 - [x] Show explicit unavailable Create Full Backup and Restore controls; no simulated jobs or backup rows.
-- [ ] Attach Restore to every real verified backup: blocked by absent provider inventory and restore connection.
+- [x] Database+photos backups: create, verify, download and restore (RIKTHE confirm) working in Admin.
 - [x] Remove the expanded restore warning/instructions shown in the user's screenshot; retain honest unavailable status and existing safety gates.
 - [ ] Complete backup and restore of website, database and storage together: blocked by missing cPanel access and managed Cloud full-export/restore controls unavailable to app code.
 - [x] Add separate admin-only website/database backup section with honest status and no simulated actions.

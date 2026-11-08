@@ -13,4 +13,4 @@
 - Leaf route SEO loaders use public server reads for SSR and the existing browser Data API on static cPanel navigation, because cPanel does not host TanStack RPC endpoints.
 - The cPanel exporter must embed saved SEO in HTML and emit a real static sitemap; preserve the existing 19-route deployment whitelist and PHP/Apache deployment boundary.
 - Sitemap collections are paginated with stable IDs and fail closed on read errors; omit lastmod when no authoritative content-only timestamp is available.
-- Backup & Restore is admin-only and capability-gated; until real provider evidence exists, show unavailable history/actions without creating backup rows or deployment-derived success. Cloud full database export/restore remains in the managed UI because no inventory API is available.
+- Backup & Restore is admin-only: database+photos snapshots go through admin-checked SECURITY DEFINER functions (create/verify/restore_db_backup) with upsert-only restore and an automatic pre-restore snapshot; website files stay unavailable until a real cPanel connection exists.
