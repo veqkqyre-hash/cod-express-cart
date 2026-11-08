@@ -83,10 +83,10 @@ if ! php -l "$LIVE/api/customers.php" >/dev/null ||
    ! php -l "$LIVE/api/visits.php" >/dev/null; then
   echo "STOP: live PHP backend syntax invalid"; exit 1
 fi
-# Configuration formats vary by PHP installation. Verify it is loadable
-# without assuming where the credentials are nested; do not print its values.
-if ! php -r '$c = require $argv[1]; if (!is_array($c)) exit(1);' "$LIVE/api/config.php" >/dev/null 2>&1; then
-  echo "STOP: PHP backend config cannot be loaded as an array"; exit 1
+# Existing deployments may use different config.php return formats.
+# Check PHP syntax only; never execute or expose configuration during deployment.
+if ! php -l "$LIVE/api/config.php" >/dev/null 2>&1; then
+  echo "STOP: live PHP backend config has invalid PHP syntax"; exit 1
 fi
 # Check the existing live PHP endpoint, rather than guessing config key names.
 # A GET should be refused by the authenticated customers API.
@@ -116,7 +116,7 @@ done
 if [[ "${#pages[@]}" -ne 19 ]]; then
   echo "STOP: expected exactly 19 site routes"; exit 1
 fi
-echo "READY: 19 HTML pages, compiled assets, existing PHP backend and loadable configuration present"
+echo "READY: 19 HTML pages, compiled assets, existing PHP backend and valid configuration syntax present"
 if [[ "$MODE" == "--check" ]]; then
   echo "CHECK ONLY: live website not modified"
   exit 0
@@ -138,6 +138,15 @@ if [[ "$MODE" == "--activate" ]]; then
     rm -f "$cron_before"
     exit 1
   fi
+fi
+
+# Avoid republishing and accumulating backups every 15 minutes when content is unchanged.
+# Marker lives outside the public website and is set only after a successful deployment.
+PUBLISHED_MARKER="/home/swisskle/.dreame-last-published-release"
+RELEASE_HASH="$(sha256sum "$SRC/BUILD-METADATA.json" | cut -d' ' -f1)"
+if [[ "$MODE" == "--apply" && -f "$PUBLISHED_MARKER" && "$(cat "$PUBLISHED_MARKER")" == "$RELEASE_HASH" ]]; then
+  echo "ALREADY PUBLISHED: release unchanged; no new backup needed."
+  exit 0
 fi
 
 # Backup HTML only; compiled assets are content-hashed and only new ones are added.
@@ -187,6 +196,7 @@ for file in "${pages[@]}"; do
   mv -f -- "$tmp" "$target"
 done
 
+printf '%s\n' "$RELEASE_HASH" > "$PUBLISHED_MARKER"
 echo "PUBLISHED: 19 HTML routes + public assets; existing PHP, .htaccess, secrets and database untouched."
 
 if [[ "$MODE" == "--activate" ]]; then
