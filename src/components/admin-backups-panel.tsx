@@ -41,6 +41,9 @@ async function restoreMissingPhotos(id: string) {
   const manifest = (row?.photos_manifest ?? []) as unknown as ManifestItem[];
   let restored = 0;
   for (const m of manifest) {
+    const pub = supabase.storage.from("product-images").getPublicUrl(m.name).data.publicUrl;
+    const head = await fetch(pub, { method: "HEAD" }).catch(() => null);
+    if (head?.ok) continue;
     const { data: blob } = await supabase.storage.from("backups").download(`${id}/photos/${m.name}`);
     if (!blob) continue;
     const { error } = await supabase.storage.from("product-images").upload(m.name, blob, { upsert: false, contentType: blob.type || undefined });
