@@ -32,6 +32,7 @@ import { HelpPanel } from "@/components/admin-help-panel";
 import { SeoPanel } from "@/components/admin-seo-panel";
 import { BackupsPanel } from "@/components/admin-backups-panel";
 import { AdminGlobalSearch } from "@/components/admin-global-search";
+import { SiteStatusToggle } from "@/components/site-status-toggle";
 import { OrderTimeline } from "@/components/order-timeline";
 import { printOrders } from "@/lib/bulk-print";
 import { NotificationsBell, NotificationsPanel } from "@/components/admin-notifications";
@@ -287,6 +288,7 @@ function Admin() {
             }}
           />
           <div className="flex items-center gap-1">
+            <SiteStatusToggle />
             {canSee("notifications") && <NotificationsBell onOpen={() => setNav("notifications")} />}
             <a href="/" target="_blank" rel="noreferrer" className="grid h-9 w-9 place-items-center rounded-lg text-neutral-600 hover:bg-neutral-100" title={L("Shiko faqen", "View site")}>
               <ExternalLink className="h-4 w-4" />
