@@ -24,6 +24,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { VisitTracker } from "@/components/visit-tracker";
 import { ProductSync } from "@/components/product-sync";
+import { ComingSoon } from "@/components/coming-soon";
+import { useSiteGate } from "@/lib/site-status";
 
 function NotFoundComponent() {
   return (
@@ -89,12 +91,16 @@ function RootComponent() {
   const pathname = router.state.location.pathname;
   // Admin dhe ekrani i klientit (POS) shfaqen pa header/footer të dyqanit
   const isAdmin = pathname.startsWith("/admin") || pathname.startsWith("/pos-display");
+  const gate = useSiteGate();
+  const closed = !!gate && !gate.active && !gate.isAdmin && !isAdmin && !pathname.startsWith("/auth");
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <CartProvider>
           <WishlistProvider>
-            {isAdmin ? (
+            {closed ? (
+              <ComingSoon />
+            ) : isAdmin ? (
               <Outlet />
             ) : (
               <div className="flex min-h-screen flex-col">
