@@ -50,6 +50,13 @@
       "when": 1794345392125,
       "tag": "0006_restrict_order_items_insert",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794345992519,
+      "tag": "0007_tighten_public_form_policies",
+      "breakpoints": true
     }
   ]
 }
