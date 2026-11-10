@@ -17,14 +17,7 @@ export function useSiteGate() {
     let alive = true;
     (async () => {
       const s = await readSiteStatus();
-      let isAdmin = false;
-      if (!s.active) {
-        const { data: u } = await supabase.auth.getUser();
-        if (u.user) {
-          const { data } = await supabase.rpc("has_role", { _user_id: u.user.id, _role: "admin" });
-          isAdmin = !!data;
-        }
-      }
+      const isAdmin = false;
       if (alive) setState({ active: s.active, isAdmin });
     })().catch(() => alive && setState({ active: true, isAdmin: false }));
     const ch = supabase
