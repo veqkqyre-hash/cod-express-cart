@@ -43,6 +43,13 @@
       "when": 1794095035968,
       "tag": "0005_real_db_backups_non_destructive",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794345392125,
+      "tag": "0006_restrict_order_items_insert",
+      "breakpoints": true
     }
   ]
 }
