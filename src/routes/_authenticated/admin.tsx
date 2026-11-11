@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/dreame-logo.webp.asset.json";
+// Use the transparent local logo so it also works on static cPanel deployments.
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
@@ -231,7 +231,7 @@ function Admin() {
       >
         <div className="flex items-center gap-3 px-6 py-5 border-b border-neutral-800">
           <div className="min-w-0">
-            <img src={logoAsset.url} alt="Dreame Beauty Cosmetics" className="h-12 w-auto rounded-md" />
+            <img src="/assets/dreame-symbol.png" alt="Dreame Beauty Cosmetics" className="h-12 w-12 object-contain bg-transparent" />
             <div className="mt-1 text-[11px] uppercase tracking-wide text-neutral-400">{roleBadge}</div>
           </div>
         </div>
