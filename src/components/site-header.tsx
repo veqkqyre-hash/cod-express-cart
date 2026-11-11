@@ -88,8 +88,8 @@ export function SiteHeader() {
         <div className="container-app flex h-16 md:h-20 items-center gap-3 md:gap-6">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <span className="grid h-10 w-10 md:h-11 md:w-11 place-items-center rounded-full bg-black shadow-pink">
-              <img src={symbolAsset.url} alt="" aria-hidden="true" className="h-6 w-6 md:h-7 md:w-7 object-contain translate-x-[1px]" />
+            <span className="grid h-10 w-10 md:h-11 md:w-11 place-items-center">
+              <img src={symbolAsset.url} alt="" aria-hidden="true" className="h-9 w-9 md:h-10 md:w-10 object-contain" />
             </span>
             <span className="font-display text-xl md:text-2xl tracking-tight font-semibold">Dreame Beauty Cosmetics</span>
           </Link>
