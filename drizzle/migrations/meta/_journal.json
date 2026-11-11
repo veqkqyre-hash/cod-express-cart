@@ -57,6 +57,13 @@
       "when": 1794345992519,
       "tag": "0007_tighten_public_form_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794438681492,
+      "tag": "0008_product_variants_specs",
+      "breakpoints": true
     }
   ]
 }
