@@ -8,6 +8,19 @@ import { Pencil, Trash2, Mail, MailOpen } from "lucide-react";
 import { AddButton, Check, Empty, Field, FormActions, Modal, Panel, TextArea } from "@/components/admin-ui";
 import { ImageUploadField } from "@/components/admin-image-field";
 import { loadBusinessInfo } from "@/lib/store-info";
+import { DndContext, closestCenter, PointerSensor, TouchSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { useQueryClient } from "@tanstack/react-query";
+
+function SortableCategory({ id, children }: { id: string; children: (handle: any) => React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  return (
+    <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 10 : undefined, opacity: isDragging ? 0.85 : 1 }}>
+      {children({ ...attributes, ...listeners })}
+    </div>
+  );
+}
 
 
 function useL() {
@@ -49,6 +62,33 @@ export function CatalogPanel() {
     },
   });
 
+  const qc = useQueryClient();
+  const [order, setOrder] = useState<any[] | null>(null);
+  const list = order ?? categories ?? [];
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  async function onDragEnd(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const from = list.findIndex((c: any) => c.id === active.id);
+    const to = list.findIndex((c: any) => c.id === over.id);
+    const next = arrayMove(list, from, to);
+    setOrder(next);
+    const changed = next.map((c: any, i: number) => ({ id: c.id, sort_order: i + 1, old: c.sort_order })).filter((x) => x.sort_order !== x.old);
+    const results = await Promise.all(changed.map((x) => supabase.from("categories").update({ sort_order: x.sort_order }).eq("id", x.id)));
+    const err = results.find((r) => r.error)?.error;
+    if (err) { toast.error(L("Renditja nuk u ruajt: ", "Order not saved: ") + err.message); setOrder(null); refetch(); return; }
+    toast.success(L("Renditja u ruajt", "Order saved"));
+    await refetch();
+    setOrder(null);
+    qc.invalidateQueries({ queryKey: ["categories"] });
+    qc.invalidateQueries({ queryKey: ["admin-categories"] });
+  }
+
   async function onDelete(id: string) {
     if (!confirm(L("Fshij këtë kategori?", "Delete this category?"))) return;
     const { error } = await supabase.from("categories").delete().eq("id", id);
@@ -83,11 +123,16 @@ export function CatalogPanel() {
   return (
     <div>
       <AddButton label={L("Shto kategori", "Add category")} onClick={() => setEditing("new")} />
+      <p className="mb-3 text-xs text-neutral-500">{L("Kap ikonën ⠿ dhe tërhiqe kategorinë për ta ndryshuar renditjen. Ruhet automatikisht.", "Grab the ⠿ handle and drag to reorder. Saves automatically.")}</p>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+      <SortableContext items={list.map((c: any) => c.id)} strategy={rectSortingStrategy}>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {(categories ?? []).map((c: any) => (
-          <div key={c.id} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+        {list.map((c: any) => (
+          <SortableCategory key={c.id} id={c.id}>{(handle) => (
+          <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <button type="button" {...handle} aria-label={L("Tërhiq për renditje", "Drag to reorder")} className="-ml-2 grid h-8 w-8 shrink-0 cursor-grab touch-none select-none place-items-center rounded-lg text-lg text-neutral-400 hover:bg-neutral-100 active:cursor-grabbing">⠿</button>
+              <div className="min-w-0 flex-1">
                 <div className="font-display text-lg">{lang === "sq" ? c.name_sq : c.name_en}</div>
                 <div className="mt-1 text-xs text-neutral-500">/{c.slug} · {counts?.[c.id] ?? 0} {L("produkte", "products")}</div>
               </div>
@@ -97,8 +142,11 @@ export function CatalogPanel() {
               </div>
             </div>
           </div>
+          )}</SortableCategory>
         ))}
       </div>
+      </SortableContext>
+      </DndContext>
 
       {editing && (
         <Modal title={cat ? L("Modifiko kategorinë", "Edit category") : L("Shto kategori", "Add category")} onClose={() => setEditing(null)}>
