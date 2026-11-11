@@ -8,7 +8,7 @@ export function SiteFooter() {
   return (
     <footer className="mt-24">
       {/* Trust strip */}
-      <div className="border-y border-border bg-[var(--pink-soft)]/40">
+      <div className="border-y border-border bg-secondary/40">
         <div className="container-app grid grid-cols-2 gap-6 py-8 md:grid-cols-4">
           {[
             { icon: Truck, title: tr("freeShippingTitle"), sub: tr("freeShippingSub") },
@@ -17,7 +17,7 @@ export function SiteFooter() {
             { icon: CreditCard, title: tr("securePayTitle"), sub: tr("securePaySub") },
           ].map((f, i) => (
             <div key={i} className="flex items-start gap-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white shadow-soft">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-card shadow-soft">
                 <f.icon className="h-5 w-5 text-[var(--pink-deep)]" />
               </span>
               <div className="min-w-0">

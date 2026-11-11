@@ -57,8 +57,8 @@ function WishlistPage() {
         )}
       </div>
       {ids.length === 0 ? (
-        <div className="rounded-3xl border border-border bg-[var(--pink-soft)]/40 py-20 text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-white shadow-soft">
+        <div className="rounded-3xl border border-border bg-secondary/40 py-20 text-center">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-card shadow-soft">
             <Heart className="h-7 w-7 text-[var(--pink-deep)]" />
           </div>
           <p className="mt-6 text-muted-foreground">{lang === "sq" ? "Lista juaj është bosh." : "Your wishlist is empty."}</p>

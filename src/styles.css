@@ -48,31 +48,31 @@
 
 :root {
   --radius: 0.75rem;
-  /* Base — pure white with pink tint */
-  --background: oklch(0.995 0.004 0);
-  --foreground: oklch(0.15 0.01 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.01 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.01 0);
-  /* Primary — deep ink black */
-  --primary: oklch(0.14 0.01 0);
-  --primary-foreground: oklch(0.995 0.003 350);
-  --secondary: oklch(0.965 0.012 350);
-  --secondary-foreground: oklch(0.18 0.01 0);
-  --muted: oklch(0.97 0.008 350);
-  --muted-foreground: oklch(0.5 0.02 350);
-  --accent: oklch(0.9 0.06 355);
-  --accent-foreground: oklch(0.2 0.03 355);
-  --destructive: oklch(0.6 0.22 25);
+  /* Base — dark leather theme (site-wide dark background) */
+  --background: oklch(0.14 0.008 0);
+  --foreground: oklch(0.97 0.008 350);
+  --card: oklch(0.18 0.01 0);
+  --card-foreground: oklch(0.97 0.008 350);
+  --popover: oklch(0.18 0.01 0);
+  --popover-foreground: oklch(0.97 0.008 350);
+  /* Primary — soft pink on dark */
+  --primary: oklch(0.94 0.035 355);
+  --primary-foreground: oklch(0.14 0.008 0);
+  --secondary: oklch(0.24 0.02 350);
+  --secondary-foreground: oklch(0.97 0.008 350);
+  --muted: oklch(0.24 0.02 350);
+  --muted-foreground: oklch(0.7 0.02 350);
+  --accent: oklch(0.35 0.08 355);
+  --accent-foreground: oklch(0.97 0.008 350);
+  --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.995 0 0);
-  --border: oklch(0.92 0.012 350);
-  --input: oklch(0.93 0.012 350);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
   --ring: oklch(0.75 0.14 355);
   /* Brand pinks */
   --pink: oklch(0.78 0.16 355);
   --pink-soft: oklch(0.94 0.035 355);
-  --pink-deep: oklch(0.55 0.2 0);
+  --pink-deep: oklch(0.72 0.16 0);
   --ink: oklch(0.12 0.008 0);
   --gold: oklch(0.78 0.11 80);
 }
@@ -103,6 +103,13 @@
   * { border-color: var(--color-border); }
   body {
     background-color: var(--color-background);
+    background-image:
+      linear-gradient(oklch(0.1 0.005 0 / 0.82), oklch(0.1 0.005 0 / 0.88)),
+      url("/__l5e/assets-v1/3ae5271c-d992-44f1-a4c1-98abaca29f0d/koki.webp");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -119,7 +126,7 @@
 }
 
 @utility gradient-pink {
-  background: linear-gradient(135deg, var(--pink-soft), oklch(1 0 0) 45%, var(--pink-soft));
+  background: linear-gradient(135deg, oklch(0.22 0.04 355), oklch(0.16 0.012 0) 45%, oklch(0.22 0.04 355));
 }
 
 @utility text-gradient-pink {
