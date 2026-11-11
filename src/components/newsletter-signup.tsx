@@ -77,14 +77,14 @@ export function StockAlertForm({ productId, productName }: { productId: string; 
 
   if (done) {
     return (
-      <div className="mt-6 rounded-2xl border border-border bg-[var(--pink-soft)]/50 p-5 text-sm">
+      <div className="mt-6 rounded-2xl border border-border bg-secondary/50 p-5 text-sm">
         {L("Kërkesa u regjistrua. Faleminderit!", "Request saved. Thank you!")}
       </div>
     );
   }
 
   return (
-    <form onSubmit={submit} className="mt-6 rounded-2xl border border-border bg-[var(--pink-soft)]/40 p-5">
+    <form onSubmit={submit} className="mt-6 rounded-2xl border border-border bg-secondary/40 p-5">
       <div className="font-medium">{L("Njoftomë kur ka stok", "Notify me when back in stock")}</div>
       <div className="mt-3 flex gap-2">
         <input

@@ -116,7 +116,7 @@ export function SiteHeader() {
               {infoOpen && (
                 <div className="absolute left-0 top-full z-50 min-w-44 rounded-xl border border-border bg-background p-2 shadow-elev">
                   {infoLinks.map((l) => (
-                    <Link key={l.to} to={l.to} onClick={() => setInfoOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-[var(--pink-soft)]">
+                    <Link key={l.to} to={l.to} onClick={() => setInfoOpen(false)} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
                       {l.label}
                     </Link>
                   ))}
@@ -133,7 +133,7 @@ export function SiteHeader() {
 
 
           {/* Search */}
-          <form onSubmit={onSearchSubmit} className="ml-auto hidden md:flex flex-1 max-w-sm items-center gap-2 rounded-full border border-border bg-[var(--pink-soft)]/50 px-4 py-2 focus-within:border-[var(--pink-deep)] transition">
+          <form onSubmit={onSearchSubmit} className="ml-auto hidden md:flex flex-1 max-w-sm items-center gap-2 rounded-full border border-border bg-secondary/60 px-4 py-2 focus-within:border-[var(--pink-deep)] transition">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               value={q}
@@ -151,11 +151,11 @@ export function SiteHeader() {
               <button onClick={() => setLang("de")} className={`px-2 py-1 rounded-full transition ${lang === "de" ? "bg-black text-white" : "text-muted-foreground"}`}>DE</button>
             </div>
 
-            <Link to={signedIn ? "/account" : "/auth"} className="hidden sm:grid h-10 w-10 place-items-center rounded-full hover:bg-[var(--pink-soft)] transition" aria-label={tr("account")}>
+            <Link to={signedIn ? "/account" : "/auth"} className="hidden sm:grid h-10 w-10 place-items-center rounded-full hover:bg-secondary transition" aria-label={tr("account")}>
               <User className="h-5 w-5" />
             </Link>
 
-            <Link to="/wishlist" className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-[var(--pink-soft)] transition" aria-label={tr("wishlist")}>
+            <Link to="/wishlist" className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-secondary transition" aria-label={tr("wishlist")}>
               <Heart className="h-5 w-5" />
               {wishCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-[var(--pink-deep)] px-1 text-[10px] font-semibold text-white">
@@ -164,7 +164,7 @@ export function SiteHeader() {
               )}
             </Link>
 
-            <Link to="/cart" className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-[var(--pink-soft)] transition" aria-label={tr("cart")}>
+            <Link to="/cart" className="relative grid h-10 w-10 place-items-center rounded-full hover:bg-secondary transition" aria-label={tr("cart")}>
               <ShoppingBag className="h-5 w-5" />
               {count > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-[var(--pink-deep)] px-1 text-[10px] font-semibold text-white">
@@ -173,7 +173,7 @@ export function SiteHeader() {
               )}
             </Link>
 
-            <button className="lg:hidden grid h-10 w-10 place-items-center rounded-full hover:bg-[var(--pink-soft)]" onClick={() => setOpen((o) => !o)} aria-label="Menu">
+            <button className="lg:hidden grid h-10 w-10 place-items-center rounded-full hover:bg-secondary" onClick={() => setOpen((o) => !o)} aria-label="Menu">
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
@@ -201,10 +201,10 @@ export function SiteHeader() {
                   </Link>
                 ))}
               </div>
-              <div className="rounded-2xl bg-gradient-to-br from-[var(--pink-soft)] to-white p-5 border border-border">
+              <div className="rounded-2xl bg-gradient-to-br from-[var(--pink-soft)] to-white p-5 border border-border text-[var(--ink)]">
                 <div className="text-[10px] font-semibold uppercase tracking-widest text-[var(--pink-deep)]">{tr("newIn")}</div>
                 <div className="mt-2 font-display text-xl leading-tight">{tr("megaPromoTitle")}</div>
-                <p className="mt-2 text-xs text-muted-foreground">{tr("megaPromoSub")}</p>
+                <p className="mt-2 text-xs text-black/60">{tr("megaPromoSub")}</p>
                 <Link
                   to="/shop"
                   onClick={() => setMegaOpen(false)}
@@ -221,7 +221,7 @@ export function SiteHeader() {
         {open && (
           <div className="lg:hidden border-t border-border/60 bg-background">
             <div className="container-app py-4 space-y-3">
-              <form onSubmit={onSearchSubmit} className="flex items-center gap-2 rounded-full border border-border bg-[var(--pink-soft)]/50 px-4 py-2">
+              <form onSubmit={onSearchSubmit} className="flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-4 py-2">
                 <Search className="h-4 w-4 text-muted-foreground" />
                 <input
                   value={q}
@@ -260,7 +260,7 @@ export function SiteHeader() {
                       to="/shop"
                       search={{ category: c.slug }}
                       onClick={() => setOpen(false)}
-                      className="rounded-lg bg-[var(--pink-soft)]/50 px-3 py-2 text-xs font-medium hover:bg-[var(--pink-soft)]"
+                      className="rounded-lg bg-secondary/60 px-3 py-2 text-xs font-medium hover:bg-secondary"
                     >
                       {lang === "sq" ? c.name_sq : c.name_en}
                     </Link>

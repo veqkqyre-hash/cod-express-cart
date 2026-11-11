@@ -345,12 +345,12 @@ function PromoDuo() {
   const { tr, lang } = useI18n();
   return (
     <section className="container-app grid gap-4 md:grid-cols-2">
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--pink-soft)] p-8 md:p-10 min-h-[280px] group">
+      <div className="relative overflow-hidden rounded-3xl bg-[var(--pink-soft)] p-8 md:p-10 min-h-[280px] group text-[var(--ink)]">
         <div className="absolute -right-8 -bottom-8 text-[10rem] opacity-40 transition-transform duration-500 group-hover:scale-110">💄</div>
         <div className="relative max-w-xs">
           <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink-deep)]">{tr("summerCollection")}</div>
           <h3 className="mt-2 font-display text-3xl md:text-4xl leading-tight">{tr("promoDuo1Title")}</h3>
-          <p className="mt-3 text-sm text-muted-foreground">{tr("promoDuo1Sub")}</p>
+          <p className="mt-3 text-sm text-black/60">{tr("promoDuo1Sub")}</p>
           <Link to="/shop" search={{ category: "gel-lak" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-black px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink-deep)] transition">
             {tr("discover")} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
@@ -434,7 +434,7 @@ const BRANDS = ["L'ORÉAL", "WELLA", "SCHWARZKOPF", "OPI", "MAC", "REVLON", "OLA
 function TopBrands() {
   const { tr } = useI18n();
   return (
-    <section id="brands" className="border-y border-border bg-[var(--pink-soft)]/40 py-16">
+    <section id="brands" className="border-y border-border bg-secondary/40 py-16">
       <div className="container-app">
         <SectionHead eyebrow={tr("brands")} title={tr("topBrandsTitle")} subtitle={tr("topBrandsSub")} />
         <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
@@ -484,12 +484,12 @@ const TESTIMONIALS = [
 function Reviews() {
   const { tr, lang } = useI18n();
   return (
-    <section className="border-y border-border bg-[var(--pink-soft)]/40 py-20">
+    <section className="border-y border-border bg-secondary/40 py-20">
       <div className="container-app">
         <SectionHead eyebrow={tr("reviews")} title={tr("reviewsTitle")} subtitle={tr("reviewsSub")} />
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {TESTIMONIALS.map((t, i) => (
-            <div key={i} className="relative rounded-3xl bg-white p-8 shadow-soft border border-border">
+            <div key={i} className="relative rounded-3xl bg-card p-8 shadow-soft border border-border">
               <div className="absolute -top-4 left-6 font-display text-6xl text-[var(--pink-deep)] leading-none">"</div>
               <div className="flex text-[var(--gold)] mb-4">
                 {[0,1,2,3,4].map((s) => <Star key={s} className="h-4 w-4 fill-current" strokeWidth={1.5} />)}
