@@ -310,7 +310,7 @@ function Marquee() {
   );
 }
 
-function FeaturedCategories({ categories, lang }: { categories: any[]; lang: "sq" | "en" | "de" }) {
+function FeaturedCategories({ categories, lang }: { categories: any[]; lang: "sq" | "en" | "de" | "fr" }) {
   const { tr } = useI18n();
   return (
     <section id="categories" className="container-app py-20">

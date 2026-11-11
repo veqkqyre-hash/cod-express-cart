@@ -1,3 +1,4 @@
+import logoAsset from "@/assets/dreame-logo.webp.asset.json";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
@@ -229,9 +230,8 @@ function Admin() {
         className={`fixed inset-y-0 left-0 z-40 w-72 bg-neutral-950 text-neutral-200 flex flex-col transform transition-transform lg:static lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex items-center gap-3 px-6 py-5 border-b border-neutral-800">
-          <div className="grid h-9 w-9 place-items-center rounded-full bg-white text-neutral-900 font-display text-sm font-semibold">D</div>
           <div className="min-w-0">
-            <div className="font-display text-xl text-white leading-none">Dreame Beauty Cosmetics</div>
+            <img src={logoAsset.url} alt="Dreame Beauty Cosmetics" className="h-12 w-auto rounded-md" />
             <div className="mt-1 text-[11px] uppercase tracking-wide text-neutral-400">{roleBadge}</div>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import logoAsset from "@/assets/dreame-logo.webp.asset.json";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ShoppingBag, Menu, X, User, Heart, Search, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -87,10 +88,7 @@ export function SiteHeader() {
         <div className="container-app flex h-16 md:h-20 items-center gap-3 md:gap-6">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-black text-white font-display text-lg tracking-tight shadow-pink">
-              D
-            </span>
-            <span className="font-display text-xl md:text-2xl tracking-tight font-semibold">Dreame Beauty Cosmetics</span>
+            <img src={logoAsset.url} alt="Dreame Beauty Cosmetics" className="h-10 md:h-14 w-auto rounded-md" />
           </Link>
 
           {/* Nav */}
@@ -149,6 +147,7 @@ export function SiteHeader() {
               <button onClick={() => setLang("sq")} className={`px-2 py-1 rounded-full transition ${lang === "sq" ? "bg-black text-white" : "text-muted-foreground"}`}>SQ</button>
               <button onClick={() => setLang("en")} className={`px-2 py-1 rounded-full transition ${lang === "en" ? "bg-black text-white" : "text-muted-foreground"}`}>EN</button>
               <button onClick={() => setLang("de")} className={`px-2 py-1 rounded-full transition ${lang === "de" ? "bg-black text-white" : "text-muted-foreground"}`}>DE</button>
+              <button onClick={() => setLang("fr")} className={`px-2 py-1 rounded-full transition ${lang === "fr" ? "bg-black text-white" : "text-muted-foreground"}`}>FR</button>
             </div>
 
             <Link to={signedIn ? "/account" : "/auth"} className="hidden sm:grid h-10 w-10 place-items-center rounded-full hover:bg-secondary transition" aria-label={tr("account")}>
