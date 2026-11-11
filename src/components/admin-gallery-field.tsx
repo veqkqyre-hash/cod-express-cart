@@ -1,9 +1,8 @@
 import { useRef, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ImagePlus, Loader2, Sparkles, X, ChevronLeft, ChevronRight, Star } from "lucide-react";
-import { generateProductImage } from "@/lib/ai-image.functions";
+import { aiImageToStorage } from "@/lib/cf-ai";
 
 /** Galeria e produktit: shumë foto nga kompjuteri ose AI, me renditje. Fotoja e parë = kryesore. */
 export function GalleryField({ lang, initial, getName }: { lang: string; initial: string[]; getName: () => string }) {
@@ -12,7 +11,6 @@ export function GalleryField({ lang, initial, getName }: { lang: string; initial
   const [busy, setBusy] = useState(false);
   const [aiBusy, setAiBusy] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
-  const gen = useServerFn(generateProductImage);
 
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []).filter((f) => f.type.startsWith("image/"));
@@ -38,7 +36,7 @@ export function GalleryField({ lang, initial, getName }: { lang: string; initial
     if (name.length < 2) { toast.error(L("Shkruani emrin e produktit fillimisht", "Enter the product name first")); return; }
     setAiBusy(true);
     try {
-      const { url } = await gen({ data: { name } });
+      const url = await aiImageToStorage(name);
       setUrls((u) => [...u, url]);
       toast.success(L("Fotoja u gjenerua me AI", "AI image generated"));
     } catch (e) {
