@@ -5,7 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { GalleryField } from "@/components/admin-gallery-field";
-import { generateProductDescription } from "@/lib/ai-image.functions";
+import { aiDescription } from "@/lib/cf-ai";
 import { Plus, Pencil, Trash2, X, ImagePlus, Loader2, Sparkles } from "lucide-react";
 
 type ProductRow = {
@@ -260,7 +260,7 @@ function AiDescriptionButton({ lang }: { lang: string }) {
     }
     setBusy(true);
     try {
-      const res = await generateProductDescription({ data: { name } });
+      const res = await aiDescription(name);
       const sq = document.querySelector<HTMLTextAreaElement>('textarea[name="description_sq"]');
       const en = document.querySelector<HTMLTextAreaElement>('textarea[name="description_en"]');
       if (sq) sq.value = res.sq;
