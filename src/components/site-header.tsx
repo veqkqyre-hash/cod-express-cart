@@ -1,4 +1,3 @@
-import symbolAsset from "@/assets/dreame-symbol.png.asset.json";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ShoppingBag, Menu, X, User, Heart, Search, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -89,7 +88,7 @@ export function SiteHeader() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <span className="grid h-10 w-10 md:h-11 md:w-11 place-items-center">
-              <img src={symbolAsset.url} alt="" aria-hidden="true" className="h-9 w-9 md:h-10 md:w-10 object-contain" />
+              <img src="/assets/dreame-symbol.png" alt="" aria-hidden="true" className="h-9 w-9 md:h-10 md:w-10 object-contain" />
             </span>
             <span className="font-display text-xl md:text-2xl tracking-tight font-semibold">Dreame Beauty Cosmetics</span>
           </Link>
