@@ -229,9 +229,10 @@ function Admin() {
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-72 bg-neutral-950 text-neutral-200 flex flex-col transform transition-transform lg:static lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-neutral-800">
+        <div className="flex items-center gap-3 px-4 py-5 border-b border-neutral-800">
+          <img src="/assets/dreame-symbol.png" alt="" aria-hidden="true" className="h-12 w-12 shrink-0 object-contain bg-transparent" />
           <div className="min-w-0">
-            <img src="/assets/dreame-symbol.png" alt="Dreame Beauty Cosmetics" className="h-12 w-12 object-contain bg-transparent" />
+            <div className="font-display text-base font-semibold leading-tight text-white">Dreame Beauty Cosmetics</div>
             <div className="mt-1 text-[11px] uppercase tracking-wide text-neutral-400">{roleBadge}</div>
           </div>
         </div>
