@@ -3,7 +3,7 @@ import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { useCart, formatEur } from "@/lib/cart";
+import { useCart, formatEur, cartKey } from "@/lib/cart";
 
 export const Route = createFileRoute("/cart")({
   loader: () => loadSeo("/cart"),
@@ -43,24 +43,24 @@ function CartPage() {
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
           {items.map((it) => (
-            <div key={it.id} className="flex gap-4 rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <div key={cartKey(it)} className="flex gap-4 rounded-2xl border border-border bg-card p-4 shadow-soft">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
                 {it.image && <img src={it.image} alt={it.name} className="h-full w-full object-cover" />}
               </div>
               <div className="flex flex-1 flex-col min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="font-medium leading-snug">{it.name}</div>
-                  <button onClick={() => remove(it.id)} className="text-muted-foreground hover:text-destructive p-1">
+                  <div className="min-w-0"><div className="font-medium leading-snug">{it.name}</div>{it.variantName && <div className="text-xs text-muted-foreground mt-0.5">{it.variantName}</div>}</div>
+                  <button onClick={() => remove(cartKey(it))} className="text-muted-foreground hover:text-destructive p-1">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
                 <div className="mt-auto flex items-center justify-between">
                   <div className="flex items-center rounded-full border border-input">
-                    <button onClick={() => setQty(it.id, it.quantity - 1)} className="grid h-9 w-9 place-items-center hover:bg-muted rounded-l-full">
+                    <button onClick={() => setQty(cartKey(it), it.quantity - 1)} className="grid h-9 w-9 place-items-center hover:bg-muted rounded-l-full">
                       <Minus className="h-3.5 w-3.5" />
                     </button>
                     <span className="w-8 text-center text-sm font-medium">{it.quantity}</span>
-                    <button onClick={() => setQty(it.id, it.quantity + 1)} className="grid h-9 w-9 place-items-center hover:bg-muted rounded-r-full">
+                    <button onClick={() => setQty(cartKey(it), it.quantity + 1)} className="grid h-9 w-9 place-items-center hover:bg-muted rounded-r-full">
                       <Plus className="h-3.5 w-3.5" />
                     </button>
                   </div>

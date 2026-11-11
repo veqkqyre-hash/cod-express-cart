@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useI18n } from "@/lib/i18n";
@@ -38,7 +39,13 @@ export function ProductCard({ p }: { p: Product }) {
   const oldPrice = discount ? Number(p.price) / (1 - discount / 100) : null;
   const wished = has(p.id);
 
-  function handleAdd() {
+  async function handleAdd() {
+    const { count } = await supabase.from("product_variants").select("id", { count: "exact", head: true }).eq("product_id", p.id).eq("active", true);
+    if (count && count > 0) {
+      toast.info(lang === "sq" ? "Zgjidhni ngjyrën/variantin te faqja e produktit" : "Choose an option on the product page");
+      window.location.href = `/product/${p.slug}`;
+      return;
+    }
     add({ id: p.id, slug: p.slug, name, price: Number(p.price), image: p.image_url });
     toast.success(lang === "sq" ? "U shtua në shportë" : "Added to cart");
   }

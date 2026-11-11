@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
-import { useCart, formatEur } from "@/lib/cart";
+import { useCart, formatEur, cartKey } from "@/lib/cart";
 import { toast } from "sonner";
 import { Banknote, Tag, X as XIcon, Truck } from "lucide-react";
 import { useShipping, validateCoupon } from "@/lib/checkout-extras";
@@ -123,6 +123,18 @@ function Checkout() {
             lang === "sq" ? `${it.name} nuk ka stok.` : `${it.name} is out of stock.`,
           );
         }
+        if (it.variantId) {
+          const { data: v } = await supabase.from("product_variants").select("stock,active").eq("id", it.variantId).maybeSingle();
+          if (!v || !v.active || v.stock < it.quantity) {
+            setSubmitting(false);
+            return toast.error(
+              lang === "sq"
+                ? `${it.name} — ${it.variantName}: vetëm ${v?.active ? v.stock : 0} në stok.`
+                : `${it.name} — ${it.variantName}: only ${v?.active ? v.stock : 0} in stock.`,
+            );
+          }
+          continue;
+        }
         if (p.stock < it.quantity) {
           setSubmitting(false);
           return toast.error(
@@ -157,13 +169,27 @@ function Checkout() {
       const itemsPayload = items.map((it) => ({
         order_id: order.id,
         product_id: it.id,
-        product_name: it.name,
+        product_name: it.variantName ? `${it.name} — ${it.variantName}` : it.name,
+        variant_id: it.variantId ?? null,
         unit_price: it.price,
         quantity: it.quantity,
         subtotal: it.price * it.quantity,
       }));
       const { error: e2 } = await supabase.from("order_items").insert(itemsPayload);
-      if (e2) throw e2;
+      if (e2) {
+        // Porosia pa artikuj anulohet që të mos mbetet bosh
+        await supabase.from("orders").update({ status: "cancelled" }).eq("id", order.id);
+        const m = e2.message || "";
+        const msg = m.includes("VARIANT_REQUIRED")
+          ? (lang === "sq" ? "Zgjidhni variantin (p.sh. ngjyrën) te produkti para porosisë." : "Choose the product option (e.g. colour) before ordering.")
+          : m.includes("OUT_OF_STOCK")
+            ? (lang === "sq" ? "Një produkt nuk ka më stok të mjaftueshëm." : "A product no longer has enough stock.")
+            : m.includes("PRICE_MISMATCH") || m.includes("row-level security")
+              ? (lang === "sq" ? "Çmimi ka ndryshuar. Rifreskoni shportën." : "A price changed. Please refresh your cart.")
+              : null;
+        if (msg) { setSubmitting(false); return toast.error(msg); }
+        throw e2;
+      }
 
       clear();
       navigate({ to: "/order/$number", params: { number: order.order_number } });
@@ -221,8 +247,8 @@ function Checkout() {
           <h2 className="font-display text-lg mb-4">{tr("items")}</h2>
           <div className="space-y-2 max-h-64 overflow-auto text-sm">
             {items.map((it) => (
-              <div key={it.id} className="flex justify-between gap-2">
-                <span className="truncate">{it.name} × {it.quantity}</span>
+              <div key={cartKey(it)} className="flex justify-between gap-2">
+                <span className="truncate">{it.name}{it.variantName ? ` — ${it.variantName}` : ""} × {it.quantity}</span>
                 <span className="shrink-0 font-medium">{formatEur(it.price * it.quantity)}</span>
               </div>
             ))}

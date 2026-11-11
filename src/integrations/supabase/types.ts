@@ -416,6 +416,8 @@ export type Database = {
           quantity: number
           subtotal: number
           unit_price: number
+          variant_id: string | null
+          variant_name: string | null
         }
         Insert: {
           created_at?: string
@@ -426,6 +428,8 @@ export type Database = {
           quantity: number
           subtotal: number
           unit_price: number
+          variant_id?: string | null
+          variant_name?: string | null
         }
         Update: {
           created_at?: string
@@ -436,6 +440,8 @@ export type Database = {
           quantity?: number
           subtotal?: number
           unit_price?: number
+          variant_id?: string | null
+          variant_name?: string | null
         }
         Relationships: [
           {
@@ -450,6 +456,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
         ]
@@ -835,6 +848,59 @@ export type Database = {
           },
         ]
       }
+      product_variants: {
+        Row: {
+          active: boolean
+          color_hex: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          name_en: string
+          name_sq: string
+          price: number | null
+          product_id: string
+          sort_order: number
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          color_hex?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name_en?: string
+          name_sq: string
+          price?: number | null
+          product_id: string
+          sort_order?: number
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          color_hex?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name_en?: string
+          name_sq?: string
+          price?: number | null
+          product_id?: string
+          sort_order?: number
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           active: boolean
@@ -853,6 +919,7 @@ export type Database = {
           price: number
           sku: string | null
           slug: string
+          specs: Json
           stock: number
           updated_at: string
         }
@@ -873,6 +940,7 @@ export type Database = {
           price: number
           sku?: string | null
           slug: string
+          specs?: Json
           stock?: number
           updated_at?: string
         }
@@ -893,6 +961,7 @@ export type Database = {
           price?: number
           sku?: string | null
           slug?: string
+          specs?: Json
           stock?: number
           updated_at?: string
         }
