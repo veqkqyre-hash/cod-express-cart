@@ -10,6 +10,9 @@ import { toast } from "sonner";
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { ProductReviews, Stars, useReviews } from "@/components/product-reviews";
 import { StockAlertForm } from "@/components/newsletter-signup";
+import { Button } from "@/components/ui/button";
+import { readSpecs, canBuyOption, optionPrice } from "@/lib/product-options";
+import type { CSSProperties } from "react";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => loadSeo(`/product/${params.slug}`),
@@ -33,6 +36,7 @@ function ProductPage() {
   const { tr, lang } = useI18n();
   const { add } = useCart();
   const [qty, setQty] = useState(1);
+  const [variantId, setVariantId] = useState<string | null>(null);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
@@ -45,6 +49,14 @@ function ProductPage() {
   });
 
   const { data: reviews } = useReviews(product?.id);
+  const { data: variants, isLoading: variantsLoading, isError: variantsError } = useQuery({
+    queryKey: ["product-variants", product?.id], enabled: Boolean(product?.id),
+    queryFn: async () => {
+      const { data, error } = await supabase.from("product_variants").select("*").eq("product_id", product?.id ?? "").eq("active", true).order("sort_order");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
   const approved = (reviews ?? []).filter((r) => r.approved);
   const avgRating = approved.length ? approved.reduce((s, r) => s + r.rating, 0) / approved.length : 0;
 
@@ -53,12 +65,20 @@ function ProductPage() {
 
   const name = lang === "sq" ? product.name_sq : product.name_en;
   const desc = lang === "sq" ? product.description_sq : product.description_en;
+  const selected = variants?.find(v => v.id === variantId);
+  const hasVariants = Boolean(variants?.length);
+  const stock = hasVariants ? selected?.stock ?? 0 : product.stock;
+  const price = optionPrice(Number(product.price), selected);
+  const specs = readSpecs(product.specs);
+  const images = product.images?.length ? product.images : product.image_url ? [product.image_url] : [];
+  const optionImages = selected?.image_url ? [selected.image_url, ...images.filter(x => x !== selected.image_url)] : images;
+  const canBuy = !variantsLoading && !variantsError && canBuyOption(hasVariants, selected, product.stock, qty);
 
   return (
     <div className="container-app py-10">
       <Link to="/shop" className="text-sm text-muted-foreground hover:text-primary">← {tr("shop")}</Link>
       <div className="mt-6 grid gap-10 lg:grid-cols-2">
-        <ProductGallery images={(product.images?.length ? product.images : product.image_url ? [product.image_url] : [])} name={name} />
+        <ProductGallery key={`${product.id}:${selected?.id ?? "base"}`} images={optionImages} name={name} />
         <div>
           <h1 className="font-display text-3xl sm:text-4xl">{name}</h1>
           {approved.length > 0 && (
@@ -67,8 +87,19 @@ function ProductPage() {
               <span>{avgRating.toFixed(1)} · {approved.length} {lang === "sq" ? "vlerësime" : "reviews"}</span>
             </div>
           )}
-          <div className="mt-4 font-display text-3xl text-primary">{formatEur(Number(product.price))}</div>
+          <div className="mt-4 font-display text-3xl text-primary">{formatEur(price)}</div>
           {desc && <p className="mt-6 text-muted-foreground leading-relaxed">{desc}</p>}
+
+          {hasVariants && <fieldset className="mt-6">
+            <legend className="text-sm font-medium mb-3">{lang === "sq" ? "Zgjidhni variantin" : "Choose an option"}{selected ? ` — ${lang === "sq" ? selected.name_sq : selected.name_en}` : ""}</legend>
+            <div className="flex flex-wrap gap-3">{variants?.map(v => <Button key={v.id} type="button" variant="outline" aria-pressed={variantId === v.id} title={`${lang === "sq" ? v.name_sq : v.name_en} · ${v.stock}`} onClick={() => { setVariantId(v.id); setQty(1); }} className={`h-auto min-h-11 py-2 ${variantId === v.id ? "ring-2 ring-primary" : ""}`}>
+              {v.color_hex && <span aria-hidden className="variant-swatch size-6 rounded-full border border-border shrink-0" style={{ "--swatch-color": v.color_hex } as CSSProperties} />}
+              <span>{lang === "sq" ? v.name_sq : v.name_en}{v.stock === 0 ? ` — ${tr("outOfStock")}` : ""}</span>
+            </Button>)}</div>
+          </fieldset>}
+          {variantsError && <p className="mt-4 text-sm text-destructive">{lang === "sq" ? "Variantet nuk u ngarkuan. Rifreskoni faqen." : "Options could not load. Refresh the page."}</p>}
+          {(!hasVariants || selected) && <p className="mt-4 text-sm text-muted-foreground">{stock > 0 ? `${stock} ${lang === "sq" ? "në stok" : "in stock"}` : tr("outOfStock")}</p>}
+          {specs.length > 0 && <table className="mt-6 w-full text-sm"><caption className="text-left font-medium mb-2">{lang === "sq" ? "Specifikimet" : "Specifications"}</caption><tbody>{specs.map(s => <tr key={s.name} className="border-b border-border"><th className="py-3 pr-4 text-left font-normal text-muted-foreground">{s.name}</th><td className="py-3 break-words">{s.value}</td></tr>)}</tbody></table>}
 
           <div className="mt-8 flex items-center gap-4">
             <div className="flex items-center rounded-full border border-input">
@@ -76,14 +107,15 @@ function ProductPage() {
                 <Minus className="h-4 w-4" />
               </button>
               <span className="w-10 text-center font-medium">{qty}</span>
-              <button onClick={() => setQty((q) => q + 1)} className="grid h-11 w-11 place-items-center hover:bg-muted rounded-r-full">
+              <button disabled={qty >= stock} onClick={() => setQty((q) => q + 1)} className="grid h-11 w-11 place-items-center hover:bg-muted rounded-r-full disabled:opacity-40">
                 <Plus className="h-4 w-4" />
               </button>
             </div>
             <button
-              disabled={product.stock === 0}
+              disabled={!canBuy}
               onClick={() => {
-                add({ id: product.id, slug: product.slug, name, price: Number(product.price), image: product.image_url }, qty);
+                if (!canBuy) return;
+                add({ id: product.id, slug: product.slug, name, price, image: selected?.image_url ?? product.image_url, variantId: selected?.id, variantName: selected ? (lang === "sq" ? selected.name_sq : selected.name_en) : null }, qty);
                 toast.success(lang === "sq" ? "U shtua në shportë" : "Added to cart");
               }}
               className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
@@ -93,7 +125,7 @@ function ProductPage() {
             </button>
           </div>
 
-          {product.stock === 0 && <StockAlertForm productId={product.id} productName={name} />}
+          {stock === 0 && (!hasVariants || selected) && <StockAlertForm productId={product.id} productName={name} />}
 
           <div className="mt-8 rounded-2xl border border-border bg-accent/40 p-5">
             <div className="font-medium">{tr("cod")}</div>

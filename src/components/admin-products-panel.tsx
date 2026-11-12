@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
@@ -6,6 +6,10 @@ import { formatEur } from "@/lib/cart";
 import { toast } from "sonner";
 import { GalleryField } from "@/components/admin-gallery-field";
 import { aiDescription } from "@/lib/cf-ai";
+import { ProductOptionsEditor, type VariantDraft } from "@/components/admin-product-options";
+import { readSpecs, type Spec } from "@/lib/product-options";
+import type { Json } from "@/integrations/supabase/types";
+import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, X, ImagePlus, Loader2, Sparkles } from "lucide-react";
 
 type ProductRow = {
@@ -25,6 +29,7 @@ type ProductRow = {
   barcode: string | null;
   sku: string | null;
   cost_price: number;
+  specs?: Json;
 };
 
 export function ProductsPanel() {
@@ -66,7 +71,7 @@ export function ProductsPanel() {
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+      <div className="product-list-light overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-soft">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -92,8 +97,8 @@ export function ProductsPanel() {
                   <td className="px-4 py-3">{p.stock}</td>
                   <td className="px-4 py-3">{p.active ? "✓" : "—"}</td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
-                    <button onClick={() => setEditing(p)} className="inline-grid h-8 w-8 place-items-center rounded-full hover:bg-muted"><Pencil className="h-4 w-4" /></button>
-                    <button onClick={() => onDelete(p.id)} className="inline-grid h-8 w-8 place-items-center rounded-full hover:bg-destructive/10 text-destructive"><Trash2 className="h-4 w-4" /></button>
+                    <Button variant="ghost" size="icon" title={tr("editProduct")} aria-label={`${tr("editProduct")} ${p.name_sq}`} onClick={() => setEditing(p)}><Pencil className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" title="Fshi produktin" aria-label={`Fshi ${p.name_sq}`} onClick={() => onDelete(p.id)} className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
                   </td>
                 </tr>
               ))}
@@ -122,9 +127,24 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
 }) {
   const { tr, lang } = useI18n();
   const [saving, setSaving] = useState(false);
+  const [specs, setSpecs] = useState<Spec[]>(() => readSpecs(product?.specs));
+  const [variants, setVariants] = useState<VariantDraft[]>([]);
+  const [optionsReady, setOptionsReady] = useState(!product);
+  const [optionsError, setOptionsError] = useState(false);
+  useEffect(() => {
+    if (!product) return;
+    let alive = true;
+    supabase.from("product_variants").select("*").eq("product_id", product.id).order("sort_order").then(({ data, error }) => {
+      if (!alive) return;
+      if (error) { setOptionsError(true); toast.error("Variantet nuk u ngarkuan. Hapeni përsëri produktin."); }
+      else { setVariants(data ?? []); setOptionsReady(true); }
+    });
+    return () => { alive = false; };
+  }, [product]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!optionsReady || optionsError) return;
     const fd = new FormData(e.currentTarget);
     const nameEn = String(fd.get("name_en") || "").trim();
     let gallery: string[] = [];
@@ -145,6 +165,7 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
       category_id: String(fd.get("category_id") || "") || null,
       active: fd.get("active") === "on",
       featured: fd.get("featured") === "on",
+      specs: Object.fromEntries(specs.filter(s => s.name.trim() && s.value.trim()).map(s => [s.name.trim(), s.value.trim()])),
     };
     if (!payload.name_sq || !payload.name_en || !payload.price) {
       toast.error(lang === "sq" ? "Plotësoni fushat" : "Fill required fields");
@@ -158,13 +179,20 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
       );
       return;
     }
+    if (new Set(specs.map(s => s.name.trim()).filter(Boolean)).size !== specs.filter(s => s.name.trim()).length) {
+      toast.error("Emrat e specifikimeve duhet të jenë të ndryshëm."); return;
+    }
     setSaving(true);
-    const { error } = product
-      ? await supabase.from("products").update(payload).eq("id", product.id)
-      : await supabase.from("products").insert(payload);
-    setSaving(false);
-    if (error) toast.error(error.message);
-    else { toast.success(lang === "sq" ? "U ruajt" : "Saved"); onSaved(); }
+    try {
+      const { error } = await supabase.rpc("save_product_options", {
+        _product: payload,
+        _variants: variants.map((v, i) => ({ ...v, name_sq: v.name_sq.trim(), sort_order: i })),
+        _id: product?.id ?? undefined,
+      });
+      if (error) throw error;
+      toast.success(lang === "sq" ? "U ruajt" : "Saved"); onSaved();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Ruajtja dështoi"); }
+    finally { setSaving(false); }
   }
 
   return (
@@ -232,9 +260,12 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
             <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" name="featured" defaultChecked={product?.featured ?? false} /> {tr("featuredLabel")}</label>
           </div>
 
+          {optionsReady && <ProductOptionsEditor specs={specs} variants={variants} onSpecs={setSpecs} onVariants={setVariants} />}
+          {!optionsReady && <p className="text-sm text-muted-foreground">{optionsError ? "Variantet nuk u ngarkuan." : "Duke ngarkuar variantet…"}</p>}
+
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={onClose} className="rounded-full border border-border px-5 py-2 text-sm hover:bg-muted">{tr("cancel")}</button>
-            <button disabled={saving} className="rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+            <button disabled={saving || !optionsReady} className="rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
               {saving ? "…" : tr("save")}
             </button>
           </div>

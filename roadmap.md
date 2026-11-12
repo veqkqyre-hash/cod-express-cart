@@ -1,5 +1,11 @@
 # SEO Manager — Phase 2
 
+## Product variants and specifications
+- [ ] Add optional specifications and editable variants to Admin products; use a white product list.
+- [ ] Show selectable variants publicly and keep each selection in cart and orders.
+- [ ] Validate stock and price atomically at checkout without changing POS or deployment.
+- [ ] Run real admin/product/checkout tests and check live cPanel release availability.
+
 ## Backup & Restore
 - [x] Show explicit unavailable Create Full Backup and Restore controls; no simulated jobs or backup rows.
 - [x] Database+photos backups: create, verify, download and restore (RIKTHE confirm) working in Admin.
