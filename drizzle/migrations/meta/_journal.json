@@ -64,6 +64,13 @@
       "when": 1794438681492,
       "tag": "0008_product_variants_specs",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794472015807,
+      "tag": "0009_atomic_product_options_checkout",
+      "breakpoints": true
     }
   ]
 }

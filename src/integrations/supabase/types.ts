@@ -1169,6 +1169,10 @@ export type Database = {
     }
     Functions: {
       backup_tables: { Args: never; Returns: string[] }
+      checkout_product_options: {
+        Args: { _coupon?: string; _customer: Json; _items: Json }
+        Returns: Json
+      }
       claim_admin_if_none: { Args: never; Returns: Json }
       close_pos_shift: {
         Args: { _counted_cash?: number; _note?: string }
@@ -1257,6 +1261,10 @@ export type Database = {
           _user_id: string
         }
         Returns: undefined
+      }
+      save_product_options: {
+        Args: { _id?: string; _product: Json; _variants: Json }
+        Returns: string
       }
       verify_db_backup: { Args: { _id: string }; Returns: Json }
     }
