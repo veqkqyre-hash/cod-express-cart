@@ -33,10 +33,9 @@ export function ProductCard({ p }: { p: Product }) {
 
   const name = lang === "sq" ? p.name_sq : p.name_en;
   const s = useMemo(() => seed(p.id), [p.id]);
-  const discount = s > 0.55 ? Math.round(10 + s * 40) : 0; // 0, or 10–50 %
   const rating = 3.8 + s * 1.2;
   const reviews = Math.round(12 + s * 220);
-  const oldPrice = discount ? Number(p.price) / (1 - discount / 100) : null;
+  const oldPrice = null; // No genuine previous price is stored: never invent discounts.
   const wished = has(p.id);
 
   async function handleAdd() {
@@ -81,11 +80,6 @@ export function ProductCard({ p }: { p: Product }) {
 
           {/* Badges */}
           <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-            {discount > 0 && (
-              <span className="rounded-full bg-[var(--pink-deep)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-pink">
-                −{discount}%
-              </span>
-            )}
             {p.stock === 0 && (
               <span className="rounded-full bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
                 {tr("outOfStock")}
