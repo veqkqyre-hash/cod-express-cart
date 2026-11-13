@@ -1,5 +1,10 @@
 # SEO Manager — Phase 2
 
+## Shared Admin product ordering
+- [x] Add persistent, atomic ordering separate from product data, shared by Products and Inventory.
+- [x] Add mouse/touch drag handles; reject filtered/incomplete permutations and stale saves without changing existing search.
+- [x] Real mouse/touch moves persisted across refresh and both views (118 rows); 10 unit tests pass. Real incomplete/stale saves rejected, product rows identical around final RPC tests, initial ordering restored. cPanel release not deployed or verified.
+
 ## Product variants and specifications
 - [x] Add optional specifications and editable variants to Admin products; use a white product list.
 - [x] Show selectable variants publicly and keep each selection in cart and orders.
