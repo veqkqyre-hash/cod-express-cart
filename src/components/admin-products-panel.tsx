@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { GalleryField } from "@/components/admin-gallery-field";
 import { aiDescription } from "@/lib/cf-ai";
 import { ProductOptionsEditor, type VariantDraft } from "@/components/admin-product-options";
-import { readSpecs, type Spec } from "@/lib/product-options";
+import { readSpecs, incompleteSpecs, type Spec } from "@/lib/product-options";
 import type { Json } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, X, ImagePlus, Loader2, Sparkles } from "lucide-react";
@@ -132,6 +132,7 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
   const [variants, setVariants] = useState<VariantDraft[]>([]);
   const [optionsReady, setOptionsReady] = useState(!product);
   const [optionsError, setOptionsError] = useState(false);
+  const [variantUploading, setVariantUploading] = useState(false);
   useEffect(() => {
     if (!product) return;
     let alive = true;
@@ -145,7 +146,10 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!optionsReady || optionsError) return;
+    if (!optionsReady || optionsError || variantUploading) return;
+    if (incompleteSpecs(specs)) {
+      toast.error("Plotësoni emrin dhe vlerën e çdo specifikimi."); return;
+    }
     const fd = new FormData(e.currentTarget);
     const nameEn = String(fd.get("name_en") || "").trim();
     let gallery: string[] = [];
@@ -273,12 +277,12 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
             <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" name="featured" defaultChecked={product?.featured ?? false} /> {tr("featuredLabel")}</label>
           </div>
 
-          {optionsReady && <ProductOptionsEditor specs={specs} variants={variants} onSpecs={setSpecs} onVariants={setVariants} />}
+          {optionsReady && <ProductOptionsEditor specs={specs} variants={variants} onSpecs={setSpecs} onVariants={setVariants} onUploading={setVariantUploading} />}
           {!optionsReady && <p className="text-sm text-muted-foreground">{optionsError ? "Variantet nuk u ngarkuan." : "Duke ngarkuar variantet…"}</p>}
 
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={onClose} className="rounded-full border border-border px-5 py-2 text-sm hover:bg-muted">{tr("cancel")}</button>
-            <button disabled={saving || !optionsReady} className="rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+            <button disabled={saving || !optionsReady || variantUploading} className="rounded-full bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
               {saving ? "…" : tr("save")}
             </button>
           </div>
