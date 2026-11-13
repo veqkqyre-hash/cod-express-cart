@@ -110,6 +110,46 @@
   --accent: oklch(0.95 0.02 350);
   --accent-foreground: oklch(0.15 0 0);
 }
+/* Admin content area only: light surface with dark, readable text. Sidebar and public shop are untouched. */
+.admin-light,
+body:has(.admin-light) [data-radix-popper-content-wrapper],
+body:has(.admin-light) [role="dialog"],
+body:has(.admin-light) [role="alertdialog"],
+body:has(.admin-light) [data-sonner-toaster] {
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.17 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.17 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.17 0 0);
+  --primary: oklch(0.58 0.2 0);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.015 355);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.955 0 0);
+  --muted-foreground: oklch(0.42 0 0);
+  --accent: oklch(0.94 0.03 355);
+  --accent-foreground: oklch(0.2 0 0);
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.84 0 0);
+  --ring: oklch(0.58 0.2 0);
+  --pink-deep: oklch(0.58 0.2 0);
+  color: var(--foreground);
+}
+.admin-light input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+.admin-light textarea,
+.admin-light select,
+body:has(.admin-light) [role="dialog"] input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+body:has(.admin-light) [role="dialog"] textarea,
+body:has(.admin-light) [role="dialog"] select {
+  background-color: oklch(1 0 0);
+  color: oklch(0.17 0 0);
+  border-color: oklch(0.84 0 0);
+}
+.admin-light input::placeholder,
+.admin-light textarea::placeholder,
+body:has(.admin-light) [role="dialog"] input::placeholder { color: oklch(0.55 0 0); }
+.admin-light option { background: oklch(1 0 0); color: oklch(0.17 0 0); }
 .variant-swatch { background-color: var(--swatch-color); }
 
 @layer base {
@@ -206,3 +246,14 @@
 .admin-settings-light textarea:focus {
   outline-color: #db2777;
 }
+
+/* Admin: lift faint grey text to a readable dark grey (light content area only). */
+.admin-light .text-neutral-300,
+.admin-light .text-neutral-400,
+.admin-light .text-gray-400 { color: oklch(0.48 0 0); }
+.admin-light .text-neutral-500,
+.admin-light .text-gray-500 { color: oklch(0.45 0 0); }
+.admin-light .text-green-600,
+.admin-light .text-emerald-600 { color: oklch(0.45 0.13 150); }
+.admin-light .text-amber-600 { color: oklch(0.5 0.13 60); }
+.admin-light .recharts-legend-item-text { color: oklch(0.3 0 0) !important; }
