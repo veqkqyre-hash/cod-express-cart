@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_product_order: {
+        Row: {
+          product_ids: string[]
+          singleton: boolean
+          updated_at: string
+        }
+        Insert: {
+          product_ids?: string[]
+          singleton?: boolean
+          updated_at?: string
+        }
+        Update: {
+          product_ids?: string[]
+          singleton?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_tasks: {
         Row: {
           assigned_email: string | null
@@ -1270,6 +1288,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: undefined
+      }
+      save_admin_product_order: {
+        Args: { _expected_ids: string[]; _ids: string[] }
         Returns: undefined
       }
       save_product_options: {

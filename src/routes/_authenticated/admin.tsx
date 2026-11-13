@@ -12,6 +12,7 @@ import {
   Menu, ExternalLink, Euro, ShoppingBag, Bell, ScrollText, Globe, Printer as PrinterIcon, CalendarDays, FileText, ScanLine, Receipt, Wallet, Clock, Star, Mail, Undo2, AlertTriangle, ClipboardList, LifeBuoy, HardDrive,
 } from "lucide-react";
 import { ProductsPanel } from "@/components/admin-products-panel";
+import { useAdminOrderedProducts, ProductOrderContext, SortableProductRow } from "@/components/admin-product-order";
 import { AdminsPanel } from "@/components/admin-admins-panel";
 import { CustomersPanel } from "@/components/admin-customers-panel";
 import { AuditPanel } from "@/components/admin-audit-panel";
@@ -911,14 +912,9 @@ type InvRow = { id: string; name_sq: string; name_en: string; stock: number; act
 
 function InventoryView({ lang }: { lang: string }) {
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
-  const { data: products } = useQuery({
-    queryKey: ["admin-inventory"],
-    queryFn: async () => {
-      const { data } = await supabase.from("products").select("id,name_sq,name_en,stock,active,price").order("stock", { ascending: true });
-      return (data ?? []) as InvRow[];
-    },
-  });
+  const { data: products, reorder, saving, isFetching, error } = useAdminOrderedProducts();
   const rows = products ?? [];
+  const ids = rows.map(p => p.id);
   const cols: Column<InvRow>[] = [
     { key: "name", label: L("Produkti", "Product"), get: (p) => (lang === "sq" ? p.name_sq : p.name_en) },
     { key: "stock", label: L("Stoku", "Stock"), get: (p) => p.stock },
@@ -947,14 +943,16 @@ function InventoryView({ lang }: { lang: string }) {
         />
       </div>
 
+      {error && <p role="alert" className="text-destructive">Lista nuk u ngarkua. Rifreskojeni faqen.</p>}
+      <ProductOrderContext ids={ids} onDragEnd={event => reorder(event, ids)}>
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
         <table className="w-full text-sm">
           <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
-            <tr><th className="px-4 py-3">{L("Produkti", "Product")}</th><th className="px-4 py-3">{L("Stoku", "Stock")}</th><th className="px-4 py-3 hidden sm:table-cell">{L("Vlera", "Value")}</th><th className="px-4 py-3">{L("Statusi", "Status")}</th></tr>
+            <tr><th className="w-12 px-2 py-3" aria-label="Renditja"></th><th className="px-4 py-3">{L("Produkti", "Product")}</th><th className="px-4 py-3">{L("Stoku", "Stock")}</th><th className="px-4 py-3 hidden sm:table-cell">{L("Vlera", "Value")}</th><th className="px-4 py-3">{L("Statusi", "Status")}</th></tr>
           </thead>
           <tbody>
             {rows.map((p) => (
-              <tr key={p.id} className="border-t border-neutral-100">
+              <SortableProductRow key={p.id} id={p.id} name={L(p.name_sq, p.name_en)} disabled={saving || isFetching} className="border-t border-neutral-100">
                 <td className="px-4 py-3 font-medium">{lang === "sq" ? p.name_sq : p.name_en}</td>
                 <td className="px-4 py-3">
                   <span className={p.stock === 0 ? "text-red-600 font-medium" : p.stock < 5 ? "text-amber-600 font-medium" : ""}>{p.stock}</span>
@@ -965,11 +963,12 @@ function InventoryView({ lang }: { lang: string }) {
                     : p.stock < 5 ? <span className="rounded-full bg-amber-50 text-amber-700 px-2.5 py-0.5 text-xs">{L("Pak", "Low")}</span>
                     : <span className="rounded-full bg-green-50 text-green-700 px-2.5 py-0.5 text-xs">OK</span>}
                 </td>
-              </tr>
+              </SortableProductRow>
             ))}
           </tbody>
         </table>
       </div>
+      </ProductOrderContext>
       <StockRefillsPanel lang={lang} />
     </div>
   );

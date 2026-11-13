@@ -11,6 +11,7 @@ import { readSpecs, type Spec } from "@/lib/product-options";
 import type { Json } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, X, ImagePlus, Loader2, Sparkles } from "lucide-react";
+import { useAdminOrderedProducts, ProductOrderContext, SortableProductRow } from "@/components/admin-product-order";
 
 type ProductRow = {
   id: string;
@@ -38,14 +39,8 @@ export function ProductsPanel() {
   const { tr, lang } = useI18n();
   const [editing, setEditing] = useState<ProductRow | "new" | null>(null);
 
-  const { data: products, refetch } = useQuery({
-    queryKey: ["admin-products"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as ProductRow[];
-    },
-  });
+  const { data: products, refetch, reorder, saving, isFetching, error } = useAdminOrderedProducts();
+  const ids = (products ?? []).map(p => p.id);
 
   const { data: categories } = useQuery({
     queryKey: ["admin-categories"],
@@ -73,11 +68,14 @@ export function ProductsPanel() {
         </button>
       </div>
 
+      {error && <p role="alert" className="text-destructive">Lista nuk u ngarkua. Rifreskojeni faqen.</p>}
+      <ProductOrderContext ids={ids} onDragEnd={event => reorder(event, ids)}>
       <div className="product-list-light overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-soft">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
+                <th className="w-12 px-2 py-3" aria-label="Renditja"></th>
                 <th className="px-4 py-3"></th>
                 <th className="px-4 py-3">{tr("productName")}</th>
                 <th className="px-4 py-3">{lang === "sq" ? "Barkodi" : "Barcode"}</th>
@@ -89,7 +87,7 @@ export function ProductsPanel() {
             </thead>
             <tbody>
               {products?.map((p) => (
-                <tr key={p.id} className="border-t border-border">
+                <SortableProductRow key={p.id} id={p.id} name={lang === "sq" ? p.name_sq : p.name_en} disabled={saving || isFetching} className="border-t border-border">
                   <td className="px-4 py-2">
                     {p.image_url ? <img src={p.image_url} alt="" className="h-10 w-10 rounded object-cover" /> : <div className="h-10 w-10 rounded bg-muted" />}
                   </td>
@@ -102,12 +100,13 @@ export function ProductsPanel() {
                     <Button variant="ghost" size="icon" title={tr("editProduct")} aria-label={`${tr("editProduct")} ${p.name_sq}`} onClick={() => setEditing(p)}><Pencil className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" title="Fshi produktin" aria-label={`Fshi ${p.name_sq}`} onClick={() => onDelete(p.id)} className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
                   </td>
-                </tr>
+                </SortableProductRow>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+      </ProductOrderContext>
 
       {editing && (
         <ProductEditor
