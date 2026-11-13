@@ -270,7 +270,7 @@ function Admin() {
       {sidebarOpen && <div onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/40 lg:hidden" />}
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="admin-light flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="flex items-center justify-between gap-3 border-b border-neutral-200 bg-white px-4 lg:px-8 py-4">
           <div className="flex items-center gap-3 min-w-0">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden grid h-9 w-9 place-items-center rounded-lg hover:bg-neutral-100">
