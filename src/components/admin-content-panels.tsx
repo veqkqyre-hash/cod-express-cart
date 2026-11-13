@@ -129,7 +129,7 @@ export function CatalogPanel() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {list.map((c: any) => (
           <SortableCategory key={c.id} id={c.id}>{(handle) => (
-          <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-neutral-200 bg-white p-5 text-neutral-900 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <button type="button" {...handle} aria-label={L("Tërhiq për renditje", "Drag to reorder")} className="-ml-2 grid h-8 w-8 shrink-0 cursor-grab touch-none select-none place-items-center rounded-lg text-lg text-neutral-400 hover:bg-neutral-100 active:cursor-grabbing">⠿</button>
               <div className="min-w-0 flex-1">
@@ -137,7 +137,7 @@ export function CatalogPanel() {
                 <div className="mt-1 text-xs text-neutral-500">/{c.slug} · {counts?.[c.id] ?? 0} {L("produkte", "products")}</div>
               </div>
               <div className="flex shrink-0">
-                <button onClick={() => setEditing(c)} className="grid h-8 w-8 place-items-center rounded-full hover:bg-neutral-100"><Pencil className="h-4 w-4" /></button>
+                <button onClick={() => setEditing(c)} aria-label={L("Ndrysho kategorinë", "Edit category")} className="grid h-8 w-8 place-items-center rounded-full text-neutral-800 hover:bg-neutral-100"><Pencil className="h-4 w-4" /></button>
                 <button onClick={() => onDelete(c.id)} className="grid h-8 w-8 place-items-center rounded-full text-red-600 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
               </div>
             </div>
