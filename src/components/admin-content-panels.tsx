@@ -678,7 +678,7 @@ export function SettingsPanel() {
 
   return (
     <Panel>
-      <form onSubmit={onSave} className="space-y-4 p-6">
+      <form onSubmit={onSave} className="admin-settings-light space-y-4 p-6">
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
             {L("Të dhënat e biznesit", "Business details")}
