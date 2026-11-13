@@ -1,10 +1,11 @@
 # SEO Manager — Phase 2
 
 ## Product variants and specifications
-- [ ] Add optional specifications and editable variants to Admin products; use a white product list.
-- [ ] Show selectable variants publicly and keep each selection in cart and orders.
-- [ ] Validate stock and price atomically at checkout without changing POS or deployment.
-- [ ] Run real admin/product/checkout tests and check live cPanel release availability.
+- [x] Add optional specifications and editable variants to Admin products; use a white product list.
+- [x] Show selectable variants publicly and keep each selection in cart and orders.
+- [x] Validate stock and price atomically at checkout without changing POS or deployment.
+- [x] Run real admin create/edit, variant photo upload, product selection, cart refresh and COD order tests; cancel test orders and hide test product. Ten unit tests pass; incorrect prices and combined overselling rejected with rollback.
+- [ ] Verify variant purchase on live cPanel: blocked by the live domain's Bot Verification page and unverified deployment of this release. Local mobile variant controls work; existing header overflow is outside this product-only request.
 
 ## Backup & Restore
 - [x] Show explicit unavailable Create Full Backup and Restore controls; no simulated jobs or backup rows.

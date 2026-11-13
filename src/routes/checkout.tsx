@@ -109,93 +109,36 @@ function Checkout() {
     }
     setSubmitting(true);
     try {
-      // Verifiko stokun aktual (i njëjti inventar si ARKA/admin) para porosisë
-      const { data: stockRows, error: stockErr } = await supabase
-        .from("products")
-        .select("id,name_sq,name_en,stock,active")
-        .in("id", items.map((it) => it.id));
-      if (stockErr) throw stockErr;
-      for (const it of items) {
-        const p = (stockRows ?? []).find((r) => r.id === it.id);
-        if (!p || !p.active || p.stock <= 0) {
-          setSubmitting(false);
-          return toast.error(
-            lang === "sq" ? `${it.name} nuk ka stok.` : `${it.name} is out of stock.`,
-          );
-        }
-        if (it.variantId) {
-          const { data: v } = await supabase.from("product_variants").select("stock,active").eq("id", it.variantId).maybeSingle();
-          if (!v || !v.active || v.stock < it.quantity) {
-            setSubmitting(false);
-            return toast.error(
-              lang === "sq"
-                ? `${it.name} — ${it.variantName}: vetëm ${v?.active ? v.stock : 0} në stok.`
-                : `${it.name} — ${it.variantName}: only ${v?.active ? v.stock : 0} in stock.`,
-            );
-          }
-          continue;
-        }
-        if (p.stock < it.quantity) {
-          setSubmitting(false);
-          return toast.error(
-            lang === "sq"
-              ? `${it.name}: vetëm ${p.stock} në stok.`
-              : `${it.name}: only ${p.stock} in stock.`,
-          );
-        }
-      }
-
-      const { data: order, error } = await supabase
-        .from("orders")
-        .insert({
-          user_id: userId,
-          customer_name: parsed.data.customer_name,
-          phone: parsed.data.phone,
-          email: parsed.data.email || null,
-          city: parsed.data.city,
-          address: parsed.data.address,
-          postal_code: parsed.data.postal_code || null,
-          notes: [parsed.data.notes || null, coupon ? `Kupon: ${coupon.code} (-${discount.toFixed(2)} EUR)` : null]
-            .filter(Boolean)
-            .join(" | ") || null,
-          subtotal,
-          shipping_fee: shippingFee,
-          total,
-        })
-        .select("id, order_number")
-        .single();
-      if (error) throw error;
-
-      const itemsPayload = items.map((it) => ({
-        order_id: order.id,
+      // One authenticated database transaction: prices, stock, order and items.
+      // Works through the Data API on static cPanel; no TanStack server endpoint.
+      const { data: result, error } = await supabase.rpc("checkout_product_options", {
+        _customer: parsed.data,
+        _coupon: coupon?.code,
+        _items: items.map((it) => ({
         product_id: it.id,
-        product_name: it.variantName ? `${it.name} — ${it.variantName}` : it.name,
         variant_id: it.variantId ?? null,
         unit_price: it.price,
         quantity: it.quantity,
-        subtotal: it.price * it.quantity,
-      }));
-      const { error: e2 } = await supabase.from("order_items").insert(itemsPayload);
-      if (e2) {
-        // Porosia pa artikuj anulohet që të mos mbetet bosh
-        await supabase.from("orders").update({ status: "cancelled" }).eq("id", order.id);
-        const m = e2.message || "";
-        const msg = m.includes("VARIANT_REQUIRED")
-          ? (lang === "sq" ? "Zgjidhni variantin (p.sh. ngjyrën) te produkti para porosisë." : "Choose the product option (e.g. colour) before ordering.")
-          : m.includes("OUT_OF_STOCK")
-            ? (lang === "sq" ? "Një produkt nuk ka më stok të mjaftueshëm." : "A product no longer has enough stock.")
-            : m.includes("PRICE_MISMATCH") || m.includes("row-level security")
-              ? (lang === "sq" ? "Çmimi ka ndryshuar. Rifreskoni shportën." : "A price changed. Please refresh your cart.")
-              : null;
-        if (msg) { setSubmitting(false); return toast.error(msg); }
-        throw e2;
+        })),
+      });
+      if (error) throw error;
+      if (!result || typeof result !== "object" || Array.isArray(result) || typeof result.order_number !== "string") {
+        throw new Error("INVALID_ORDER_RESPONSE");
       }
-
       clear();
-      navigate({ to: "/order/$number", params: { number: order.order_number } });
+      navigate({ to: "/order/$number", params: { number: result.order_number } });
     } catch (err) {
       console.error(err);
-      toast.error(lang === "sq" ? "Ndodhi një gabim. Provoni përsëri." : "Something went wrong.");
+      const m = err && typeof err === "object" && "message" in err ? String(err.message) : "";
+      const messages = [
+        ["VARIANT_REQUIRED", "Zgjidhni variantin te produkti para porosisë.", "Choose a product option before ordering."],
+        ["VARIANT_INVALID", "Varianti nuk është më i disponueshëm.", "This option is no longer available."],
+        ["OUT_OF_STOCK", "Nuk ka stok të mjaftueshëm. Kontrolloni produktet në shportë.", "Insufficient stock. Check the products in your cart."],
+        ["PRICE_MISMATCH", "Çmimi ka ndryshuar. Hiqeni produktin dhe shtojeni përsëri nga dyqani.", "A price changed. Remove the product and add it again from the shop."],
+        ["COUPON_INVALID", "Kuponi nuk është më i vlefshëm.", "The coupon is no longer valid."],
+        ["PRODUCT_UNAVAILABLE", "Një produkt nuk është më i disponueshëm.", "A product is no longer available."],
+      ].find(([code]) => m.includes(code));
+      toast.error(messages ? messages[lang === "sq" ? 1 : 2] : lang === "sq" ? "Ndodhi një gabim. Provoni përsëri." : "Something went wrong.");
       setSubmitting(false);
     }
   }
