@@ -185,3 +185,24 @@
   }
   .print-brand { color: black !important; }
 }
+
+
+/* Business settings: light controls only in the Admin panel.
+   Keep public storefront colors and other Admin sections unchanged. */
+.admin-settings-light input:not([type="checkbox"]),
+.admin-settings-light textarea {
+  background-color: #ffffff !important;
+  color: #171717 !important;
+  border-color: #d4d4d4 !important;
+}
+.admin-settings-light input::placeholder,
+.admin-settings-light textarea::placeholder {
+  color: #737373 !important;
+}
+.admin-settings-light label {
+  color: #262626 !important;
+}
+.admin-settings-light input:focus,
+.admin-settings-light textarea:focus {
+  outline-color: #db2777;
+}
