@@ -1,37 +1,39 @@
-import { useState } from "react";
+import { useState, type Dispatch, type SetStateAction, type CSSProperties } from "react";
 import { Plus, Trash2, ImagePlus, Loader2, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import type { Spec, Variant } from "@/lib/product-options";
+import { variantColors } from "@/lib/product-options";
 import { toast } from "sonner";
 
 export type VariantDraft = Pick<Variant, "id" | "name_sq" | "name_en" | "color_hex" | "image_url" | "price" | "stock" | "active">;
 const input = "w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-sm";
 const presets = ["Madhësia / dimensionet", "Pesha", "Madhësia e paketimit", "Materiali", "Modeli / numri", "Njësia e shitjes"];
 
-export function ProductOptionsEditor({ specs, variants, onSpecs, onVariants }: {
-  specs: Spec[]; variants: VariantDraft[]; onSpecs: (v: Spec[]) => void; onVariants: (v: VariantDraft[]) => void;
+export function ProductOptionsEditor({ specs, variants, onSpecs, onVariants, onUploading }: {
+  specs: Spec[]; variants: VariantDraft[]; onSpecs: (v: Spec[]) => void; onVariants: Dispatch<SetStateAction<VariantDraft[]>>; onUploading: (busy: boolean) => void;
 }) {
   const [uploading, setUploading] = useState<string | null>(null);
-  const change = (id: string, patch: Partial<VariantDraft>) => onVariants(variants.map(v => v.id === id ? { ...v, ...patch } : v));
+  const change = (id: string, patch: Partial<VariantDraft>) => onVariants(current => current.map(v => v.id === id ? { ...v, ...patch } : v));
   async function upload(id: string, file?: File) {
     if (!file) return;
     if (!["image/png", "image/jpeg", "image/webp"].includes(file.type) || file.size > 10 * 1024 * 1024) {
       toast.error("Zgjidhni JPG, PNG ose WebP deri në 10 MB."); return;
     }
     setUploading(id);
+    onUploading(true);
     try {
       const path = `variants/${crypto.randomUUID()}.${file.type.split("/")[1]}`;
       const { error } = await supabase.storage.from("product-images").upload(path, file);
       if (error) throw error;
       change(id, { image_url: supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Ngarkimi dështoi"); }
-    finally { setUploading(null); }
+    finally { setUploading(null); onUploading(false); }
   }
   function move(index: number, to: number) {
     const next = [...variants]; const [v] = next.splice(index, 1); if (v) next.splice(to, 0, v); onVariants(next);
   }
-  return <section className="space-y-4 border-t border-border pt-5">
+  return <section aria-label="Variantet & Specifikimet" className="space-y-4 border-t border-border pt-5">
     <h3 className="font-display text-xl">Variantet & Specifikimet</h3>
     <div className="flex items-center justify-between gap-2"><h4 className="font-medium text-sm">Specifikimet</h4>
       <Button type="button" variant="outline" size="sm" onClick={() => onSpecs([...specs, { name: "", value: "" }])}><Plus /> Shto specifikim</Button></div>
@@ -43,6 +45,7 @@ export function ProductOptionsEditor({ specs, variants, onSpecs, onVariants }: {
     </div>)}
     <div className="flex items-center justify-between gap-2"><h4 className="font-medium text-sm">Ngjyrat / variantet</h4>
       <Button type="button" variant="outline" size="sm" onClick={() => onVariants([...variants, { id: crypto.randomUUID(), name_sq: "", name_en: "", color_hex: null, image_url: null, price: null, stock: 0, active: true }])}><Plus /> Shto variant</Button></div>
+    <div className="flex flex-wrap gap-2">{variantColors.map(color => <Button key={color.name} type="button" variant="outline" size="icon" title={`Shto ${color.name}`} aria-label={`Shto ${color.name}`} onClick={() => onVariants(current => [...current, { id: crypto.randomUUID(), name_sq: color.name, name_en: color.name, color_hex: color.hex, image_url: null, price: null, stock: 0, active: true }])} className="rounded-full"><span className="variant-swatch size-6 rounded-full border border-border" style={{ "--swatch-color": color.hex } as CSSProperties} /></Button>)}</div>
     <div className="space-y-4">{variants.map((v, i) => <div key={v.id} className="border-b border-border pb-4 space-y-3">
       <div className="flex items-center gap-2"><span className="text-sm font-medium flex-1">Varianti {i + 1}</span>
         <Button type="button" variant="ghost" size="icon" aria-label="Lëviz lart" title="Lëviz lart" disabled={i === 0} onClick={() => move(i, i - 1)}><ArrowUp /></Button>

@@ -2,6 +2,14 @@ import type { Json, Database } from "@/integrations/supabase/types";
 
 export type Variant = Database["public"]["Tables"]["product_variants"]["Row"];
 export type Spec = { name: string; value: string };
+export const variantColors = [
+  { name: "Pink", hex: "#ffc0cb" }, { name: "Orange", hex: "#ffa500" },
+  { name: "Purple", hex: "#800080" }, { name: "Blue", hex: "#0000ff" },
+  { name: "White", hex: "#ffffff" }, { name: "Black", hex: "#000000" },
+];
+export function incompleteSpecs(specs: Spec[]) {
+  return specs.some(s => Boolean(s.name.trim()) !== Boolean(s.value.trim()));
+}
 export function readSpecs(value: Json | undefined): Spec[] {
   if (!value || typeof value !== "object" || Array.isArray(value)) return [];
   return Object.entries(value).filter(([, v]) => typeof v === "string" && v.trim()).map(([name, v]) => ({ name, value: String(v) }));

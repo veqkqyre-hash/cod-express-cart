@@ -1,8 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { readSpecs, canBuyOption, optionPrice } from "./product-options";
+import { readSpecs, canBuyOption, optionPrice, incompleteSpecs, variantColors } from "./product-options";
 import { cartKey } from "./cart";
 
 describe("optional product configuration", () => {
+  it("provides the six requested colors without automatically adding variants", () => {
+    expect(variantColors.map(c => c.name)).toEqual(["Pink", "Orange", "Purple", "Blue", "White", "Black"]);
+    expect(variantColors.find(c => c.name === "White")?.hex).toBe("#ffffff");
+  });
+  it("accepts optional specs but rejects silently dropping half-filled rows", () => {
+    expect(incompleteSpecs([])).toBe(false);
+    expect(incompleteSpecs([{ name: "Modeli", value: "G1" }])).toBe(false);
+    expect(incompleteSpecs([{ name: "Pesha", value: "" }])).toBe(true);
+    expect(incompleteSpecs([{ name: "", value: "0.600 KG" }])).toBe(true);
+  });
   it("requires a variant before adding a variant product", () => {
     expect(canBuyOption(true, undefined, 100, 1)).toBe(false);
     expect(canBuyOption(false, undefined, 100, 1)).toBe(true);

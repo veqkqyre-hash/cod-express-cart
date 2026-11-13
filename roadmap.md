@@ -6,6 +6,8 @@
 - [x] Real mouse/touch moves persisted across refresh and both views (118 rows); 10 unit tests pass. Real incomplete/stale saves rejected, product rows identical around final RPC tests, initial ordering restored. cPanel release not deployed or verified.
 
 ## Product variants and specifications
+- [x] Complete six color presets and circular public selectors, prevent half-filled specs and saving during variant photo upload; retain existing schema/APIs.
+- [x] Real new test-product create/edit/reopen, 4 specifications, 6 variants, photo upload, independent stock/price, cart refresh and Admin/public mobile checks pass; test product hidden, protected fields unchanged. 12 tests pass. No order created this turn; live cPanel remains unverified.
 - [x] Add optional specifications and editable variants to Admin products; use a white product list.
 - [x] Show selectable variants publicly and keep each selection in cart and orders.
 - [x] Validate stock and price atomically at checkout without changing POS or deployment.
