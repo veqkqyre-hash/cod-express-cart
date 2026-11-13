@@ -9,6 +9,7 @@ export function GalleryField({ lang, initial, getName }: { lang: string; initial
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
   const [urls, setUrls] = useState<string[]>(initial);
   const [busy, setBusy] = useState(false);
+  const [removed, setRemoved] = useState(false);
   const [aiBusy, setAiBusy] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
 
@@ -53,12 +54,13 @@ export function GalleryField({ lang, initial, getName }: { lang: string; initial
     <div>
       <label className="mb-1.5 block text-sm font-medium">{L("Fotot e produktit (galeria)", "Product photos (gallery)")}</label>
       <input type="hidden" name="gallery_json" value={JSON.stringify(urls)} />
+      <input type="hidden" name="gallery_touched" value={removed ? "1" : "0"} />
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
         {urls.map((u, i) => (
           <div key={u + i} className="group relative aspect-square overflow-hidden rounded-xl border border-border bg-muted">
             <img src={u} alt="" className="h-full w-full object-cover" />
             {i === 0 && <span className="absolute left-1 top-1 inline-flex items-center gap-0.5 rounded-full bg-primary px-1.5 py-0.5 text-[10px] text-primary-foreground"><Star className="h-3 w-3" />{L("Kryesore", "Main")}</span>}
-            <button type="button" onClick={() => setUrls((x) => x.filter((_, k) => k !== i))} className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-background/90 shadow"><X className="h-3 w-3" /></button>
+            <button type="button" onClick={() => { setRemoved(true); setUrls((x) => x.filter((_, k) => k !== i)); }} className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-background/90 shadow"><X className="h-3 w-3" /></button>
             <div className="absolute inset-x-1 bottom-1 flex justify-between">
               <button type="button" disabled={i === 0} onClick={() => move(i, -1)} className="grid h-6 w-6 place-items-center rounded-full bg-background/90 shadow disabled:opacity-30"><ChevronLeft className="h-3 w-3" /></button>
               <button type="button" disabled={i === urls.length - 1} onClick={() => move(i, 1)} className="grid h-6 w-6 place-items-center rounded-full bg-background/90 shadow disabled:opacity-30"><ChevronRight className="h-3 w-3" /></button>
