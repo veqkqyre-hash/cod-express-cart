@@ -164,6 +164,8 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
       stock: Number(fd.get("stock")),
       images: gallery,
       image_url: gallery[0] ?? null,
+      // Only an explicit removal of every existing photo may clear the gallery.
+      clear_images: gallery.length === 0 && fd.get("gallery_touched") === "1" && !!(product?.images?.length || product?.image_url),
       category_id: String(fd.get("category_id") || "") || null,
       active: fd.get("active") === "on",
       featured: fd.get("featured") === "on",

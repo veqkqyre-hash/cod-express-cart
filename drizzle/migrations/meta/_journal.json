@@ -85,6 +85,13 @@
       "when": 1794558632672,
       "tag": "0011_product_discounts",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794558795073,
+      "tag": "0012_preserve_product_images_on_save",
+      "breakpoints": true
     }
   ]
 }
