@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { formatEur } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
 import type { Product } from "@/components/product-card";
+import { salePrice, discountPercent } from "@/lib/product-options";
 
 export function QuickViewModal({
   product,
@@ -65,8 +66,9 @@ export function QuickViewModal({
             </div>
             <h2 className="font-display text-2xl leading-tight">{name}</h2>
             <div className="flex items-baseline gap-3">
-              <span className="font-display text-3xl text-[var(--pink-deep)]">{formatEur(Number(product.price))}</span>
+              <span className="font-display text-3xl text-[var(--pink-deep)]">{formatEur(salePrice(Number(product.price), product))}</span>
               {oldPrice && <span className="text-sm text-muted-foreground line-through">{formatEur(oldPrice)}</span>}
+              {discountPercent(product) > 0 && <span className="rounded-full bg-destructive px-2 py-0.5 text-xs font-bold text-destructive-foreground">-{discountPercent(product)}%</span>}
             </div>
             <p className="text-sm text-muted-foreground">
               {lang === "sq"

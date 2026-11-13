@@ -910,6 +910,8 @@ export type Database = {
           created_at: string
           description_en: string | null
           description_sq: string | null
+          discount_active: boolean
+          discount_percent: number
           featured: boolean
           id: string
           image_url: string | null
@@ -931,6 +933,8 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_sq?: string | null
+          discount_active?: boolean
+          discount_percent?: number
           featured?: boolean
           id?: string
           image_url?: string | null
@@ -952,6 +956,8 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_sq?: string | null
+          discount_active?: boolean
+          discount_percent?: number
           featured?: boolean
           id?: string
           image_url?: string | null
@@ -1202,6 +1208,10 @@ export type Database = {
           }
       current_pos_shift: { Args: never; Returns: Json }
       delete_pos_shift: { Args: { _id: string }; Returns: undefined }
+      discounted_price: {
+        Args: { _active: boolean; _base: number; _pct: number }
+        Returns: number
+      }
       get_order_by_number: { Args: { _order_number: string }; Returns: Json }
       grant_admin_by_email: { Args: { _email: string }; Returns: Json }
       grant_role_by_email: {

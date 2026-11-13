@@ -7,6 +7,7 @@ import { useWishlist } from "@/lib/wishlist";
 import { toast } from "sonner";
 import { Heart, Eye, ShoppingBag, Star } from "lucide-react";
 import { QuickViewModal } from "@/components/quick-view-modal";
+import { salePrice, discountPercent } from "@/lib/product-options";
 
 export type Product = {
   id: string;
@@ -16,6 +17,8 @@ export type Product = {
   price: number;
   image_url: string | null;
   stock: number;
+  discount_active?: boolean | null;
+  discount_percent?: number | null;
 };
 
 // Deterministic pseudo-random 0..1 from id, used for consistent demo ratings / discounts
@@ -35,7 +38,9 @@ export function ProductCard({ p }: { p: Product }) {
   const s = useMemo(() => seed(p.id), [p.id]);
   const rating = 3.8 + s * 1.2;
   const reviews = Math.round(12 + s * 220);
-  const oldPrice = null; // No genuine previous price is stored: never invent discounts.
+  const pct = discountPercent(p);
+  const price = salePrice(Number(p.price), p);
+  const oldPrice = pct ? Number(p.price) : null; // Only a sale the admin activated.
   const wished = has(p.id);
 
   async function handleAdd() {
@@ -45,7 +50,7 @@ export function ProductCard({ p }: { p: Product }) {
       window.location.href = `/product/${p.slug}`;
       return;
     }
-    add({ id: p.id, slug: p.slug, name, price: Number(p.price), image: p.image_url });
+    add({ id: p.id, slug: p.slug, name, price, image: p.image_url });
     toast.success(lang === "sq" ? "U shtua në shportë" : "Added to cart");
   }
 
@@ -58,6 +63,7 @@ export function ProductCard({ p }: { p: Product }) {
           params={{ slug: p.slug }}
           className="relative block aspect-square overflow-hidden bg-[var(--pink-soft)]"
         >
+          {pct > 0 && <span className="absolute left-3 top-3 z-10 rounded-full bg-destructive px-2.5 py-1 text-xs font-bold text-destructive-foreground">-{pct}%</span>}
           {p.image_url ? (
             <>
               <img
@@ -135,7 +141,7 @@ export function ProductCard({ p }: { p: Product }) {
             {name}
           </Link>
           <div className="mt-auto flex items-baseline gap-2">
-            <span className="font-display text-lg text-[var(--pink-deep)]">{formatEur(Number(p.price))}</span>
+            <span className="font-display text-lg text-[var(--pink-deep)]">{formatEur(price)}</span>
             {oldPrice && (
               <span className="text-xs text-muted-foreground line-through">{formatEur(oldPrice)}</span>
             )}

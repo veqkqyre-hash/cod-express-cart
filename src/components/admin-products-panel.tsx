@@ -30,6 +30,8 @@ type ProductRow = {
   sku: string | null;
   cost_price: number;
   specs?: Json;
+  discount_active?: boolean;
+  discount_percent?: number;
 };
 
 export function ProductsPanel() {
@@ -165,11 +167,16 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
       category_id: String(fd.get("category_id") || "") || null,
       active: fd.get("active") === "on",
       featured: fd.get("featured") === "on",
+      discount_active: fd.get("discount_active") === "on",
+      discount_percent: Number(fd.get("discount_percent") || 0),
       specs: Object.fromEntries(specs.filter(s => s.name.trim() && s.value.trim()).map(s => [s.name.trim(), s.value.trim()])),
     };
     if (!payload.name_sq || !payload.name_en || !payload.price) {
       toast.error(lang === "sq" ? "Plotësoni fushat" : "Fill required fields");
       return;
+    }
+    if (!Number.isFinite(payload.discount_percent) || payload.discount_percent < 0 || payload.discount_percent > 100) {
+      toast.error("Zbritja duhet të jetë nga 0 deri 100%."); return;
     }
     if (payload.barcode && !BARCODE_RE.test(payload.barcode)) {
       toast.error(
@@ -226,6 +233,11 @@ function ProductEditor({ product, categories, onClose, onSaved }: {
           <div className="grid gap-4 sm:grid-cols-2">
             <FieldA label={(lang === "sq" ? "Çmimi i blerjes" : "Cost price") + " (€)"} name="cost_price" type="number" step="0.01" defaultValue={(product?.cost_price ?? 0).toString()} />
             <FieldA label={(lang === "sq" ? "Çmimi i shitjes" : "Sale price") + " (€)"} name="price" type="number" step="0.01" defaultValue={product?.price?.toString()} required />
+          </div>
+
+          <div className="grid gap-4 rounded-xl border border-border p-4 sm:grid-cols-2">
+            <FieldA label="Aksion / Zbritje (%)" name="discount_percent" type="number" step="0.01" defaultValue={(product?.discount_percent ?? 0).toString()} />
+            <label className="flex items-center gap-2 self-end pb-2.5 text-sm font-medium"><input type="checkbox" name="discount_active" defaultChecked={product?.discount_active ?? false} /> {lang === "sq" ? "Aksioni aktiv" : "Sale active"}</label>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2"> <FieldA label={tr("stock")} name="stock" type="number" defaultValue={(product?.stock ?? 0).toString()} required />
