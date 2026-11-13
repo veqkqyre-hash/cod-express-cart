@@ -26,3 +26,12 @@ describe("optional product configuration", () => {
     expect(readSpecs({ Materiali: "Metal", Pesha: "" })).toEqual([{ name: "Materiali", value: "Metal" }]);
   });
 });
+import { salePrice } from "./product-options";
+describe("manual product sale", () => {
+  it("applies the percentage only when the sale is active", () => {
+    expect(salePrice(20, { discount_active: true, discount_percent: 25 })).toBe(15);
+    expect(salePrice(20, { discount_active: false, discount_percent: 25 })).toBe(20);
+    expect(salePrice(20, { discount_active: true, discount_percent: 0 })).toBe(20);
+    expect(salePrice(20, { discount_active: true, discount_percent: 100 })).toBe(0);
+  });
+});

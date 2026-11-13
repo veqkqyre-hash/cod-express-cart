@@ -11,7 +11,7 @@ import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { ProductReviews, Stars, useReviews } from "@/components/product-reviews";
 import { StockAlertForm } from "@/components/newsletter-signup";
 import { Button } from "@/components/ui/button";
-import { readSpecs, canBuyOption, optionPrice } from "@/lib/product-options";
+import { readSpecs, canBuyOption, optionPrice, salePrice, discountPercent } from "@/lib/product-options";
 import type { CSSProperties } from "react";
 
 export const Route = createFileRoute("/product/$slug")({
@@ -68,7 +68,9 @@ function ProductPage() {
   const selected = variants?.find(v => v.id === variantId);
   const hasVariants = Boolean(variants?.length);
   const stock = hasVariants ? selected?.stock ?? 0 : product.stock;
-  const price = optionPrice(Number(product.price), selected);
+  const basePrice = optionPrice(Number(product.price), selected);
+  const pct = discountPercent(product);
+  const price = salePrice(basePrice, product);
   const specs = readSpecs(product.specs);
   const images = product.images?.length ? product.images : product.image_url ? [product.image_url] : [];
   const optionImages = selected?.image_url ? [selected.image_url, ...images.filter(x => x !== selected.image_url)] : images;
@@ -87,7 +89,7 @@ function ProductPage() {
               <span>{avgRating.toFixed(1)} · {approved.length} {lang === "sq" ? "vlerësime" : "reviews"}</span>
             </div>
           )}
-          <div className="mt-4 font-display text-3xl text-primary">{formatEur(price)}</div>
+          <div className="mt-4 flex flex-wrap items-baseline gap-3"><span className="font-display text-3xl text-primary">{formatEur(price)}</span>{pct > 0 && <><span className="text-lg text-muted-foreground line-through">{formatEur(basePrice)}</span><span className="rounded-full bg-destructive px-2.5 py-1 text-sm font-bold text-destructive-foreground">-{pct}%</span></>}</div>
           {desc && <p className="mt-6 text-muted-foreground leading-relaxed">{desc}</p>}
 
           {hasVariants && <fieldset className="mt-6">
@@ -150,7 +152,7 @@ function ProductPage() {
             brand: { "@type": "Brand", name: "Dreame Beauty Cosmetics" },
             offers: {
               "@type": "Offer",
-              price: Number(product.price).toFixed(2),
+              price: salePrice(Number(product.price), product).toFixed(2),
               priceCurrency: "EUR",
               availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
               url: `https://dreamebeautycosmetics.com/product/${product.slug}`,

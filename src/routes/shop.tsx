@@ -48,7 +48,7 @@ function Shop() {
     queryFn: async () => {
       let query = supabase
         .from("products")
-        .select("id,slug,name_sq,name_en,price,image_url,stock,category_id")
+        .select("id,slug,name_sq,name_en,price,image_url,stock,discount_active,discount_percent,category_id")
         .eq("active", true)
         .gt("stock", 0)
         .order("created_at", { ascending: false });

@@ -13,3 +13,12 @@ export function canBuyOption(hasVariants: boolean, variant: Pick<Variant, "stock
   if (!Number.isInteger(qty) || qty < 1 || qty > 1000) return false;
   return hasVariants ? Boolean(variant?.active && variant.stock >= qty) : baseStock >= qty;
 }
+/** Manual per-product sale: applies only when the admin activated it with 1–100%. Mirrors public.discounted_price in the database. */
+export function discountPercent(p: { discount_active?: boolean | null; discount_percent?: number | null }) {
+  const pct = Number(p.discount_percent ?? 0);
+  return p.discount_active && pct > 0 ? Math.min(pct, 100) : 0;
+}
+export function salePrice(base: number, p: { discount_active?: boolean | null; discount_percent?: number | null }) {
+  const pct = discountPercent(p);
+  return pct ? Math.round(base * (100 - pct)) / 100 : Number(base);
+}

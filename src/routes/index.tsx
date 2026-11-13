@@ -88,7 +88,7 @@ function Home() {
     queryFn: async () => {
       const { data } = await supabase
         .from("products")
-        .select("id,slug,name_sq,name_en,price,image_url,stock")
+        .select("id,slug,name_sq,name_en,price,image_url,stock,discount_active,discount_percent")
         .eq("active", true).eq("featured", true).gt("stock", 0).limit(8);
       return (data ?? []) as Product[];
     },
@@ -99,7 +99,7 @@ function Home() {
     queryFn: async () => {
       const { data } = await supabase
         .from("products")
-        .select("id,slug,name_sq,name_en,price,image_url,stock")
+        .select("id,slug,name_sq,name_en,price,image_url,stock,discount_active,discount_percent")
         .eq("active", true).gt("stock", 0).order("created_at", { ascending: false }).limit(8);
       return (data ?? []) as Product[];
     },

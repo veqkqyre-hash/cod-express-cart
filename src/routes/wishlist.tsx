@@ -35,7 +35,7 @@ function WishlistPage() {
       if (ids.length === 0) return [];
       const { data } = await supabase
         .from("products")
-        .select("id,slug,name_sq,name_en,price,image_url,stock")
+        .select("id,slug,name_sq,name_en,price,image_url,stock,discount_active,discount_percent")
         .in("id", ids)
         .eq("active", true);
       return (data ?? []) as Product[];
