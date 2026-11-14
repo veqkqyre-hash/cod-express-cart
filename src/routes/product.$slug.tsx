@@ -94,12 +94,12 @@ function ProductPage() {
 
           {hasVariants && <fieldset className="mt-6">
             <legend className="text-sm font-medium mb-3">{lang === "sq" ? "Zgjidhni variantin" : "Choose an option"}{selected ? ` — ${lang === "sq" ? selected.name_sq : selected.name_en}` : ""}</legend>
-            <div className="flex flex-wrap gap-3">{variants?.map(v => <Button key={v.id} type="button" variant="outline" aria-label={lang === "sq" ? v.name_sq : v.name_en} aria-pressed={variantId === v.id} title={`${lang === "sq" ? v.name_sq : v.name_en} · ${v.stock === 0 ? tr("outOfStock") : v.stock}`} onClick={() => { setVariantId(v.id); setQty(1); }} className={`${v.color_hex ? "size-11 rounded-full p-1" : "h-auto min-h-11 py-2"} ${variantId === v.id ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""}`}>
+            <div className="flex flex-wrap gap-3">{variants?.map(v => <Button key={v.id} type="button" variant="outline" aria-label={lang === "sq" ? v.name_sq : v.name_en} aria-pressed={variantId === v.id} title={`${lang === "sq" ? v.name_sq : v.name_en} · ${v.stock === 0 ? tr("outOfStock") : (lang === "sq" ? "Në stok" : "In stock")}`} onClick={() => { setVariantId(v.id); setQty(1); }} className={`${v.color_hex ? "size-11 rounded-full p-1" : "h-auto min-h-11 py-2"} ${variantId === v.id ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""}`}>
               {v.color_hex ? <span aria-hidden className="variant-swatch size-8 rounded-full border border-border shrink-0" style={{ "--swatch-color": v.color_hex } as CSSProperties} /> : <span>{lang === "sq" ? v.name_sq : v.name_en}{v.stock === 0 ? ` — ${tr("outOfStock")}` : ""}</span>}
             </Button>)}</div>
           </fieldset>}
           {variantsError && <p className="mt-4 text-sm text-destructive">{lang === "sq" ? "Variantet nuk u ngarkuan. Rifreskoni faqen." : "Options could not load. Refresh the page."}</p>}
-          {(!hasVariants || selected) && <p className="mt-4 text-sm text-muted-foreground">{stock > 0 ? `${stock} ${lang === "sq" ? "në stok" : "in stock"}` : tr("outOfStock")}</p>}
+          {(!hasVariants || selected) && <p className="mt-4 text-sm text-muted-foreground">{stock > 0 ? (lang === "sq" ? "Në stok" : "In stock") : tr("outOfStock")}</p>}
           {specs.length > 0 && <table className="mt-6 w-full table-fixed text-sm"><caption className="text-left font-medium mb-2">{lang === "sq" ? "Specifikimet" : "Specifications"}</caption><tbody>{specs.map(s => <tr key={s.name} className="border-b border-border"><th scope="row" className="w-1/2 py-3 pr-4 break-words text-left font-normal text-muted-foreground">{s.name}</th><td className="py-3 break-words">{s.value}</td></tr>)}</tbody></table>}
 
           <div className="mt-8 flex items-center gap-4">
