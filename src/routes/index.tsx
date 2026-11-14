@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ProductCard, type Product } from "@/components/product-card";
-import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Instagram, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import heroNails1 from "@/assets/hero-nails-1.jpg";
@@ -83,17 +83,6 @@ function Home() {
     },
   });
 
-  const featured = useQuery({
-    queryKey: ["home-featured"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("products")
-        .select("id,slug,name_sq,name_en,price,image_url,stock,discount_active,discount_percent")
-        .eq("active", true).eq("featured", true).gt("stock", 0).limit(8);
-      return (data ?? []) as Product[];
-    },
-  });
-
   const newArrivals = useQuery({
     queryKey: ["home-new"],
     queryFn: async () => {
@@ -115,19 +104,11 @@ function Home() {
         subtitle={tr("newArrivalsSub")}
         products={newArrivals.data ?? []}
       />
-      <PromoDuo />
-      <ProductSection
-        eyebrow={tr("bestSellers")}
-        title={tr("bestSellersTitle")}
-        subtitle={tr("bestSellersSub")}
-        products={featured.data ?? []}
-      />
       <PromoWide />
       <FeaturedCategories categories={categories.data ?? []} lang={lang} />
       <TopBrands />
       <WhyChooseUs />
       <Reviews />
-      <InstagramGallery />
       <Newsletter />
     </div>
   );
@@ -341,36 +322,6 @@ function FeaturedCategories({ categories, lang }: { categories: any[]; lang: "sq
   );
 }
 
-function PromoDuo() {
-  const { tr, lang } = useI18n();
-  return (
-    <section className="container-app grid gap-4 md:grid-cols-2">
-      <div className="relative overflow-hidden rounded-3xl bg-[var(--pink-soft)] p-8 md:p-10 min-h-[280px] group text-[var(--ink)]">
-        <div className="absolute -right-8 -bottom-8 text-[10rem] opacity-40 transition-transform duration-500 group-hover:scale-110">💄</div>
-        <div className="relative max-w-xs">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink-deep)]">{tr("summerCollection")}</div>
-          <h3 className="mt-2 font-display text-3xl md:text-4xl leading-tight">{tr("promoDuo1Title")}</h3>
-          <p className="mt-3 text-sm text-black/60">{tr("promoDuo1Sub")}</p>
-          <Link to="/shop" search={{ category: "gel-lak" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-black px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink-deep)] transition">
-            {tr("discover")} <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-      </div>
-      <div className="relative overflow-hidden rounded-3xl bg-black p-8 md:p-10 min-h-[280px] group text-white">
-        <div className="absolute -right-8 -bottom-8 text-[10rem] opacity-30 transition-transform duration-500 group-hover:scale-110">✂️</div>
-        <div className="relative max-w-xs">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--pink)]">{tr("proExclusive")}</div>
-          <h3 className="mt-2 font-display text-3xl md:text-4xl leading-tight">{tr("promoDuo2Title")}</h3>
-          <p className="mt-3 text-sm text-white/70">{tr("promoDuo2Sub")}</p>
-          <Link to="/shop" search={{ category: "freza-aparate" }} className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-[var(--pink-deep)] px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-[var(--pink)] transition">
-            {tr("shopNow")} <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function PromoWide() {
   const { tr } = useI18n();
   return (
@@ -507,30 +458,6 @@ function Reviews() {
             </div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
-
-const INSTA = ["💄","💅","💇‍♀️","💗","✨","💋"];
-function InstagramGallery() {
-  const { tr, lang } = useI18n();
-  return (
-    <section className="container-app py-20">
-      <div className="text-center">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--pink-deep)]">@pink.salon</div>
-        <h2 className="mt-3 font-display text-4xl md:text-5xl">{tr("followUs")}</h2>
-        <p className="mt-3 text-sm text-muted-foreground">{lang === "sq" ? "Bashkohuni me komunitetin tonë të bukurisë." : "Join our beauty community."}</p>
-      </div>
-      <div className="mt-10 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-        {INSTA.map((e, i) => (
-          <a key={i} href="#" className="group relative aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--pink-soft)] via-white to-[var(--pink)]/30 grid place-items-center">
-            <span className="text-5xl transition duration-500 group-hover:scale-110 group-hover:rotate-6">{e}</span>
-            <div className="absolute inset-0 grid place-items-center bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <Instagram className="h-6 w-6 text-white" />
-            </div>
-          </a>
-        ))}
       </div>
     </section>
   );
