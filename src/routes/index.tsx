@@ -106,7 +106,6 @@ function Home() {
       />
       <PromoWide />
       <FeaturedCategories categories={categories.data ?? []} lang={lang} />
-      <TopBrands />
       <WhyChooseUs />
       <Reviews />
       <Newsletter />
@@ -377,25 +376,6 @@ function ProductSection({ eyebrow, title, subtitle, products }: { eyebrow: strin
           {products.map((p) => <ProductCard key={p.id} p={p} />)}
         </div>
       )}
-    </section>
-  );
-}
-
-const BRANDS = ["L'ORÉAL", "WELLA", "SCHWARZKOPF", "OPI", "MAC", "REVLON", "OLAPLEX", "REDKEN"];
-function TopBrands() {
-  const { tr } = useI18n();
-  return (
-    <section id="brands" className="border-y border-border bg-secondary/40 py-16">
-      <div className="container-app">
-        <SectionHead eyebrow={tr("brands")} title={tr("topBrandsTitle")} subtitle={tr("topBrandsSub")} />
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-          {BRANDS.map((b) => (
-            <div key={b} className="group grid h-20 place-items-center rounded-2xl bg-white border border-border transition hover:-translate-y-1 hover:shadow-soft hover:border-[var(--pink-deep)]/40">
-              <span className="font-display text-sm tracking-[0.2em] text-black/70 transition group-hover:text-[var(--pink-deep)]">{b}</span>
-            </div>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }
