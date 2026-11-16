@@ -13,6 +13,7 @@ import heroNails1 from "@/assets/hero-nails-1.jpg";
 import heroNails2 from "@/assets/hero-nails-2.jpg";
 import heroNails3 from "@/assets/hero-nails-3.jpg";
 import heroNails4 from "@/assets/hero-nails-4.jpg";
+import heroDreame from "@/assets/hero-dreame-banner.jpg";
 
 export const Route = createFileRoute("/")({
   loader: () => loadSeo("/"),
@@ -97,7 +98,6 @@ function Home() {
 
   return (
     <div className="overflow-x-hidden">
-      <DreameHomeExtra />
       <Hero />
       <Marquee />
       <ProductSection
@@ -111,13 +111,14 @@ function Home() {
       <WhyChooseUs />
       <Reviews />
       <Newsletter />
+      <DreameHomeExtra />
     </div>
   );
 }
 
 /* ------------------------------ Sections ------------------------------ */
 
-const HERO_SLIDES = [
+const HERO_SLIDES: { src: string; mobile: string; alt: string; full?: boolean }[] = [
   {
     src: heroNails1,
     mobile: heroNails1,
@@ -137,6 +138,12 @@ const HERO_SLIDES = [
     src: heroNails3,
     mobile: heroNails3,
     alt: "Lampë UV/LED profesionale për tharjen e gel lakut në sallon thonjsh",
+  },
+  {
+    src: heroDreame,
+    mobile: heroDreame,
+    alt: "DREAMÈ Beauty Cosmetics — Gel Polish, Cleaner dhe Builder Gel",
+    full: true,
   },
 ];
 
@@ -195,14 +202,16 @@ function Hero() {
             fetchPriority={i === 0 ? "high" : "low"}
             loading={i === 0 ? "eager" : "lazy"}
             decoding={i === 0 ? "sync" : "async"}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-in-out ${i === idx ? "opacity-70" : "opacity-0"}`}
+            className={`absolute inset-0 h-full w-full ${s.full ? "" : "object-cover"} transition-opacity duration-[1200ms] ease-in-out ${i === idx ? (s.full ? "opacity-100" : "opacity-70") : "opacity-0"} ${s.full ? "object-contain sm:object-cover" : ""}`}
           />
         </picture>
       ))}
       {/* Overlays for text legibility */}
+      <div className={`contents transition-opacity ${HERO_SLIDES[idx].full ? "[&>*]:opacity-0" : ""}`}>
       <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
       <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[var(--pink-deep)]/25 blur-3xl" />
+      </div>
 
       {/* Prev / next arrows — larger tap target on mobile */}
       <button
@@ -221,7 +230,7 @@ function Hero() {
       </button>
 
       <div className="container-app relative py-12 sm:py-24 md:py-32 lg:py-40 min-h-[68svh] sm:min-h-[600px] flex items-center">
-        <div className="max-w-2xl space-y-5 sm:space-y-7 text-white">
+        <div className={`max-w-2xl space-y-5 sm:space-y-7 text-white transition-opacity duration-700 ${HERO_SLIDES[idx].full ? "opacity-0 pointer-events-none" : ""}`}>
           <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-white backdrop-blur">
             <Sparkles className="h-3 w-3 text-[var(--pink)]" /> {tr("heroBadge")}
           </span>
