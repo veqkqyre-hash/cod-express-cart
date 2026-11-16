@@ -97,6 +97,7 @@ function Home() {
 
   return (
     <div className="overflow-x-hidden">
+      <DreameHomeExtra />
       <Hero />
       <Marquee />
       <ProductSection
@@ -110,7 +111,6 @@ function Home() {
       <WhyChooseUs />
       <Reviews />
       <Newsletter />
-      <DreameHomeExtra />
     </div>
   );
 }
