@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, Youtube, Mail, MapPin, CreditCard, Truck, ShieldCheck, Headphones } from "lucide-react";
+import { Instagram, Facebook, Youtube, Mail, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { NewsletterSignup } from "@/components/newsletter-signup";
 
@@ -7,28 +7,6 @@ export function SiteFooter() {
   const { tr, lang } = useI18n();
   return (
     <footer className="mt-24">
-      {/* Trust strip */}
-      <div className="border-y border-border bg-secondary/40">
-        <div className="container-app grid grid-cols-2 gap-6 py-8 md:grid-cols-4">
-          {[
-            { icon: Truck, title: tr("freeShippingTitle"), sub: tr("freeShippingSub") },
-            { icon: ShieldCheck, title: tr("codTitle"), sub: tr("codSub") },
-            { icon: Headphones, title: tr("supportTitle"), sub: tr("supportSub") },
-            { icon: CreditCard, title: tr("securePayTitle"), sub: tr("securePaySub") },
-          ].map((f, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-card shadow-soft">
-                <f.icon className="h-5 w-5 text-[var(--pink-deep)]" />
-              </span>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold">{f.title}</div>
-                <div className="text-xs text-muted-foreground">{f.sub}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       <div className="bg-black text-white">
         <div className="container-app grid gap-10 py-16 md:grid-cols-12">
           <div className="md:col-span-4 space-y-5">
