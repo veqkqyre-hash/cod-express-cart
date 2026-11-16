@@ -274,7 +274,7 @@ function Hero() {
 
 function Marquee() {
   const { tr } = useI18n();
-  const items = [tr("marq1"), tr("marq2"), tr("marq3"), tr("marq4"), tr("marq5")];
+  const items = [tr("marq1"), tr("marq2"), tr("marq3"), tr("marq5")];
   const line = [...items, ...items];
   return (
     <div className="border-y border-black/10 bg-black text-white overflow-hidden">
