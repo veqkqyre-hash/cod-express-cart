@@ -120,6 +120,12 @@ function Home() {
 
 const HERO_SLIDES: { src: string; mobile: string; alt: string; full?: boolean }[] = [
   {
+    src: heroDreame,
+    mobile: heroDreame,
+    alt: "DREAMÈ Beauty Cosmetics — Gel Polish, Cleaner dhe Builder Gel",
+    full: true,
+  },
+  {
     src: heroNails1,
     mobile: heroNails1,
     alt: "Manikyr me gel lak rozë të shkëlqyeshëm — produkte profesionale për thonj nga Dreame Beauty Cosmetics",
@@ -138,12 +144,6 @@ const HERO_SLIDES: { src: string; mobile: string; alt: string; full?: boolean }[
     src: heroNails3,
     mobile: heroNails3,
     alt: "Lampë UV/LED profesionale për tharjen e gel lakut në sallon thonjsh",
-  },
-  {
-    src: heroDreame,
-    mobile: heroDreame,
-    alt: "DREAMÈ Beauty Cosmetics — Gel Polish, Cleaner dhe Builder Gel",
-    full: true,
   },
 ];
 
@@ -185,6 +185,7 @@ function Hero() {
   return (
     <section
       className="relative overflow-hidden bg-black select-none touch-pan-y"
+      style={HERO_SLIDES[idx].full ? { aspectRatio: "1660 / 491" } : undefined}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -202,7 +203,7 @@ function Hero() {
             fetchPriority={i === 0 ? "high" : "low"}
             loading={i === 0 ? "eager" : "lazy"}
             decoding={i === 0 ? "sync" : "async"}
-            className={`absolute inset-0 h-full w-full ${s.full ? "" : "object-cover"} transition-opacity duration-[1200ms] ease-in-out ${i === idx ? (s.full ? "opacity-100" : "opacity-70") : "opacity-0"} ${s.full ? "object-contain sm:object-cover" : ""}`}
+            className={`absolute inset-0 h-full w-full ${s.full ? "" : "object-cover"} transition-opacity duration-[1200ms] ease-in-out ${i === idx ? (s.full ? "opacity-100" : "opacity-70") : "opacity-0"} ${s.full ? "object-cover" : ""}`}
           />
         </picture>
       ))}
@@ -229,7 +230,7 @@ function Hero() {
         <ChevronRight className="h-6 w-6" />
       </button>
 
-      <div className="container-app relative py-12 sm:py-24 md:py-32 lg:py-40 min-h-[68svh] sm:min-h-[600px] flex items-center">
+      <div className={`container-app relative flex items-center ${HERO_SLIDES[idx].full ? "py-0" : "py-12 sm:py-24 md:py-32 lg:py-40 min-h-[68svh] sm:min-h-[600px]"}`}>
         <div className={`max-w-2xl space-y-5 sm:space-y-7 text-white transition-opacity duration-700 ${HERO_SLIDES[idx].full ? "opacity-0 pointer-events-none" : ""}`}>
           <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-white backdrop-blur">
             <Sparkles className="h-3 w-3 text-[var(--pink)]" /> {tr("heroBadge")}
