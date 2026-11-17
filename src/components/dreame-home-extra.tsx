@@ -21,12 +21,6 @@ const CATS = [
 ];
 
 export function DreameHomeExtra() {
-  const { tr } = useI18n();
-  const promos = [
-    { img: p0, title: tr("promoStudiosTitle"), sub: tr("promoStudiosSub"), btn: tr("promoLearnMore"), to: "/shop", photoLeft: true },
-    { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), to: "/contact", photoLeft: false },
-    { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: tr("promoLearnMore"), to: "/shop", photoLeft: true },
-  ];
   return (
     <div className="bg-background">
       {/* Categories */}
@@ -45,6 +39,21 @@ export function DreameHomeExtra() {
         </div>
       </section>
 
+
+    </div>
+  );
+}
+
+// Kept separate so only the existing promo banners can be positioned lower on the homepage.
+export function DreameHomePromos() {
+  const { tr } = useI18n();
+  const promos = [
+    { img: p0, title: tr("promoStudiosTitle"), sub: tr("promoStudiosSub"), btn: tr("promoLearnMore"), to: "/shop", photoLeft: true },
+    { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), to: "/contact", photoLeft: false },
+    { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: tr("promoLearnMore"), to: "/shop", photoLeft: true },
+  ];
+  return (
+    <div className="bg-background">
       {/* Promo banners */}
       <section className="container-app pb-12">
         <div className="grid gap-3 md:grid-cols-3">
