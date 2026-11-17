@@ -28,12 +28,13 @@ function ProductStripCard({ product, lang, duplicate = false }: { product: Strip
       className="group relative block w-[185px] shrink-0 overflow-hidden rounded-xl border border-border bg-white sm:w-[210px] lg:w-[245px]"
       aria-label={name}
     >
-      <div className="aspect-[4/3] w-full overflow-hidden bg-[#f7f0f3]">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#f7f0f3]">
+        <img src={product.image_url!} alt="" aria-hidden="true" loading="lazy" className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-xl" />
         <img
           src={product.image_url!}
           alt={name}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="relative h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
         />
       </div>
       <div className="px-3 py-3 text-foreground">
