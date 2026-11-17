@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whatsappLink } from "@/lib/business-whatsapp";
@@ -7,42 +9,127 @@ import { AppointmentBooking } from "@/components/appointment-booking";
 import p0 from "@/assets/dreame-home/promo-0-photo.jpg";
 import p1 from "@/assets/dreame-home/promo-1-photo.jpg";
 import p2 from "@/assets/dreame-home/promo-2-photo.jpg";
-import c0 from "@/assets/dreame-home/cat-0.jpg";
-import c1 from "@/assets/dreame-home/cat-1.jpg";
-import c2 from "@/assets/dreame-home/cat-2.jpg";
-import c3 from "@/assets/dreame-home/cat-3.jpg";
-import c4 from "@/assets/dreame-home/cat-4.jpg";
-import c5 from "@/assets/dreame-home/cat-5.jpg";
+type StripProduct = {
+  id: string;
+  slug: string;
+  name_sq: string;
+  name_en: string;
+  image_url: string | null;
+  category_id: string | null;
+};
 
-const CATS = [
-  { img: c0, label: "Nail Care", slug: "nail-art" },
-  { img: c1, label: "Gel Polish", slug: "llak-gel" },
-  { img: c2, label: "Builder Gel", slug: "builder-gel" },
-  { img: c3, label: "Tools & Accessories", slug: "lime-instrumente" },
-  { img: c4, label: "Foot Care", slug: "pedikyr" },
-  { img: c5, label: "Cleaner & Acetone", slug: "baze-top-coat" },
-];
+function ProductStripCard({ product, lang, duplicate = false }: { product: StripProduct; lang: "sq" | "en" | "de" | "fr"; duplicate?: boolean }) {
+  const name = (lang === "sq" ? product.name_sq : product.name_en) || product.name_sq || product.name_en;
+  return (
+    <Link
+      to="/product/$slug"
+      params={{ slug: product.slug }}
+      tabIndex={duplicate ? -1 : undefined}
+      className="group relative block w-[185px] shrink-0 overflow-hidden rounded-xl border border-border bg-white sm:w-[210px] lg:w-[245px]"
+      aria-label={name}
+    >
+      <div className="aspect-[4/3] w-full bg-white p-2">
+        <img src={product.image_url!} alt={name} loading="lazy" className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" />
+      </div>
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent px-3 pb-3 pt-8 text-white">
+        <div className="line-clamp-2 text-xs font-semibold leading-snug sm:text-sm">{name}</div>
+        <span className="mt-1 block text-[11px] text-white/90">
+          {({ sq: "Shiko produktin", en: "View product", de: "Produkt ansehen", fr: "Voir le produit" } as const)[lang]} →
+        </span>
+      </div>
+    </Link>
+  );
+}
 
 export function DreameHomeExtra() {
+  const { lang } = useI18n();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const pauseRef = useRef(false);
+  const { data: products = [] } = useQuery({
+    queryKey: ["home-real-products-strip"],
+    queryFn: async (): Promise<StripProduct[]> => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id,slug,name_sq,name_en,image_url,category_id")
+        .eq("active", true)
+        .gt("stock", 0)
+        .not("image_url", "is", null)
+        .neq("image_url", "")
+        .order("created_at", { ascending: false })
+        .limit(120);
+      if (error) throw error;
+      const available = (data ?? []).filter((p) => p.image_url && p.slug && (p.name_sq || p.name_en)) as StripProduct[];
+
+      // Start with distinct real categories, then fill with other real products.
+      const chosen: StripProduct[] = [];
+      const seenCategories = new Set<string>();
+      const seenProducts = new Set<string>();
+      for (const p of available) {
+        if (p.category_id && !seenCategories.has(p.category_id)) {
+          chosen.push(p);
+          seenCategories.add(p.category_id);
+          seenProducts.add(p.id);
+        }
+        if (chosen.length >= 12) break;
+      }
+      for (const p of available) {
+        if (chosen.length >= 12) break;
+        if (!seenProducts.has(p.id)) { chosen.push(p); seenProducts.add(p.id); }
+      }
+      return chosen;
+    },
+    staleTime: 120_000,
+  });
+
+  useEffect(() => {
+    const viewport = scrollRef.current;
+    if (!viewport || products.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let frame = 0;
+    let previous = 0;
+    const animate = (timestamp: number) => {
+      const elapsed = previous ? Math.min(timestamp - previous, 50) : 0;
+      previous = timestamp;
+      if (!pauseRef.current && !document.hidden) {
+        const distance = viewport.scrollWidth / 2;
+        if (distance > viewport.clientWidth) {
+          viewport.scrollLeft += elapsed * 0.028;
+          if (viewport.scrollLeft >= distance) viewport.scrollLeft -= distance;
+        }
+      }
+      frame = window.requestAnimationFrame(animate);
+    };
+    frame = window.requestAnimationFrame(animate);
+    return () => window.cancelAnimationFrame(frame);
+  }, [products.length]);
+
+  // If no existing, photographed products are available, don't show fake categories.
+  if (products.length === 0) return null;
+
   return (
     <div className="bg-background">
-      {/* Categories */}
-      <section className="container-app pt-12 pb-8">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {CATS.map((c) => (
-            <Link key={c.label} to="/shop" search={{ category: c.slug } as any} className="group relative block aspect-[4/3] overflow-hidden rounded-xl">
-              <img src={c.img} alt={c.label} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/10 to-transparent" />
-              <div className="absolute bottom-2 left-3 text-background">
-                <div className="text-sm font-semibold md:text-base">{c.label}</div>
-                <div className="text-[11px] opacity-90">Shop now →</div>
+      <section className="container-app pt-12 pb-8" aria-label={({ sq: "Produkte nga dyqani", en: "Products from our shop", de: "Produkte aus unserem Shop", fr: "Produits de notre boutique" } as const)[lang]}>
+        <div
+          ref={scrollRef}
+          className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          onMouseEnter={() => { pauseRef.current = true; }}
+          onMouseLeave={() => { pauseRef.current = false; }}
+          onFocus={() => { pauseRef.current = true; }}
+          onBlur={() => { pauseRef.current = false; }}
+          onTouchStart={() => { pauseRef.current = true; }}
+          onTouchEnd={() => { pauseRef.current = false; }}
+        >
+          <div className="flex w-max">
+            <div className="flex shrink-0 gap-3 pr-3">
+              {products.map((product) => <ProductStripCard key={product.id} product={product} lang={lang} />)}
+            </div>
+            {products.length > 1 && (
+              <div className="flex shrink-0 gap-3 pr-3" aria-hidden="true">
+                {products.map((product) => <ProductStripCard key={product.id} product={product} lang={lang} duplicate />)}
               </div>
-            </Link>
-          ))}
+            )}
+          </div>
         </div>
       </section>
-
-
     </div>
   );
 }
