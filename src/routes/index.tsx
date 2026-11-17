@@ -177,12 +177,12 @@ function Hero() {
       </div>
 
       {/* Soft light veil at the bottom so the text stays readable without hiding the photo. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-[#f7f0f3]/95 via-[#f7f0f3]/55 to-transparent" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-[#faf5f7] via-[#f7f0f3]/80 to-transparent" aria-hidden="true" />
 
       {/* Brand text and button overlaid on the photo. */}
       <div className="absolute inset-0 flex items-end">
         <div className="px-5 pb-6 pt-10 sm:px-10 sm:pb-10 lg:px-14 lg:pb-12">
-          <div className="max-w-xl text-[#241b20]">
+          <div className="max-w-xl text-[#1d1418] [text-shadow:0_1px_2px_rgba(255,255,255,0.55),0_0_14px_rgba(255,255,255,0.45)]">
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.21em] text-[#614b56] sm:mb-3 sm:text-xs">
               {brandCopy.eyebrow}
             </p>
