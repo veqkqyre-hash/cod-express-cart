@@ -257,24 +257,3 @@ body:has(.admin-light) [role="dialog"] input::placeholder { color: oklch(0.55 0 
 .admin-light .text-emerald-600 { color: oklch(0.45 0.13 150); }
 .admin-light .text-amber-600 { color: oklch(0.5 0.13 60); }
 .admin-light .recharts-legend-item-text { color: oklch(0.3 0 0) !important; }
-
-/* Hero banner photo: the source photo has dark-brown/satin edges, not pure black,
-   so where it is shown smaller than the banner the rectangle edge would show as a
-   hard line. Fade the exposed edges into the black banner background. */
-.hero-photo {
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 20%),
-    linear-gradient(to top, transparent 0%, #000 16%);
-  mask-image: linear-gradient(to right, transparent 0%, #000 20%),
-    linear-gradient(to top, transparent 0%, #000 16%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
-}
-
-@media (max-width: 639px) {
-  .hero-photo {
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 26%),
-      linear-gradient(to top, transparent 0%, #000 30%);
-    mask-image: linear-gradient(to right, transparent 0%, #000 26%),
-      linear-gradient(to top, transparent 0%, #000 30%);
-  }
-}
