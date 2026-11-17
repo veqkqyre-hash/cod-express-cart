@@ -88,13 +88,13 @@ export function SiteHeader() {
       </div>
 
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl">
-        <div className="container-app flex h-16 md:h-20 items-center gap-3 md:gap-6">
+        <div className="container-app flex h-16 min-w-0 items-center gap-1.5 sm:gap-3 md:h-20 md:gap-5">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <span className="grid h-10 w-10 md:h-11 md:w-11 place-items-center">
-              <img src="/assets/dreame-symbol.svg" alt="" aria-hidden="true" className="h-9 w-9 md:h-10 md:w-10 object-contain brightness-0 invert" />
+          <Link to="/" className="flex min-w-0 shrink items-center gap-1.5 sm:gap-2.5 lg:shrink-0" aria-label="Dreame Beauty Cosmetics">
+            <span className="grid h-8 w-8 shrink-0 place-items-center sm:h-10 sm:w-10 md:h-11 md:w-11">
+              <img src="/assets/dreame-symbol.svg" alt="" aria-hidden="true" className="h-7 w-7 object-contain brightness-0 invert sm:h-9 sm:w-9 md:h-10 md:w-10" />
             </span>
-            <span className="font-display text-xl md:text-2xl tracking-tight font-semibold">Dreame Beauty Cosmetics</span>
+            <span className="min-w-0 truncate font-display text-[17px] font-semibold tracking-tight sm:text-xl md:text-2xl"><span>Dreame</span><span className="hidden min-[440px]:inline"> Beauty Cosmetics</span></span>
           </Link>
 
           {/* Nav */}
@@ -147,15 +147,15 @@ export function SiteHeader() {
           </form>
 
           {/* Icons */}
-          <div className="md:ml-0 ml-auto flex items-center gap-1">
-            <div className="hidden sm:flex items-center gap-0.5 rounded-full border border-border px-1 py-0.5 text-[10px] mr-1">
+          <div className="ml-auto flex shrink-0 items-center gap-0 sm:gap-1 md:ml-0">
+            <div className="hidden lg:flex items-center gap-0.5 rounded-full border border-border px-1 py-0.5 text-[10px] mr-1">
               <button onClick={() => setLang("sq")} className={`px-2 py-1 rounded-full transition ${lang === "sq" ? "bg-black text-white" : "text-muted-foreground"}`}>SQ</button>
               <button onClick={() => setLang("en")} className={`px-2 py-1 rounded-full transition ${lang === "en" ? "bg-black text-white" : "text-muted-foreground"}`}>EN</button>
               <button onClick={() => setLang("de")} className={`px-2 py-1 rounded-full transition ${lang === "de" ? "bg-black text-white" : "text-muted-foreground"}`}>DE</button>
               <button onClick={() => setLang("fr")} className={`px-2 py-1 rounded-full transition ${lang === "fr" ? "bg-black text-white" : "text-muted-foreground"}`}>FR</button>
             </div>
 
-            <Link to={signedIn ? "/account" : "/auth"} className="hidden sm:grid h-10 w-10 place-items-center rounded-full hover:bg-secondary transition" aria-label={tr("account")}>
+            <Link to={signedIn ? "/account" : "/auth"} className="hidden lg:grid h-10 w-10 place-items-center rounded-full hover:bg-secondary transition" aria-label={tr("account")}>
               <User className="h-5 w-5" />
             </Link>
 
@@ -177,7 +177,7 @@ export function SiteHeader() {
               )}
             </Link>
 
-            <button className="lg:hidden grid h-10 w-10 place-items-center rounded-full hover:bg-secondary" onClick={() => setOpen((o) => !o)} aria-label="Menu">
+            <button className="lg:hidden grid h-10 w-10 shrink-0 place-items-center rounded-full hover:bg-secondary" onClick={() => setOpen((o) => !o)} aria-label="Menu">
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
@@ -234,6 +234,19 @@ export function SiteHeader() {
                   className="w-full bg-transparent text-sm outline-none"
                 />
               </form>
+              <div className="flex flex-wrap items-center gap-2 border-b border-border/60 pb-3" aria-label="Language">
+                {(["sq", "en", "de", "fr"] as const).map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => setLang(code)}
+                    aria-pressed={lang === code}
+                    className={`min-h-10 min-w-12 rounded-full border px-3 text-xs font-semibold uppercase transition ${lang === code ? "border-[var(--pink-deep)] bg-[var(--pink-deep)] text-white" : "border-border text-foreground"}`}
+                  >
+                    {code}
+                  </button>
+                ))}
+              </div>
               <nav className="flex flex-col text-sm">
                 <Link to="/shop" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("shop")}</Link>
                 <Link to="/wishlist" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("wishlist")}</Link>
