@@ -108,10 +108,10 @@ function Home() {
         products={newArrivals.data ?? []}
       />
       <FeaturedCategories categories={categories.data ?? []} lang={lang} />
+      <DreameHomePromos />
       <WhyChooseUs />
       <Reviews />
       <PromoWide />
-      <DreameHomePromos />
       <Newsletter />
     </div>
   );
