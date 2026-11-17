@@ -25,7 +25,7 @@ function ProductStripCard({ product, lang, duplicate = false }: { product: Strip
       to="/product/$slug"
       params={{ slug: product.slug }}
       tabIndex={duplicate ? -1 : undefined}
-      className="group relative block w-[185px] shrink-0 overflow-hidden rounded-xl border border-border bg-white sm:w-[210px] lg:w-[245px]"
+      className="group relative block w-[min(48vw,185px)] min-w-[145px] shrink-0 overflow-hidden rounded-xl border border-neutral-200 bg-white text-[#241d20] sm:w-[210px] lg:w-[245px]"
       aria-label={name}
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#f7f0f3]">
@@ -37,9 +37,9 @@ function ProductStripCard({ product, lang, duplicate = false }: { product: Strip
           className="relative h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
         />
       </div>
-      <div className="px-3 py-3 text-foreground">
+      <div className="px-3 py-3 text-[#241d20]">
         <div className="line-clamp-2 text-xs font-semibold leading-snug sm:text-sm">{name}</div>
-        <span className="mt-1 block text-[11px] text-muted-foreground">
+        <span className="mt-1 block text-[11px] text-neutral-600">
           {({ sq: "Shiko produktin", en: "View product", de: "Produkt ansehen", fr: "Voir le produit" } as const)[lang]} →
         </span>
       </div>
@@ -113,7 +113,7 @@ export function DreameHomeExtra() {
 
   return (
     <div className="bg-background">
-      <section className="container-app pt-12 pb-8" aria-label={({ sq: "Produkte nga dyqani", en: "Products from our shop", de: "Produkte aus unserem Shop", fr: "Produits de notre boutique" } as const)[lang]}>
+      <section className="container-app pt-7 pb-7 sm:pt-12 sm:pb-8" aria-label={({ sq: "Produkte nga dyqani", en: "Products from our shop", de: "Produkte aus unserem Shop", fr: "Produits de notre boutique" } as const)[lang]}>
         <div
           ref={scrollRef}
           className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
