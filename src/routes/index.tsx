@@ -105,8 +105,8 @@ function Home() {
         subtitle={tr("newArrivalsSub")}
         products={newArrivals.data ?? []}
       />
-      <DreameHomePromos />
       <Newsletter />
+      <DreameHomePromos />
     </div>
   );
 }
