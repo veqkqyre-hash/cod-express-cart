@@ -326,6 +326,18 @@ export function HomepagePanel() {
 
   return (
     <div>
+      <div className="mb-5 rounded-2xl border border-neutral-200 bg-white p-4 text-sm text-neutral-700">
+        <p className="font-semibold">{L("Dy fotot e ballinës", "The two homepage photos")}</p>
+        <p className="mt-1">
+          {L(
+            "Dy fotot e para aktive, sipas radhitjes, shfaqen në krye të faqes pa shtresa të zeza. Këtu mund t'i ngarkosh, ndërrosh, fshehësh dhe t'ua ndryshosh linkun. Nëse nuk ka foto aktive, përdoret një fotografi rezervë.",
+            "The first two active photos, in sort order, appear at the top of the website with no black overlays. Upload, replace, hide or change their links here. If none are active, a default photo is used."
+          )}
+        </p>
+        <p className="mt-2 text-neutral-500">
+          {L("Fotot e produkteve në shiritin poshtë menaxhohen te Produktet.", "Product photos in the scrolling strip below are managed under Products.")}
+        </p>
+      </div>
       <AddButton label={L("Shto sllajd", "Add slide")} onClick={() => setEditing("new")} />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {(slides ?? []).map((x: any) => (
