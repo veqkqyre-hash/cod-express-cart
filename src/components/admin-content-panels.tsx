@@ -327,11 +327,11 @@ export function HomepagePanel() {
   return (
     <div>
       <div className="mb-5 rounded-2xl border border-neutral-200 bg-white p-4 text-sm text-neutral-700">
-        <p className="font-semibold">{L("Dy fotot e ballinës", "The two homepage photos")}</p>
+        <p className="font-semibold">{L("Fotoja kryesore e ballinës", "Homepage banner photo")}</p>
         <p className="mt-1">
           {L(
-            "Dy fotot e para aktive, sipas radhitjes, shfaqen në krye të faqes pa shtresa të zeza. Këtu mund t'i ngarkosh, ndërrosh, fshehësh dhe t'ua ndryshosh linkun. Nëse nuk ka foto aktive, përdoret një fotografi rezervë.",
-            "The first two active photos, in sort order, appear at the top of the website with no black overlays. Upload, replace, hide or change their links here. If none are active, a default photo is used."
+            "Fotoja e parë aktive, sipas radhitjes, shfaqet në bannerin kryesor. Mund ta ngarkosh ose ta ndërrrosh këtu. Banneri nuk ndërron automatikisht foto dhe shkrimi ndryshon sipas gjuhës së zgjedhur. Nëse nuk ka foto aktive, përdoret fotografia rezervë.",
+            "The first active photo, in sort order, appears in the homepage banner. Upload or replace it here. The banner does not rotate photos and the text follows the selected language. If there is no active photo, the fallback is shown."
           )}
         </p>
         <p className="mt-2 text-neutral-500">
