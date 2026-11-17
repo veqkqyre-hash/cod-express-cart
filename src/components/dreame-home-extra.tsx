@@ -1,6 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
-import heroModel from "@/assets/dreame-home/hero-model.jpg";
 import c0 from "@/assets/dreame-home/cat-0.jpg";
 import c1 from "@/assets/dreame-home/cat-1.jpg";
 import c2 from "@/assets/dreame-home/cat-2.jpg";
@@ -20,26 +18,8 @@ const CATS = [
 export function DreameHomeExtra() {
   return (
     <div className="bg-background">
-      {/* Hero */}
-      <section className="container-app pt-12">
-        <div className="relative overflow-hidden rounded-2xl bg-card text-foreground border border-border">
-          <div className="grid md:grid-cols-2">
-            <div className="relative z-10 flex flex-col justify-center p-8 md:p-12">
-              <p className="text-[11px] tracking-[0.3em] opacity-80">PROFESSIONAL BEAUTY SOLUTIONS</p>
-              <h2 className="mt-3 font-display text-5xl leading-none md:text-7xl">DREAMÈ</h2>
-              <p className="font-display text-3xl italic md:text-5xl">Beauty Cosmetics</p>
-              <p className="mt-4 text-sm md:text-lg opacity-90">Qualität. Eleganz. Perfektion.<br />Für deine Schönheit – jeden Tag.</p>
-              <Link to="/shop" className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-background">
-                Jetzt entdecken <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <img src={heroModel} alt="DREAMÈ Beauty Cosmetics – Gel Polish, Cleaner und Builder Gel" className="h-64 w-full object-cover md:h-full" loading="lazy" />
-          </div>
-        </div>
-      </section>
-
       {/* Categories */}
-      <section className="container-app pt-4 pb-8">
+      <section className="container-app pt-12 pb-8">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {CATS.map((c) => (
             <Link key={c.label} to="/shop" search={{ category: c.slug } as any} className="group relative block aspect-[4/3] overflow-hidden rounded-xl">
