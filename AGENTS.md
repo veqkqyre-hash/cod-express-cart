@@ -17,3 +17,4 @@
 - Product options use separate persistent variants, optional product specifications and atomic authenticated database RPCs for edits and checkout, so cPanel needs no Node endpoints; removed variants are deactivated to retain order references.
 - Cart identity is product ID plus optional variant ID; order lines retain the chosen label and price, while online stock validation locks parent products before variants to remain compatible with POS inventory.
 - Admin Products and Inventory share a paginated product query and a separate admin-only ordering record; save complete ID permutations atomically with stale-list checks, never updating product rows or public/POS ordering.
+- Keep the header, homepage triangle and favicon on the same local public SVG asset so cPanel requires no CDN dependency; preserve the original raster reference.
