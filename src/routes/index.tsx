@@ -109,11 +109,9 @@ function Home() {
         subtitle={tr("newArrivalsSub")}
         products={newArrivals.data ?? []}
       />
-      <FeaturedCategories categories={categories.data ?? []} lang={lang} />
       <DreameHomePromos />
       <WhyChooseUs />
       <Reviews />
-      <PromoWide />
       <Newsletter />
     </div>
   );
