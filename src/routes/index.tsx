@@ -9,6 +9,7 @@ import { DreameHomeExtra, DreameHomePromos } from "@/components/dreame-home-extr
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import heroModel from "@/assets/dreame-home/hero-model.jpg";
 
 
 export const Route = createFileRoute("/")({
@@ -111,6 +112,15 @@ function Home() {
 
 /* ------------------------------ Sections ------------------------------ */
 
+type HomepageBanner = {
+  id: string;
+  image_url: string | null;
+  title_sq: string;
+  title_en: string;
+  link_url: string | null;
+};
+
+// Restore the original banner text in every supported language.
 const BRAND_HERO_COPY = {
   sq: { eyebrow: "ZGJIDHJE PROFESIONALE PËR BUKURI", line1: "Cilësi. Elegancë. Përsosmëri.", line2: "Për bukurinë tënde — çdo ditë." },
   en: { eyebrow: "PROFESSIONAL BEAUTY SOLUTIONS", line1: "Quality. Elegance. Perfection.", line2: "For your beauty — every day." },
@@ -119,44 +129,85 @@ const BRAND_HERO_COPY = {
 } as const;
 
 function Hero() {
-  const { tr, lang } = useI18n();
+  const { lang, tr } = useI18n();
   const brandCopy = BRAND_HERO_COPY[lang];
+  const { data: savedBanners = [] } = useQuery({
+    queryKey: ["homepage-visible-slides"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("homepage_slides")
+        .select("id,image_url,title_sq,title_en,link_url")
+        .eq("active", true)
+        .not("image_url", "is", null)
+        .order("sort_order", { ascending: true })
+        .limit(2);
+      if (error) throw error;
+      return (data ?? []) as HomepageBanner[];
+    },
+    staleTime: 60_000,
+  });
+
+  const activeBanners = savedBanners.filter((slide) => Boolean(slide.image_url)).slice(0, 2);
+  const banners: HomepageBanner[] = activeBanners.length ? activeBanners : [{
+    id: "default-photo",
+    image_url: heroModel,
+    title_sq: "DREAMÈ Beauty Cosmetics",
+    title_en: "DREAMÈ Beauty Cosmetics",
+    link_url: "/shop",
+  }];
 
   return (
-    <section
-      aria-label={tr("heroBadge")}
-      className="relative overflow-hidden bg-[#f7f0f3] text-[#241b20]"
-    >
-      <div className="container-app grid min-h-[450px] grid-cols-1 items-center gap-6 py-12 sm:py-16 lg:min-h-[490px] lg:grid-cols-2 lg:gap-12 lg:py-16">
-        {/* Retain the original branding and call-to-action; no photo or black mask. */}
-        <div className="relative z-10 max-w-xl">
-          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.21em] text-[#614b56] sm:text-xs">
-            {brandCopy.eyebrow}
-          </p>
-          <h1 className="font-display text-[clamp(2.9rem,5vw,5.8rem)] leading-[0.94] tracking-tight">
-            DREAMÈ
-          </h1>
-          <p className="mt-1 font-display text-[clamp(1.5rem,2.8vw,3rem)] italic leading-tight">
-            Beauty Cosmetics
-          </p>
-          <p className="mt-4 text-sm leading-relaxed text-[#51434b] sm:text-base">
-            {brandCopy.line1}<br />{brandCopy.line2}
-          </p>
-          <Link
-            to="/shop"
-            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#241b20] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--pink-deep)]"
-          >
-            {tr("shopNow")} <ArrowRight className="h-4 w-4" />
-          </Link>
+    <section aria-label={tr("heroBadge")} className="overflow-hidden bg-[#f7f0f3]">
+      <div className="grid lg:grid-cols-[minmax(320px,36%)_minmax(0,1fr)]">
+        {/* Keep all original text visible without putting black overlays on the photographs. */}
+        <div className="flex min-h-[330px] items-center bg-gradient-to-r from-[#f7f0f3] to-[#f4e7ec] px-6 py-10 sm:px-10 lg:min-h-[480px] lg:px-10 xl:px-14">
+          <div className="max-w-xl text-[#241b20]">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.21em] text-[#614b56] sm:text-xs">
+              {brandCopy.eyebrow}
+            </p>
+            <h1 className="font-display text-[clamp(2.9rem,5vw,5.8rem)] leading-[0.94] tracking-tight">
+              DREAMÈ
+            </h1>
+            <p className="mt-1 font-display text-[clamp(1.5rem,2.8vw,3rem)] italic leading-tight">
+              Beauty Cosmetics
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-[#51434b] sm:text-base">
+              {brandCopy.line1}<br />{brandCopy.line2}
+            </p>
+            <Link
+              to="/shop"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#241b20] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--pink-deep)]"
+            >
+              {tr("shopNow")} <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
 
-        {/* Outlined, textured triangle from the supplied reference replaces the model image. */}
-        <div className="flex items-center justify-center py-2 sm:py-4 lg:py-0" aria-hidden="true">
-          <img
-            src="/assets/dreame-symbol.svg"
-            alt=""
-            className="h-auto w-[120px] object-contain sm:w-[155px] lg:w-[175px]"
-          />
+        <div className={`grid min-w-0 ${banners.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
+          {banners.map((banner) => {
+            const title = ((lang === "sq" ? banner.title_sq : banner.title_en) || banner.title_sq || banner.title_en).trim();
+            const url = banner.link_url || "/shop";
+            const safeUrl = ((url.startsWith("/") && !url.startsWith("//")) || url.startsWith("https://") || url.startsWith("http://")) ? url : "/shop";
+            const src = banner.image_url || heroModel;
+            return (
+              <a
+                key={banner.id}
+                href={safeUrl}
+                aria-label={title || tr("shopNow")}
+                className="group relative block h-[300px] min-w-0 overflow-hidden bg-[#f7f0f3] sm:h-[420px] lg:h-[480px]"
+              >
+                {/* Fill spare space with the photo itself, not black bars or overlays. */}
+                <img src={src} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover opacity-75 blur-2xl" />
+                <img
+                  src={src}
+                  alt={title || "DREAMÈ Beauty Cosmetics"}
+                  loading="eager"
+                  fetchPriority="high"
+                  className="relative h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.015]"
+                />
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>
