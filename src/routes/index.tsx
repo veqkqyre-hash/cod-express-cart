@@ -92,7 +92,7 @@ function Home() {
       const { data } = await supabase
         .from("products")
         .select("id,slug,name_sq,name_en,price,image_url,stock,discount_active,discount_percent")
-        .eq("active", true).gt("stock", 0).order("created_at", { ascending: false }).limit(8);
+        .eq("active", true).gt("stock", 0).order("created_at", { ascending: false }).limit(5);
       return (data ?? []) as Product[];
     },
   });
@@ -409,14 +409,14 @@ function ProductSection({ eyebrow, title, subtitle, products }: { eyebrow: strin
         </Link>
       </div>
       {products.length === 0 ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="aspect-[3/4] rounded-2xl bg-[var(--pink-soft)]/60 animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {products.map((p) => <ProductCard key={p.id} p={p} />)}
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
+          {products.map((p) => <ProductCard key={p.id} p={p} compact />)}
         </div>
       )}
     </section>
