@@ -109,9 +109,7 @@ function Home() {
         products={newArrivals.data ?? []}
       />
       <DreameHomePromos />
-      <WhyChooseUs />
       <AppointmentBooking />
-      <Reviews />
       <Newsletter />
     </div>
   );
