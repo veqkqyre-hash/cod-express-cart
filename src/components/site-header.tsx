@@ -94,7 +94,7 @@ export function SiteHeader() {
             <span className="grid h-8 w-8 shrink-0 place-items-center sm:h-10 sm:w-10 md:h-11 md:w-11">
               <img src="/assets/dreame-symbol.svg" alt="" aria-hidden="true" className="h-7 w-7 object-contain brightness-0 invert sm:h-9 sm:w-9 md:h-10 md:w-10" />
             </span>
-            <span className="min-w-0 truncate font-display text-[17px] font-semibold tracking-tight sm:text-xl md:text-2xl"><span>Dreame</span><span className="hidden min-[440px]:inline"> Beauty Cosmetics</span></span>
+            <span className="flex min-w-0 flex-col font-display text-[14px] font-semibold leading-[1.05] tracking-tight min-[440px]:inline min-[440px]:text-lg sm:text-xl md:text-2xl"><span>Dreame</span><span className="whitespace-nowrap text-[11px] min-[440px]:text-[inherit]"> Beauty Cosmetics</span></span>
           </Link>
 
           {/* Nav */}
