@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whatsappLink } from "@/lib/business-whatsapp";
+import { AppointmentBooking } from "@/components/appointment-booking";
 import p0 from "@/assets/dreame-home/promo-0-photo.jpg";
 import p1 from "@/assets/dreame-home/promo-1-photo.jpg";
 import p2 from "@/assets/dreame-home/promo-2-photo.jpg";
@@ -88,8 +90,24 @@ const PROMO_INFO = {
 export function DreameHomePromos() {
   const { tr, lang } = useI18n();
   const info = PROMO_INFO[lang];
+  const bookingRef = useRef<HTMLDetailsElement>(null);
+  function revealBooking() {
+    if (bookingRef.current) bookingRef.current.open = true;
+  }
+  useEffect(() => {
+    function revealFromHash() {
+      if (window.location.hash === "#rezervo-termin") {
+        revealBooking();
+        document.getElementById("rezervo-termin")?.scrollIntoView({ block: "start" });
+      }
+    }
+    revealFromHash();
+    window.addEventListener("hashchange", revealFromHash);
+    return () => window.removeEventListener("hashchange", revealFromHash);
+  }, []);
+  const bookingLabel = ({ sq: "Cakto termin", en: "Book appointment", de: "Termin vereinbaren", fr: "Prendre rendez-vous" } as const)[lang];
   const promos = [
-    { img: p0, title: tr("promoStudiosTitle"), sub: tr("promoStudiosSub"), btn: tr("promoLearnMore"), href: "#studio-info", photoLeft: true, external: false },
+    { img: p0, title: tr("promoStudiosTitle"), sub: tr("promoStudiosSub"), btn: tr("promoLearnMore"), href: "#rezervo-termin", photoLeft: true, external: false },
     { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), href: whatsappLink(info.academyMessage), photoLeft: false, external: true },
     { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: tr("promoLearnMore"), href: "#feet-info", photoLeft: true, external: false },
   ];
@@ -99,7 +117,7 @@ export function DreameHomePromos() {
       <section className="container-app pb-12">
         <div className="grid gap-3 md:grid-cols-3">
           {promos.map((p) => (
-            <a key={p.title} href={p.href} target={p.external ? "_blank" : undefined} rel={p.external ? "noopener noreferrer" : undefined} className="group flex overflow-hidden rounded-xl bg-foreground text-background">
+            <a key={p.title} href={p.href} onClick={p.href === "#rezervo-termin" ? revealBooking : undefined} target={p.external ? "_blank" : undefined} rel={p.external ? "noopener noreferrer" : undefined} className="group flex overflow-hidden rounded-xl bg-foreground text-background">
               {p.photoLeft && <img src={p.img} alt="" loading="lazy" className="w-24 shrink-0 object-cover sm:w-28" />}
               <div className="flex flex-1 flex-col justify-center gap-1.5 p-4">
                 <div className="font-display text-lg leading-tight">{p.title}</div>
@@ -116,6 +134,9 @@ export function DreameHomePromos() {
           <article id="studio-info" className="scroll-mt-28 rounded-2xl border border-border bg-card p-5 text-foreground">
             <h3 className="font-display text-xl">{info.studioTitle}</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{info.studioBody}</p>
+            <a href="#rezervo-termin" onClick={revealBooking} className="mt-4 mr-5 inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-[var(--pink-deep)] hover:underline">
+              {bookingLabel} <ArrowRight className="h-4 w-4" />
+            </a>
             <Link to="/shop" search={{}} className="mt-4 inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-[var(--pink-deep)] hover:underline">
               {info.studioAction} <ArrowRight className="h-4 w-4" />
             </Link>
@@ -123,11 +144,15 @@ export function DreameHomePromos() {
           <article id="feet-info" className="scroll-mt-28 rounded-2xl border border-border bg-card p-5 text-foreground">
             <h3 className="font-display text-xl">{info.feetTitle}</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{info.feetBody}</p>
-            <a href="/#rezervo-termin" className="mt-4 inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-[var(--pink-deep)] hover:underline">
+            <a href="/#rezervo-termin" onClick={revealBooking} className="mt-4 inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-[var(--pink-deep)] hover:underline">
               {info.feetAction} <ArrowRight className="h-4 w-4" />
             </a>
           </article>
         </div>
+        <details id="rezervo-termin" ref={bookingRef} className="mt-5 scroll-mt-28 rounded-2xl border border-border bg-card p-5 text-foreground sm:p-8">
+          <summary className="cursor-pointer text-base font-semibold text-[var(--pink-deep)] marker:text-[var(--pink-deep)]">{bookingLabel}</summary>
+          <AppointmentBooking embedded />
+        </details>
       </section>
     </div>
   );
