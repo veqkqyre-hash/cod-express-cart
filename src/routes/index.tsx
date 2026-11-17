@@ -147,58 +147,57 @@ function Hero() {
     staleTime: 60_000,
   });
 
-  const activeBanners = savedBanners.filter((slide) => Boolean(slide.image_url)).slice(0, 2);
-  const banners: HomepageBanner[] = activeBanners.length ? activeBanners : [{
-    id: "default-photo",
-    image_url: heroModel,
-    title_sq: "DREAMÈ Beauty Cosmetics",
-    title_en: "DREAMÈ Beauty Cosmetics",
-    link_url: "/shop",
-  }];
+  // Use the original photographic composition: dark branding space on the
+  // left, model and DREAMÈ products on the right. Keep copy localized and the
+  // call-to-action clickable instead of relying on text baked into a JPG.
+  const chosenPhotos = savedBanners.filter((slide) => Boolean(slide.image_url)).slice(0, 2);
+  const heroPhoto = chosenPhotos[0]?.image_url || heroModel;
 
   return (
-    <section aria-label={tr("heroBadge")} className="relative overflow-hidden bg-[#f7f0f3]">
-      {/* Full photo, uncropped, edge to edge. */}
-      <div className={`grid min-w-0 ${banners.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
-        {banners.map((banner) => {
-          const title = ((lang === "sq" ? banner.title_sq : banner.title_en) || banner.title_sq || banner.title_en).trim();
-          const src = banner.image_url || heroModel;
-          return (
-            <img
-              key={banner.id}
-              src={src}
-              alt={title || "DREAMÈ Beauty Cosmetics"}
-              loading="eager"
-              fetchPriority="high"
-              className="block h-auto w-full min-w-0"
-            />
-          );
-        })}
+    <section
+      aria-label={tr("heroBadge")}
+      className="relative isolate overflow-hidden bg-[#080607] text-white"
+    >
+      {/* A real photograph fills the right-hand side on desktop, and the banner
+          on phones. No white washout, artificial photo masking, or separate panel. */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <img
+          src={heroPhoto}
+          alt=""
+          loading="eager"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover object-[55%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-none sm:object-contain"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(90deg, rgba(0,0,0,.89) 0%, rgba(0,0,0,.74) 30%, rgba(0,0,0,.28) 57%, rgba(0,0,0,0) 86%)",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent sm:hidden" />
       </div>
 
-      {/* Brand text and button overlaid on the photo. */}
-      <div className="absolute inset-0 flex items-end">
-        <div className="px-5 pb-6 pt-10 sm:px-10 sm:pb-10 lg:px-14 lg:pb-12">
-          <div className="max-w-xl text-[#1d1418] [text-shadow:0_1px_2px_rgba(255,255,255,0.95),0_0_9px_rgba(255,255,255,0.78)]">
-            <p className="mb-2 inline-block max-w-full rounded-md bg-[#241b20]/90 px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.17em] text-white shadow-sm [text-shadow:none] sm:mb-3 sm:text-xs">
-              {brandCopy.eyebrow}
-            </p>
-            <h1 className="font-display text-[clamp(2.2rem,7vw,5.8rem)] leading-[0.94] tracking-tight">
-              DREAMÈ
-            </h1>
-            <p className="mt-1 font-display text-[clamp(1.2rem,3.4vw,3rem)] italic leading-tight">
-              Beauty Cosmetics
-            </p>
-            <p className="mt-3 hidden text-sm leading-relaxed text-[#51434b] sm:mt-4 sm:block sm:text-base">
-              {brandCopy.line1}<br />{brandCopy.line2}
-            </p>
-            <Link
-              to="/shop"
-              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#241b20] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--pink-deep)] sm:mt-5"
-            >
-              {tr("shopNow")} <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+      {/* Recreate the white text and white pill from the reference banner. */}
+      <div className="container-app relative z-10 flex min-h-[390px] items-end py-8 sm:min-h-[410px] sm:items-center sm:py-10 lg:min-h-[460px]">
+        <div className="w-full max-w-[370px] sm:max-w-[46%] lg:max-w-[530px]">
+          <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.12em] text-white/95 sm:text-xs sm:tracking-[0.16em]">
+            {brandCopy.eyebrow}
+          </p>
+          <h1 className="font-display text-[clamp(3.1rem,8vw,6rem)] leading-[0.94] tracking-tight text-white">
+            DREAMÈ
+          </h1>
+          <p className="mt-1 font-display text-[clamp(1.65rem,4vw,3.2rem)] italic leading-tight text-white">
+            Beauty Cosmetics
+          </p>
+          <p className="mt-4 text-sm leading-snug text-white/95 sm:text-base">
+            {brandCopy.line1}<br />{brandCopy.line2}
+          </p>
+          <Link
+            to="/shop"
+            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-[#151015] shadow-sm transition hover:bg-[#f8e6ec]"
+          >
+            {tr("shopNow")} <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </section>
