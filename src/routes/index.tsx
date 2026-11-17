@@ -166,7 +166,7 @@ function Hero() {
           alt=""
           loading="eager"
           fetchPriority="high"
-          className="hero-photo absolute right-0 top-0 h-auto w-[70%] object-contain sm:left-auto sm:right-0 sm:top-auto sm:bottom-0 sm:h-[86%] sm:w-auto sm:max-w-none sm:object-contain"
+          className="absolute inset-0 h-full w-full object-cover object-[55%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-none sm:object-contain"
         />
         <div
           className="absolute inset-0"
