@@ -99,6 +99,7 @@ function Home() {
   return (
     <div className="overflow-x-hidden">
       <Hero />
+      <DreameHomeExtra />
       <Marquee />
       <ProductSection
         eyebrow={tr("newArrivals")}
@@ -111,7 +112,6 @@ function Home() {
       <WhyChooseUs />
       <Reviews />
       <Newsletter />
-      <DreameHomeExtra />
     </div>
   );
 }
