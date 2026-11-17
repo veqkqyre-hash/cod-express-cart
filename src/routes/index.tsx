@@ -101,7 +101,6 @@ function Home() {
     <div className="overflow-x-hidden">
       <Hero />
       <DreameHomeExtra />
-      <AppointmentBooking />
       <Marquee />
       <ProductSection
         eyebrow={tr("newArrivals")}
@@ -111,6 +110,7 @@ function Home() {
       />
       <DreameHomePromos />
       <WhyChooseUs />
+      <AppointmentBooking />
       <Reviews />
       <Newsletter />
     </div>
