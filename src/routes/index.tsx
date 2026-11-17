@@ -153,9 +153,9 @@ function Hero() {
         {/* Outlined, textured triangle from the supplied reference replaces the model image. */}
         <div className="flex items-center justify-center py-2 sm:py-4 lg:py-0" aria-hidden="true">
           <img
-            src="/assets/dreame-symbol.png"
+            src="/assets/dreame-symbol.svg"
             alt=""
-            className="h-auto w-[120px] object-contain brightness-0 sm:w-[155px] lg:w-[175px]"
+            className="h-auto w-[120px] object-contain sm:w-[155px] lg:w-[175px]"
           />
         </div>
       </div>
