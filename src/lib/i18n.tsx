@@ -181,6 +181,14 @@ export const t: Dict = {
   contact: { sq: "Kontakt", en: "Contact" },
   shippingPolicy: { sq: "Politika e Transportit", en: "Shipping Policy" },
   returns: { sq: "Kthimet", en: "Returns" },
+  promoStudiosTitle: { sq: "Për Studiot e Thonjve", en: "For Nail Studios" },
+  promoStudiosSub: { sq: "Produkte profesionale për kërkesat më të larta.", en: "Professional products for the highest demands." },
+  promoLearnMore: { sq: "Mëso më shumë", en: "Learn more" },
+  promoAcademyTitle: { sq: "DREAMÈ Beauty Academy", en: "DREAMÈ Beauty Academy" },
+  promoAcademySub: { sq: "Formim & trajnim për karrierën tënde.", en: "Training & education for your career." },
+  promoAcademyBtn: { sq: "Regjistrohu tani", en: "Sign up now" },
+  promoFeetTitle: { sq: "Për Këmbët e Tua", en: "For Your Feet" },
+  promoFeetSub: { sq: "Kujdes & bukuri nga koka te këmbët.", en: "Care & beauty from head to toe." },
 };
 
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; tr: (k: keyof typeof t) => string };
