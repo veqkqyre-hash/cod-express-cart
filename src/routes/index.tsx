@@ -158,9 +158,9 @@ function Hero() {
 
   return (
     <section aria-label={tr("heroBadge")} className="overflow-hidden bg-[#f7f0f3]">
-      <div className="grid lg:grid-cols-[minmax(320px,36%)_minmax(0,1fr)]">
+      <div className="flex flex-col-reverse lg:grid lg:grid-cols-[minmax(320px,36%)_minmax(0,1fr)]">
         {/* Keep all original text visible without putting black overlays on the photographs. */}
-        <div className="flex min-h-[330px] items-center bg-gradient-to-r from-[#f7f0f3] to-[#f4e7ec] px-6 py-10 sm:px-10 lg:min-h-[480px] lg:px-10 xl:px-14">
+        <div className="relative z-10 flex items-center bg-gradient-to-r from-[#f7f0f3] to-[#f4e7ec] px-6 pb-9 pt-7 sm:px-10 sm:py-9 lg:min-h-[480px] lg:px-10 lg:py-10 xl:px-14">
           <div className="max-w-xl text-[#241b20]">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.21em] text-[#614b56] sm:text-xs">
               {brandCopy.eyebrow}
@@ -194,7 +194,7 @@ function Hero() {
                 key={banner.id}
                 href={safeUrl}
                 aria-label={title || tr("shopNow")}
-                className="group relative block h-[300px] min-w-0 overflow-hidden bg-[#f7f0f3] sm:h-[420px] lg:h-[480px]"
+                className="group relative block h-[290px] min-w-0 overflow-hidden bg-[#f7f0f3] sm:h-[370px] lg:h-[480px]"
               >
                 {/* Fill spare space with the photo itself, not black bars or overlays. */}
                 <img src={src} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover opacity-75 blur-2xl" />
