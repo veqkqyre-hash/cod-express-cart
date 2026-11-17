@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ProductCard, type Product } from "@/components/product-card";
-import { DreameHomeExtra } from "@/components/dreame-home-extra";
+import { DreameHomeExtra, DreameHomePromos } from "@/components/dreame-home-extra";
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -107,10 +107,11 @@ function Home() {
         subtitle={tr("newArrivalsSub")}
         products={newArrivals.data ?? []}
       />
-      <PromoWide />
       <FeaturedCategories categories={categories.data ?? []} lang={lang} />
       <WhyChooseUs />
       <Reviews />
+      <PromoWide />
+      <DreameHomePromos />
       <Newsletter />
     </div>
   );
