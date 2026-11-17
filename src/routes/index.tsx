@@ -9,7 +9,7 @@ import { DreameHomeExtra, DreameHomePromos } from "@/components/dreame-home-extr
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import heroDreame from "@/assets/hero-dreame-banner.jpg";
+import heroModel from "@/assets/dreame-home/hero-model.jpg";
 
 export const Route = createFileRoute("/")({
   loader: () => loadSeo("/"),
@@ -111,115 +111,73 @@ function Home() {
 
 /* ------------------------------ Sections ------------------------------ */
 
-const HERO_SLIDES: { src: string; mobile: string; alt: string; full?: boolean }[] = [
-  {
-    src: heroDreame,
-    mobile: heroDreame,
-    alt: "DREAMÈ Beauty Cosmetics — Gel Polish, Cleaner dhe Builder Gel",
-    full: true,
-  },
-];
-
-const BRAND_HERO_COPY = {
-  sq: { eyebrow: "ZGJIDHJE PROFESIONALE PËR BUKURI", line1: "Cilësi. Elegancë. Përsosmëri.", line2: "Për bukurinë tënde — çdo ditë." },
-  en: { eyebrow: "PROFESSIONAL BEAUTY SOLUTIONS", line1: "Quality. Elegance. Perfection.", line2: "For your beauty — every day." },
-  de: { eyebrow: "PROFESSIONELLE BEAUTY-LÖSUNGEN", line1: "Qualität. Eleganz. Perfektion.", line2: "Für deine Schönheit — jeden Tag." },
-  fr: { eyebrow: "SOLUTIONS BEAUTÉ PROFESSIONNELLES", line1: "Qualité. Élégance. Perfection.", line2: "Pour votre beauté — chaque jour." },
-} as const;
+type HomepageBanner = {
+  id: string;
+  image_url: string | null;
+  title_sq: string;
+  title_en: string;
+  link_url: string | null;
+};
 
 function Hero() {
-  const { tr, lang } = useI18n();
-  const brandCopy = BRAND_HERO_COPY[lang];
-  const idx = 0;
+  const { lang, tr } = useI18n();
+  const { data: savedBanners = [] } = useQuery({
+    queryKey: ["homepage-visible-slides"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("homepage_slides")
+        .select("id,image_url,title_sq,title_en,link_url")
+        .eq("active", true)
+        .not("image_url", "is", null)
+        .order("sort_order", { ascending: true })
+        .limit(2);
+      if (error) throw error;
+      return (data ?? []) as HomepageBanner[];
+    },
+    staleTime: 60_000,
+  });
+
+  // The homepage shows up to two photographs managed in Admin > Ballina.
+  // Keep a photo-only default instead of the old banner with black artwork.
+  const banners: HomepageBanner[] = savedBanners.filter((s) => Boolean(s.image_url)).length
+    ? savedBanners.filter((s) => Boolean(s.image_url)).slice(0, 2)
+    : [{
+        id: "default-photo",
+        image_url: heroModel,
+        title_sq: "DREAMÈ Beauty Cosmetics",
+        title_en: "DREAMÈ Beauty Cosmetics",
+        link_url: "/shop",
+      }];
 
   return (
-    <section
-      className={`relative overflow-hidden bg-black select-none touch-pan-y ${HERO_SLIDES[idx].full ? "min-h-[410px] sm:min-h-[440px]" : ""}`}
-      style={HERO_SLIDES[idx].full ? { aspectRatio: "1660 / 491" } : undefined}
-    >
-      {/* Rotating background images (responsive via <picture>) */}
-      {HERO_SLIDES.map((s, i) => (
-        <picture key={s.src}>
-          <source media="(max-width: 640px)" srcSet={s.mobile} />
-          <img
-            src={s.src}
-            alt={i === idx ? s.alt : ""}
-            title={s.alt}
-            width={1600}
-            height={900}
-            fetchPriority={i === 0 ? "high" : "low"}
-            loading={i === 0 ? "eager" : "lazy"}
-            decoding={i === 0 ? "sync" : "async"}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-in-out ${i === idx ? (s.full ? "opacity-100" : "opacity-70") : "opacity-0"}`}
-            style={s.full ? { maskImage: "linear-gradient(to right, transparent 0%, transparent 27%, rgba(0,0,0,0.35) 37%, black 49%)", WebkitMaskImage: "linear-gradient(to right, transparent 0%, transparent 27%, rgba(0,0,0,0.35) 37%, black 49%)", objectPosition: "center" } : undefined}
-          />
-        </picture>
-      ))}
-      {/* Overlays for text legibility */}
-      <div className={`contents transition-opacity ${HERO_SLIDES[idx].full ? "[&>*]:opacity-0" : ""}`}>
-      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
-      <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[var(--pink-deep)]/25 blur-3xl" />
-      </div>
-
-      {/* The reference banner has German lettering baked into its pixels. Show only
-          its photographic right-hand portion and render language-aware text in HTML. */}
-      {HERO_SLIDES[idx].full && (
-        <>
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/95 via-black/60 to-transparent" />
-          <div className="pointer-events-none absolute inset-0 z-[1] flex items-center">
-            <div className="container-app w-full py-10">
-              <div className="pointer-events-auto max-w-xl text-white">
-                <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.21em] text-white/80 sm:text-xs">{brandCopy.eyebrow}</p>
-                <h1 className="font-display text-[clamp(2.9rem,6vw,5.8rem)] leading-[0.94] tracking-tight">DREAMÈ</h1>
-                <p className="mt-1 font-display text-[clamp(1.5rem,3vw,3rem)] italic leading-tight">Beauty Cosmetics</p>
-                <p className="mt-4 text-sm leading-relaxed text-white/90 sm:text-base">{brandCopy.line1}<br />{brandCopy.line2}</p>
-                <Link to="/shop" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-[var(--pink-soft)]">
-                  {tr("shopNow")} <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      <div className={`container-app relative flex items-center ${HERO_SLIDES[idx].full ? "py-0" : "py-12 sm:py-24 md:py-32 lg:py-40 min-h-[68svh] sm:min-h-[600px]"}`}>
-        <div className={`max-w-2xl space-y-5 sm:space-y-7 text-white transition-opacity duration-700 ${HERO_SLIDES[idx].full ? "opacity-0 pointer-events-none" : ""}`}>
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-white backdrop-blur">
-            <Sparkles className="h-3 w-3 text-[var(--pink)]" /> {tr("heroBadge")}
-          </span>
-          <h1 className="font-display text-4xl leading-[1.05] sm:text-6xl lg:text-7xl">
-            {tr("heroLine1")}
-            <br />
-            <span className="relative inline-block mt-2 sm:mt-3">
-              <span className="absolute inset-0 -skew-y-2 rounded-2xl bg-[var(--pink-deep)] -z-0" aria-hidden />
-              <span className="relative italic px-3 py-1 sm:px-5 sm:py-1.5 text-white">{tr("heroLine2")}</span>
-            </span>
-          </h1>
-          <p className="max-w-lg text-sm sm:text-base md:text-lg text-white/85">{tr("heroSub2")}</p>
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            <Link
-              to="/shop"
-              className="group inline-flex items-center gap-2 rounded-full bg-[var(--pink-deep)] px-6 py-3 sm:px-8 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-white shadow-pink transition hover:bg-[var(--pink)]"
-            >
-              {tr("shopNow")}
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-            </Link>
+    <section aria-label={tr("heroBadge")} className="bg-[#f7f0f3]">
+      <h1 className="sr-only">DREAMÈ Beauty Cosmetics</h1>
+      <div className={`grid grid-cols-1 ${banners.length === 2 ? "md:grid-cols-2" : ""}`}>
+        {banners.map((banner) => {
+          const title = ((lang === "sq" ? banner.title_sq : banner.title_en) || banner.title_sq || banner.title_en).trim();
+          const url = banner.link_url || "/shop";
+          const safeUrl = ((url.startsWith("/") && !url.startsWith("//")) || url.startsWith("https://") || url.startsWith("http://")) ? url : "/shop";
+          const src = banner.image_url || heroModel;
+          return (
             <a
-              href="#categories"
-              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 sm:px-8 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-white/20"
+              key={banner.id}
+              href={safeUrl}
+              aria-label={title || tr("shopNow")}
+              className="group relative block h-[300px] overflow-hidden bg-[#f7f0f3] sm:h-[420px] lg:h-[480px]"
             >
-              {tr("shopCategories")}
+              {/* The same photo fills any spare area: never black letterboxing. */}
+              <img src={src} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover opacity-75 blur-2xl" />
+              <img
+                src={src}
+                alt={title || "DREAMÈ Beauty Cosmetics"}
+                loading="eager"
+                fetchPriority="high"
+                className="relative h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.015]"
+              />
             </a>
-          </div>
-          <div className="flex flex-wrap gap-x-5 gap-y-2 sm:gap-x-7 sm:gap-y-3 pt-2 sm:pt-4 text-[11px] sm:text-xs text-white/80">
-            <div className="flex items-center gap-1.5 sm:gap-2"><Truck className="h-4 w-4 text-[var(--pink)]" /> {tr("freeShippingBanner")}</div>
-            <div className="flex items-center gap-1.5 sm:gap-2"><ShieldCheck className="h-4 w-4 text-[var(--pink)]" /> {tr("codShort")}</div>
-            <div className="flex items-center gap-1.5 sm:gap-2"><Award className="h-4 w-4 text-[var(--pink)]" /> {tr("qualityBadge")}</div>
-          </div>
-        </div>
+          );
+        })}
       </div>
-
     </section>
   );
 }

@@ -28,12 +28,18 @@ function ProductStripCard({ product, lang, duplicate = false }: { product: Strip
       className="group relative block w-[185px] shrink-0 overflow-hidden rounded-xl border border-border bg-white sm:w-[210px] lg:w-[245px]"
       aria-label={name}
     >
-      <div className="aspect-[4/3] w-full bg-white p-2">
-        <img src={product.image_url!} alt={name} loading="lazy" className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" />
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#f7f0f3]">
+        <img src={product.image_url!} alt="" aria-hidden="true" loading="lazy" className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-xl" />
+        <img
+          src={product.image_url!}
+          alt={name}
+          loading="lazy"
+          className="relative h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+        />
       </div>
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent px-3 pb-3 pt-8 text-white">
+      <div className="px-3 py-3 text-foreground">
         <div className="line-clamp-2 text-xs font-semibold leading-snug sm:text-sm">{name}</div>
-        <span className="mt-1 block text-[11px] text-white/90">
+        <span className="mt-1 block text-[11px] text-muted-foreground">
           {({ sq: "Shiko produktin", en: "View product", de: "Produkt ansehen", fr: "Voir le produit" } as const)[lang]} →
         </span>
       </div>
