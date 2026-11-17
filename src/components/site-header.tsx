@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ShoppingBag, Menu, X, User, Heart, Search, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -14,7 +14,6 @@ export function SiteHeader() {
   const { count } = useCart();
   const { count: wishCount } = useWishlist();
   const navigate = useNavigate();
-  const isHome = useLocation().pathname === "/";
   const [open, setOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -88,12 +87,12 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isHome ? "home-header border-[#e6e1e3] bg-white text-[#1e1b1c]" : "border-border/60 bg-background/85"}`}>
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl">
         <div className="container-app flex h-16 md:h-20 items-center gap-3 md:gap-6">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <span className="grid h-10 w-10 md:h-11 md:w-11 place-items-center">
-              <img src="/assets/dreame-symbol.svg" alt="" aria-hidden="true" className={`h-9 w-9 md:h-10 md:w-10 object-contain brightness-0 ${isHome ? "" : "invert"}`} />
+              <img src="/assets/dreame-symbol.svg" alt="" aria-hidden="true" className="h-9 w-9 md:h-10 md:w-10 object-contain brightness-0 invert" />
             </span>
             <span className="font-display text-xl md:text-2xl tracking-tight font-semibold">Dreame Beauty Cosmetics</span>
           </Link>
