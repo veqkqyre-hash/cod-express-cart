@@ -28,7 +28,7 @@ function seed(id: string) {
   return (h % 1000) / 1000;
 }
 
-export function ProductCard({ p }: { p: Product }) {
+export function ProductCard({ p, compact = false }: { p: Product; compact?: boolean }) {
   const { lang, tr } = useI18n();
   const { add } = useCart();
   const { has, toggle } = useWishlist();
@@ -112,11 +112,11 @@ export function ProductCard({ p }: { p: Product }) {
           </div>
 
           {/* Add to cart bar — slides up on hover */}
-          <div className="absolute inset-x-3 bottom-3 translate-y-3 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <div className={compact ? "absolute inset-x-2 bottom-2 translate-y-0 opacity-100 transition duration-300 md:inset-x-3 md:bottom-3 md:translate-y-3 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100" : "absolute inset-x-3 bottom-3 translate-y-3 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100"}>
             <button
               disabled={p.stock === 0}
               onClick={(e) => { e.preventDefault(); handleAdd(); }}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-black px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-elev transition hover:bg-[var(--pink-deep)] disabled:opacity-40"
+              className={compact ? "flex min-h-9 w-full items-center justify-center gap-1 rounded-full bg-black px-1.5 py-2 text-[10px] font-semibold uppercase leading-tight tracking-tight text-white shadow-elev transition hover:bg-[var(--pink-deep)] disabled:opacity-40 sm:gap-2 sm:px-3 sm:text-xs" : "flex w-full items-center justify-center gap-2 rounded-full bg-black px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-elev transition hover:bg-[var(--pink-deep)] disabled:opacity-40"}
             >
               <ShoppingBag className="h-3.5 w-3.5" /> {tr("addToCart")}
             </button>
@@ -124,7 +124,7 @@ export function ProductCard({ p }: { p: Product }) {
         </Link>
 
         {/* Meta */}
-        <div className="flex flex-1 flex-col gap-2 p-4">
+        <div className={compact ? "flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-4" : "flex flex-1 flex-col gap-2 p-4"}>
           <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
             <div className="flex text-[var(--gold)]">
               {[0, 1, 2, 3, 4].map((i) => (
@@ -136,12 +136,12 @@ export function ProductCard({ p }: { p: Product }) {
           <Link
             to="/product/$slug"
             params={{ slug: p.slug }}
-            className="line-clamp-2 min-h-[2.6rem] text-sm font-medium leading-snug transition-colors hover:text-[var(--pink-deep)]"
+            className={compact ? "line-clamp-2 min-h-[2.4rem] text-xs font-medium leading-snug transition-colors hover:text-[var(--pink-deep)] sm:text-sm" : "line-clamp-2 min-h-[2.6rem] text-sm font-medium leading-snug transition-colors hover:text-[var(--pink-deep)]"}
           >
             {name}
           </Link>
           <div className="mt-auto flex items-baseline gap-2">
-            <span className="font-display text-lg text-[var(--pink-deep)]">{formatEur(price)}</span>
+            <span className={compact ? "font-display text-base text-[var(--pink-deep)] sm:text-lg" : "font-display text-lg text-[var(--pink-deep)]"}>{formatEur(price)}</span>
             {oldPrice && (
               <span className="text-xs text-muted-foreground line-through">{formatEur(oldPrice)}</span>
             )}
