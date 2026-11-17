@@ -1,4 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import p0 from "@/assets/dreame-home/promo-0-photo.jpg";
+import p1 from "@/assets/dreame-home/promo-1-photo.jpg";
+import p2 from "@/assets/dreame-home/promo-2-photo.jpg";
 import c0 from "@/assets/dreame-home/cat-0.jpg";
 import c1 from "@/assets/dreame-home/cat-1.jpg";
 import c2 from "@/assets/dreame-home/cat-2.jpg";
@@ -16,6 +21,12 @@ const CATS = [
 ];
 
 export function DreameHomeExtra() {
+  const { tr } = useI18n();
+  const promos = [
+    { img: p0, title: tr("promoStudiosTitle"), sub: tr("promoStudiosSub"), btn: tr("promoLearnMore"), to: "/shop", photoLeft: true },
+    { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), to: "/contact", photoLeft: false },
+    { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: tr("promoLearnMore"), to: "/shop", photoLeft: true },
+  ];
   return (
     <div className="bg-background">
       {/* Categories */}
@@ -29,6 +40,25 @@ export function DreameHomeExtra() {
                 <div className="text-sm font-semibold md:text-base">{c.label}</div>
                 <div className="text-[11px] opacity-90">Shop now →</div>
               </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Promo banners */}
+      <section className="container-app pb-12">
+        <div className="grid gap-3 md:grid-cols-3">
+          {promos.map((p) => (
+            <Link key={p.title} to={p.to} className="group flex overflow-hidden rounded-xl bg-foreground text-background">
+              {p.photoLeft && <img src={p.img} alt="" loading="lazy" className="w-24 shrink-0 object-cover sm:w-28" />}
+              <div className="flex flex-1 flex-col justify-center gap-1.5 p-4">
+                <div className="font-display text-lg leading-tight">{p.title}</div>
+                <div className="text-xs opacity-80">{p.sub}</div>
+                <span className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-background px-4 py-1.5 text-xs font-semibold text-foreground">
+                  {p.btn} <ArrowRight className="h-3 w-3" />
+                </span>
+              </div>
+              {!p.photoLeft && <img src={p.img} alt="" loading="lazy" className="w-24 shrink-0 object-cover sm:w-28" />}
             </Link>
           ))}
         </div>
