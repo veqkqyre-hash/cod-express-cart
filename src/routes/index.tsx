@@ -10,6 +10,7 @@ import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail } fr
 import { useState } from "react";
 import { toast } from "sonner";
 import heroModel from "@/assets/dreame-home/hero-model.jpg";
+import heroDreameBanner from "@/assets/hero-dreame-banner.jpg";
 
 
 export const Route = createFileRoute("/")({
@@ -147,46 +148,44 @@ function Hero() {
     staleTime: 60_000,
   });
 
-  // Use the original photographic composition: dark branding space on the
-  // left, model and DREAMÈ products on the right. Keep copy localized and the
-  // call-to-action clickable instead of relying on text baked into a JPG.
-  const chosenPhotos = savedBanners.filter((slide) => Boolean(slide.image_url)).slice(0, 2);
-  const heroPhoto = chosenPhotos[0]?.image_url || heroModel;
+  // One still photo: no carousel, pagination dots, arrows, or automatic rotation.
+  // The original composition is the default. Admin can replace it using the
+  // first active homepage slide without changing the language-aware text.
+  const activePhoto = savedBanners.find((slide) => Boolean(slide.image_url))?.image_url;
+  const desktopPhoto = activePhoto || heroDreameBanner;
+  const mobilePhoto = activePhoto || heroModel;
 
   return (
-    <section
-      aria-label={tr("heroBadge")}
-      className="relative isolate overflow-hidden bg-[#080607] text-white"
-    >
-      {/* A real photograph fills the right-hand side on desktop, and the banner
-          on phones. No white washout, artificial photo masking, or separate panel. */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <img
-          src={heroPhoto}
-          alt=""
-          loading="eager"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover object-[55%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-none sm:object-contain"
-        />
+    <section aria-label={tr("heroBadge")} className="relative isolate overflow-hidden bg-[#080607] text-white">
+      {/* Exact original DREAMÈ banner on wider screens; its text is masked on
+          the left so that every language uses accessible, translated HTML. */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <picture>
+          <source media="(min-width: 640px)" srcSet={desktopPhoto} />
+          <img
+            src={mobilePhoto}
+            alt=""
+            loading="eager"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover object-[59%_center] sm:object-center"
+          />
+        </picture>
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.93)_0%,rgba(0,0,0,0.77)_46%,rgba(0,0,0,0.32)_77%,transparent_100%)] sm:hidden" />
         <div
-          className="absolute inset-0"
-          style={{
-            background: "linear-gradient(90deg, rgba(0,0,0,.89) 0%, rgba(0,0,0,.74) 30%, rgba(0,0,0,.28) 57%, rgba(0,0,0,0) 86%)",
-          }}
+          className="absolute inset-0 hidden sm:block"
+          style={{ background: "linear-gradient(90deg, #080607 0%, #080607 42%, rgba(8,6,7,.90) 46%, rgba(8,6,7,.45) 54%, rgba(8,6,7,.05) 70%, transparent 84%)" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent sm:hidden" />
       </div>
 
-      {/* Recreate the white text and white pill from the reference banner. */}
-      <div className="container-app relative z-10 flex min-h-[390px] items-end py-8 sm:min-h-[410px] sm:items-center sm:py-10 lg:min-h-[460px]">
-        <div className="w-full max-w-[370px] sm:max-w-[46%] lg:max-w-[530px]">
-          <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.12em] text-white/95 sm:text-xs sm:tracking-[0.16em]">
+      <div className="container-app relative z-10 flex min-h-[390px] items-center py-8 sm:min-h-[390px] sm:py-9 lg:min-h-[435px]">
+        <div className="w-full max-w-[335px] sm:max-w-[43%] lg:max-w-[540px]">
+          <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.13em] text-white/95 sm:text-xs">
             {brandCopy.eyebrow}
           </p>
-          <h1 className="font-display text-[clamp(3.1rem,8vw,6rem)] leading-[0.94] tracking-tight text-white">
+          <h1 className="font-display text-[clamp(3.1rem,7vw,6.2rem)] leading-[0.94] tracking-tight text-white">
             DREAMÈ
           </h1>
-          <p className="mt-1 font-display text-[clamp(1.65rem,4vw,3.2rem)] italic leading-tight text-white">
+          <p className="mt-1 font-display text-[clamp(1.55rem,3.75vw,3.2rem)] italic leading-tight text-white">
             Beauty Cosmetics
           </p>
           <p className="mt-4 text-sm leading-snug text-white/95 sm:text-base">
@@ -194,7 +193,7 @@ function Hero() {
           </p>
           <Link
             to="/shop"
-            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-[#151015] shadow-sm transition hover:bg-[#f8e6ec]"
+            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-[#151015] transition hover:bg-[#f8e6ec]"
           >
             {tr("shopNow")} <ArrowRight className="h-4 w-4" />
           </Link>
