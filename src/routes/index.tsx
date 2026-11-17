@@ -152,28 +152,11 @@ function Hero() {
 
         {/* Outlined, textured triangle from the supplied reference replaces the model image. */}
         <div className="flex items-center justify-center py-2 sm:py-4 lg:py-0" aria-hidden="true">
-          <svg
-            viewBox="0 0 270 240"
-            className="h-auto w-[180px] text-[#2a2025] sm:w-[260px] lg:w-[320px] xl:w-[375px]"
-            fill="none"
-          >
-            <defs>
-              <pattern id="dreame-hero-triangle-texture" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
-                <path d="M 0 0 L 0 7" stroke="currentColor" strokeWidth="1.2" opacity="0.45" />
-              </pattern>
-            </defs>
-            <path
-              d="M 45 10 L 236 120 L 45 230 Z M 60 37 L 60 203 L 205 120 Z"
-              fill="url(#dreame-hero-triangle-texture)"
-              fillRule="evenodd"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-            <path d="M 52 23 L 219 120 L 52 217 Z" stroke="currentColor" strokeWidth="1" strokeDasharray="2 3" opacity="0.8" />
-            <path d="M 73 59 L 179 120 L 73 181 Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-            <path d="M 81 73 L 163 120 L 81 167 Z" stroke="currentColor" strokeWidth="1" strokeDasharray="1.5 3" opacity="0.7" />
-          </svg>
+          <img
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC0AAAA1CAMAAADiQZJeAAAAYFBMVEUkGyAkGyAkGyAkGyAkGyAkGyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO3pUDAAAAIHRSTlMA9VKvbs8vkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKVdoQcAAAH4SURBVHjatVZJksNACGPn/z8eQXc5XmK7c5hUZTkoihACQvSvD9df0MxsP6Aj2WMZbSzMuYy2VGOOVXS4k7MuKnEh4ViiZyoQ8A4572jhgWaRdzMBSiXzDGJ/rbarzCkq05/NZCla9f6oKflI7/2q1SDWINPUBzPZqu/qMjgtotTbLTohu5Q0pwlSo3oXHVQJ5a0beQRY6pfu6FGlzirBzP2upDfRGf1T3eJuxZ3d2vyWkz2akBfKLpflSg+pkKE707Q5BbIoz9Fx9JJj6t7oYTzDzKKXkxKjA/eotjQEgnZM5qzSj78YXpwRGEPM7YfKpXt5aXaZGWUu+06OC+bywj3MnEHS3OiRb1O5ons0CuNZ2mXrpX1Rot1VhK2Z/aaXG3GTGQw+9IhHjg7oWhdZnsCSPKQdurEe9uhBlmCJsuOcb8My0Z0VOkQE06mT5eBBSRNXURg5uS4YP1Q5UqrJJHEh/jiYu3jUNEDet1lGL4HvjVL96M3lLt+IG41dVftnLAaESMPybkloaM/tHNtCP+xDjaEYZPWEKn3YnSqlWaRDgANnrA+bLaUGah4sxyqSp62ZXaUVqHL/cq5ybntMONLydkxyXpLE197PLEBlBRK0cpJTEPlEiJYOpgXSFr546zFJkbl66BGklOX/EBidH/6fRND/PP4ATGkIortw38gAAAAASUVORK5CYII="
+            alt=""
+            className="h-auto w-[120px] object-contain sm:w-[155px] lg:w-[175px]"
+          />
         </div>
       </div>
     </section>
