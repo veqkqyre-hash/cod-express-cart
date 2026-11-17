@@ -75,7 +75,7 @@ function todayLocal() {
   return local.toISOString().slice(0, 10);
 }
 
-export function AppointmentBooking() {
+export function AppointmentBooking({ embedded = false }: { embedded?: boolean }) {
   const { lang } = useI18n();
   const w = WORDS[lang];
   const [warning, setWarning] = useState("");
@@ -108,8 +108,8 @@ export function AppointmentBooking() {
 
   const field = "w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[var(--pink-deep)]";
   return (
-    <section id="rezervo-termin" className="container-app scroll-mt-28 py-10 sm:py-14">
-      <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-8">
+    <section id={embedded ? undefined : "rezervo-termin"} className={embedded ? "w-full py-4 sm:py-5" : "container-app scroll-mt-28 py-10 sm:py-14"}>
+      <div className={embedded ? "w-full" : "rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-8"}>
         <div className="max-w-3xl">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--pink-deep)]">{w.eyebrow}</p>
           <h2 className="mt-2 font-display text-3xl sm:text-4xl">{w.title}</h2>
