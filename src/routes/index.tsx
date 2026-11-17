@@ -151,7 +151,7 @@ function Hero() {
             loading={i === 0 ? "eager" : "lazy"}
             decoding={i === 0 ? "sync" : "async"}
             className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-in-out ${i === idx ? (s.full ? "opacity-100" : "opacity-70") : "opacity-0"}`}
-            style={s.full ? { clipPath: "inset(0 0 0 52%)", objectPosition: "center" } : undefined}
+            style={s.full ? { maskImage: "linear-gradient(to right, transparent 0%, transparent 27%, rgba(0,0,0,0.35) 37%, black 49%)", WebkitMaskImage: "linear-gradient(to right, transparent 0%, transparent 27%, rgba(0,0,0,0.35) 37%, black 49%)", objectPosition: "center" } : undefined}
           />
         </picture>
       ))}
@@ -166,7 +166,7 @@ function Hero() {
           its photographic right-hand portion and render language-aware text in HTML. */}
       {HERO_SLIDES[idx].full && (
         <>
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/95 via-black/60 to-transparent" />
           <div className="pointer-events-none absolute inset-0 z-[1] flex items-center">
             <div className="container-app w-full py-10">
               <div className="pointer-events-auto max-w-xl text-white">
