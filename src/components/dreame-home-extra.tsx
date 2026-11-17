@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Gem, Truck, ShieldCheck, Headphones } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whatsappLink } from "@/lib/business-whatsapp";
 import { AppointmentBooking } from "@/components/appointment-booking";
@@ -212,25 +212,83 @@ export function DreameHomePromos() {
     { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), href: whatsappLink(info.academyMessage), photoLeft: false, external: true },
     { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: tr("promoLearnMore"), href: "#feet-info", photoLeft: true, external: false },
   ];
+  const benefits = [
+    {
+      Icon: Gem,
+      title: ({ sq: "Cilësi Premium", en: "Premium Quality", de: "Premium Qualität", fr: "Qualité premium" } as const)[lang],
+      sub: ({ sq: "Për profesionistë dhe shtëpi", en: "For professionals & home", de: "Für Profis & Zuhause", fr: "Pour pros et particuliers" } as const)[lang],
+    },
+    {
+      Icon: Truck,
+      title: ({ sq: "Dërgesë e shpejtë", en: "Fast Delivery", de: "Schnelle Lieferung", fr: "Livraison rapide" } as const)[lang],
+      sub: ({ sq: "Në gjithë Kosovën", en: "Across Kosovo", de: "In ganz Kosovo", fr: "Partout au Kosovo" } as const)[lang],
+    },
+    {
+      Icon: ShieldCheck,
+      title: ({ sq: "Pagesë e sigurt", en: "Secure Payment", de: "Sichere Zahlung", fr: "Paiement sécurisé" } as const)[lang],
+      sub: ({ sq: "Dhe mbrojtje e të dhënave", en: "& data protection", de: "& Datenschutz", fr: "Et protection des données" } as const)[lang],
+    },
+    {
+      Icon: Headphones,
+      title: ({ sq: "Këshillim profesional", en: "Expert Advice", de: "Kompetente Beratung", fr: "Conseils professionnels" } as const)[lang],
+      sub: ({ sq: "Dhe trajnime", en: "& training", de: "& Schulung", fr: "Et formations" } as const)[lang],
+    },
+  ];
+
   return (
     <div className="bg-background">
-      {/* Existing promotional cards: images, titles and layout remain unchanged. */}
-      <section className="container-app pb-12">
-        <div className="grid gap-3 md:grid-cols-3">
-          {promos.map((p) => (
-            <a key={p.title} href={p.href} onClick={p.href === "#rezervo-termin" ? revealBooking : undefined} target={p.external ? "_blank" : undefined} rel={p.external ? "noopener noreferrer" : undefined} className="group flex overflow-hidden rounded-xl bg-foreground text-background">
-              {p.photoLeft && <img src={p.img} alt="" loading="lazy" className="w-24 shrink-0 object-cover sm:w-28" />}
-              <div className="flex flex-1 flex-col justify-center gap-1.5 p-4">
-                <div className="font-display text-lg leading-tight">{p.title}</div>
-                <div className="text-xs opacity-80">{p.sub}</div>
-                <span className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-background px-4 py-1.5 text-xs font-semibold text-foreground">
-                  {p.btn} <ArrowRight className="h-3 w-3" />
-                </span>
+      {/* Restore the four service highlights near the foot of the homepage. */}
+      <section className="border-y border-neutral-200 bg-white text-[#191517]" aria-label={lang === "sq" ? "Përparësitë tona" : "Our advantages"}>
+        <div className="container-app grid grid-cols-2 gap-5 py-7 md:grid-cols-4 md:gap-4">
+          {benefits.map(({ Icon, title, sub }) => (
+            <div key={title} className="flex min-w-0 items-center gap-3 md:justify-center">
+              <Icon className="h-8 w-8 shrink-0 text-[#1c1719]" strokeWidth={1.5} aria-hidden="true" />
+              <div>
+                <p className="text-xs font-semibold leading-snug sm:text-sm">{title}</p>
+                <p className="mt-0.5 text-[11px] leading-snug text-neutral-600">{sub}</p>
               </div>
-              {!p.photoLeft && <img src={p.img} alt="" loading="lazy" className="w-24 shrink-0 object-cover sm:w-28" />}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Keep the three existing promotions and their original working destinations. */}
+      <section className="bg-[#f8f6f7]">
+        <div className="container-app grid gap-3 py-5 md:grid-cols-3">
+          {promos.map((p) => (
+            <a
+              key={p.title}
+              href={p.href}
+              onClick={p.href === "#rezervo-termin" ? revealBooking : undefined}
+              target={p.external ? "_blank" : undefined}
+              rel={p.external ? "noopener noreferrer" : undefined}
+              className="group relative flex min-h-[175px] items-center overflow-hidden rounded-lg bg-[#20191c] text-white sm:min-h-[185px]"
+            >
+              <img
+                src={p.img}
+                alt=""
+                loading="lazy"
+                className={`absolute inset-y-0 h-full w-[62%] object-cover transition-transform duration-500 group-hover:scale-105 ${p.photoLeft ? "left-0" : "right-0"}`}
+              />
+              <div
+                aria-hidden="true"
+                className={`pointer-events-none absolute inset-0 ${p.photoLeft ? "bg-gradient-to-l from-[#20191c] via-[#20191c]/95 to-transparent" : "bg-gradient-to-r from-[#20191c] via-[#20191c]/95 to-transparent"}`}
+              />
+              <div className={`relative z-10 flex w-full px-4 py-5 ${p.photoLeft ? "justify-end text-left" : "justify-start text-left"}`}>
+                <div className="w-[57%]">
+                  <div className="font-display text-lg leading-tight sm:text-xl">{p.title}</div>
+                  <div className="mt-1.5 text-xs leading-snug text-white/85">{p.sub}</div>
+                  <span className="mt-3 inline-flex min-h-8 items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold text-[#21191d]">
+                    {p.btn} <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                  </span>
+                </div>
+              </div>
             </a>
           ))}
         </div>
+      </section>
+
+      <section className="container-app pb-12 pt-6">
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <article id="studio-info" className="scroll-mt-28 rounded-2xl border border-border bg-card p-5 text-foreground">
             <h3 className="font-display text-xl">{info.studioTitle}</h3>
