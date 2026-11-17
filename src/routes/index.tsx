@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ProductCard, type Product } from "@/components/product-card";
 import { DreameHomeExtra, DreameHomePromos } from "@/components/dreame-home-extra";
+import { AppointmentBooking } from "@/components/appointment-booking";
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -100,6 +101,7 @@ function Home() {
     <div className="overflow-x-hidden">
       <Hero />
       <DreameHomeExtra />
+      <AppointmentBooking />
       <Marquee />
       <ProductSection
         eyebrow={tr("newArrivals")}

@@ -76,10 +76,13 @@ export function SiteHeader() {
       {/* Announcement bar */}
       <div className="bg-black text-white text-xs">
         <div className="container-app flex h-9 items-center justify-between gap-4">
-          <div className="flex items-center gap-2 truncate">
+          <div className="flex min-w-0 items-center gap-2 truncate">
             <span className="hidden sm:inline">✦</span>
             <span className="truncate">{tr("announcementBar")}</span>
           </div>
+          <a href="/#rezervo-termin" className="shrink-0 rounded-full bg-[var(--pink-deep)] px-3 py-1 text-[11px] font-semibold text-white hover:opacity-90">
+            {({ sq: "Rezervo termin", en: "Book appointment", de: "Termin buchen", fr: "Prendre rendez-vous" } as const)[lang]}
+          </a>
         </div>
       </div>
 

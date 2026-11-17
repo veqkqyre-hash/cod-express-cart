@@ -1,0 +1,156 @@
+import { useState, type FormEvent } from "react";
+import { CalendarDays, Clock3, MessageCircle } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import { whatsappLink } from "@/lib/business-whatsapp";
+
+const WORDS = {
+  sq: {
+    eyebrow: "TERMINE PËR THONJ & PEDIKYR",
+    title: "Rezervo termin",
+    intro: "Zgjidh shërbimin, datën dhe orën që preferon. Dërgo kërkesën në WhatsApp; termini konfirmohet vetëm pasi të përgjigjemi.",
+    service: "Shërbimi", selectService: "Zgjedh shërbimin",
+    name: "Emri dhe mbiemri", phone: "Numri yt i telefonit",
+    date: "Data e preferuar", time: "Ora e preferuar", notes: "Shënime (opsionale)",
+    notesPlaceholder: "P.sh. lloji i trajtimit, pyetje ose kërkesa të veçanta",
+    send: "Dërgo kërkesën në WhatsApp",
+    note: "Orët janë sipas Kosovës dhe janë vetëm preferencë, jo disponueshmëri e konfirmuar. Në WhatsApp duhet ta shtypësh Dërgo.",
+    invalidDate: "Zgjedh një datë të ardhshme.",
+  },
+  en: {
+    eyebrow: "NAIL & PEDICURE APPOINTMENTS",
+    title: "Request an appointment",
+    intro: "Choose a service, date and preferred time. Send your request via WhatsApp; your appointment is confirmed only after we reply.",
+    service: "Service", selectService: "Choose a service",
+    name: "Full name", phone: "Your phone number",
+    date: "Preferred date", time: "Preferred time", notes: "Notes (optional)",
+    notesPlaceholder: "For example, treatment type or special requests",
+    send: "Send request via WhatsApp",
+    note: "Times are Kosovo local time and are preferences only, not confirmed availability. Press Send in WhatsApp.",
+    invalidDate: "Choose a future date.",
+  },
+  de: {
+    eyebrow: "TERMINE FÜR NÄGEL & PEDIKÜRE",
+    title: "Termin anfragen",
+    intro: "Wählen Sie Behandlung, Datum und Wunschzeit. Senden Sie die Anfrage über WhatsApp; der Termin gilt erst nach unserer Bestätigung.",
+    service: "Behandlung", selectService: "Behandlung wählen",
+    name: "Vor- und Nachname", phone: "Ihre Telefonnummer",
+    date: "Wunschdatum", time: "Wunschzeit", notes: "Anmerkungen (optional)",
+    notesPlaceholder: "Zum Beispiel Behandlungswunsch oder Fragen",
+    send: "Anfrage per WhatsApp senden",
+    note: "Zeiten sind Ortszeit Kosovo und nur Wunschzeiten, keine bestätigte Verfügbarkeit. In WhatsApp auf Senden drücken.",
+    invalidDate: "Bitte wählen Sie ein zukünftiges Datum.",
+  },
+  fr: {
+    eyebrow: "RENDEZ-VOUS ONGLES & PÉDICURE",
+    title: "Demander un rendez-vous",
+    intro: "Choisissez le soin, la date et l'heure souhaitées. Envoyez la demande sur WhatsApp ; le rendez-vous est confirmé après notre réponse.",
+    service: "Soin", selectService: "Choisissez un soin",
+    name: "Nom et prénom", phone: "Votre numéro de téléphone",
+    date: "Date souhaitée", time: "Heure souhaitée", notes: "Remarques (facultatif)",
+    notesPlaceholder: "Par exemple, type de soin ou questions",
+    send: "Envoyer via WhatsApp",
+    note: "Les heures sont celles du Kosovo et restent des préférences, non des disponibilités confirmées. Appuyez sur Envoyer dans WhatsApp.",
+    invalidDate: "Choisissez une date à venir.",
+  },
+} as const;
+
+const SERVICES = [
+  { id: "manicure", sq: "Manikyr", en: "Manicure", de: "Maniküre", fr: "Manucure" },
+  { id: "gel-polish", sq: "Gel lak", en: "Gel polish", de: "Gel-Lack", fr: "Vernis gel" },
+  { id: "nail-extensions", sq: "Ndërtim / zgjatje thonjsh", en: "Nail extensions / builder gel", de: "Nagelverlängerung / Aufbaugel", fr: "Extensions / gel de construction" },
+  { id: "nail-art", sq: "Nail art & dekorim", en: "Nail art & decoration", de: "Nail Art & Dekoration", fr: "Nail art & décoration" },
+  { id: "pedicure", sq: "Pedikyr", en: "Pedicure", de: "Pediküre", fr: "Pédicure" },
+  { id: "nail-care", sq: "Trajtim / kujdes për thonj", en: "Nail treatment / care", de: "Nagelpflege / Behandlung", fr: "Soin des ongles" },
+  { id: "other", sq: "Shërbim tjetër (shkruaj te shënimet)", en: "Other service (describe in notes)", de: "Andere Behandlung (in Anmerkungen beschreiben)", fr: "Autre soin (précisez en remarques)" },
+] as const;
+
+const TIMES = Array.from({ length: 21 }, (_, i) => {
+  const h = 9 + Math.floor(i / 2);
+  return `${String(h).padStart(2, "0")}:${i % 2 === 0 ? "00" : "30"}`;
+});
+
+function todayLocal() {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 10);
+}
+
+export function AppointmentBooking() {
+  const { lang } = useI18n();
+  const w = WORDS[lang];
+  const [warning, setWarning] = useState("");
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const name = String(form.get("name") || "").trim();
+    const phone = String(form.get("phone") || "").trim();
+    const serviceId = String(form.get("service") || "");
+    const date = String(form.get("date") || "");
+    const time = String(form.get("time") || "");
+    const notes = String(form.get("notes") || "").trim();
+    const service = SERVICES.find(item => item.id === serviceId);
+    if (!service || !name || !phone || !date || !time) return;
+    if (date < todayLocal()) { setWarning(w.invalidDate); return; }
+    setWarning("");
+    const message = [
+      "DREAMÈ Beauty Cosmetics — KËRKESË PËR TERMIN",
+      `Emri: ${name}`,
+      `Telefoni: ${phone}`,
+      `Shërbimi: ${service.sq}`,
+      `Data e preferuar: ${date}`,
+      `Ora e preferuar (Kosovë): ${time}`,
+      notes ? `Shënime: ${notes}` : "",
+      "Ju lutem më konfirmoni nëse termini është i lirë.",
+    ].filter(Boolean).join("\n");
+    window.open(whatsappLink(message), "_blank", "noopener,noreferrer");
+  }
+
+  const field = "w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[var(--pink-deep)]";
+  return (
+    <section id="rezervo-termin" className="container-app scroll-mt-28 py-10 sm:py-14">
+      <div className="rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-8">
+        <div className="max-w-3xl">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--pink-deep)]">{w.eyebrow}</p>
+          <h2 className="mt-2 font-display text-3xl sm:text-4xl">{w.title}</h2>
+          <p className="mt-3 text-sm text-muted-foreground">{w.intro}</p>
+        </div>
+        <form className="mt-7 grid gap-4 sm:grid-cols-2" onSubmit={onSubmit}>
+          <label className="sm:col-span-2 text-sm font-medium">{w.service} *
+            <select required name="service" defaultValue="" className={`mt-1.5 ${field}`}>
+              <option value="" disabled>{w.selectService}</option>
+              {SERVICES.map(service => <option key={service.id} value={service.id}>{service[lang]}</option>)}
+            </select>
+          </label>
+          <label className="text-sm font-medium">{w.name} *
+            <input required name="name" type="text" autoComplete="name" maxLength={120} className={`mt-1.5 ${field}`} />
+          </label>
+          <label className="text-sm font-medium">{w.phone} *
+            <input required name="phone" type="tel" autoComplete="tel" maxLength={30} className={`mt-1.5 ${field}`} />
+          </label>
+          <label className="text-sm font-medium">{w.date} *
+            <span className="mt-1.5 flex items-center gap-2 text-muted-foreground"><CalendarDays className="h-4 w-4" /></span>
+            <input required name="date" type="date" min={todayLocal()} className={`mt-1.5 ${field}`} />
+          </label>
+          <label className="text-sm font-medium">{w.time} *
+            <span className="mt-1.5 flex items-center gap-2 text-muted-foreground"><Clock3 className="h-4 w-4" /></span>
+            <select required name="time" defaultValue="" className={`mt-1.5 ${field}`}>
+              <option value="" disabled>--:--</option>
+              {TIMES.map(time => <option key={time} value={time}>{time}</option>)}
+            </select>
+          </label>
+          <label className="sm:col-span-2 text-sm font-medium">{w.notes}
+            <textarea name="notes" rows={3} maxLength={750} placeholder={w.notesPlaceholder} className={`mt-1.5 ${field}`} />
+          </label>
+          {warning && <p role="alert" className="sm:col-span-2 text-sm text-red-600">{warning}</p>}
+          <div className="sm:col-span-2 flex flex-col items-start gap-3">
+            <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-[var(--pink-deep)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90">
+              <MessageCircle className="h-4 w-4" /> {w.send}
+            </button>
+            <p className="text-xs text-muted-foreground">{w.note}</p>
+          </div>
+        </form>
+      </div>
+    </section>
+  );
+}
