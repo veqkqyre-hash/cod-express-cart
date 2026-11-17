@@ -103,9 +103,9 @@ function RootComponent() {
             ) : isAdmin ? (
               <Outlet />
             ) : (
-              <div className="flex min-h-screen flex-col" style={gate ? undefined : { visibility: "hidden" }}>
+              <div className="flex min-h-screen w-full min-w-0 flex-col" style={gate ? undefined : { visibility: "hidden" }}>
                 <SiteHeader />
-                <main className="flex-1"><Outlet /></main>
+                <main className="min-w-0 flex-1"><Outlet /></main>
                 <SiteFooter />
               </div>
             )}
