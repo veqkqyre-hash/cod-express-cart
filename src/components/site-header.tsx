@@ -44,6 +44,7 @@ export function SiteHeader() {
   }, []);
 
   const L = (sq: string, en: string) => (lang === "sq" ? sq : en);
+  const bookingLabel = ({ sq: "Cakto termin", en: "Book appointment", de: "Termin buchen", fr: "Prendre rendez-vous" } as const)[lang];
   const infoLinks = [
     { to: "/faq" as const, label: L("Pyetjet e shpeshta", "FAQ") },
     { to: "/shipping" as const, label: L("Transporti", "Shipping") },
@@ -81,7 +82,7 @@ export function SiteHeader() {
             <span className="truncate">{tr("announcementBar")}</span>
           </div>
           <a href="/#rezervo-termin" className="shrink-0 rounded-full bg-[var(--pink-deep)] px-3 py-1 text-[11px] font-semibold text-white hover:opacity-90">
-            {({ sq: "Rezervo termin", en: "Book appointment", de: "Termin buchen", fr: "Prendre rendez-vous" } as const)[lang]}
+            {bookingLabel}
           </a>
         </div>
       </div>
@@ -112,6 +113,7 @@ export function SiteHeader() {
             <a href="#brands" className="hover:text-[var(--pink-deep)] transition-colors">{tr("brands")}</a>
             <Link to="/blog" className="hover:text-[var(--pink-deep)] transition-colors">Blog</Link>
             <Link to="/contact" className="hover:text-[var(--pink-deep)] transition-colors">{tr("contact")}</Link>
+            <a href="/#rezervo-termin" className="whitespace-nowrap font-semibold text-[var(--pink-deep)] hover:underline">{bookingLabel}</a>
             <div className="relative" onMouseEnter={() => setInfoOpen(true)} onMouseLeave={() => setInfoOpen(false)}>
               <button className="inline-flex items-center gap-1 hover:text-[var(--pink-deep)] transition-colors">
                 Info <ChevronDown className="h-3.5 w-3.5" />
@@ -240,6 +242,7 @@ export function SiteHeader() {
                 <Link to="/wishlist" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("wishlist")}</Link>
                 <Link to="/blog" className="py-2 font-medium" onClick={() => setOpen(false)}>Blog</Link>
                 <Link to="/contact" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("contact")}</Link>
+                <a href="/#rezervo-termin" className="py-2 font-semibold text-[var(--pink-deep)]" onClick={() => setOpen(false)}>{bookingLabel}</a>
                 {infoLinks.map((l) => (
                   <Link key={l.to} to={l.to} className="py-2 text-muted-foreground" onClick={() => setOpen(false)}>{l.label}</Link>
                 ))}
