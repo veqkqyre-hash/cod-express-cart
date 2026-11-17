@@ -148,8 +148,16 @@ const HERO_SLIDES: { src: string; mobile: string; alt: string; full?: boolean }[
   },
 ];
 
+const BRAND_HERO_COPY = {
+  sq: { eyebrow: "ZGJIDHJE PROFESIONALE PËR BUKURI", line1: "Cilësi. Elegancë. Përsosmëri.", line2: "Për bukurinë tënde — çdo ditë." },
+  en: { eyebrow: "PROFESSIONAL BEAUTY SOLUTIONS", line1: "Quality. Elegance. Perfection.", line2: "For your beauty — every day." },
+  de: { eyebrow: "PROFESSIONELLE BEAUTY-LÖSUNGEN", line1: "Qualität. Eleganz. Perfektion.", line2: "Für deine Schönheit — jeden Tag." },
+  fr: { eyebrow: "SOLUTIONS BEAUTÉ PROFESSIONNELLES", line1: "Qualité. Élégance. Perfection.", line2: "Pour votre beauté — chaque jour." },
+} as const;
+
 function Hero() {
-  const { tr } = useI18n();
+  const { tr, lang } = useI18n();
+  const brandCopy = BRAND_HERO_COPY[lang];
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -185,7 +193,7 @@ function Hero() {
 
   return (
     <section
-      className="relative overflow-hidden bg-black select-none touch-pan-y"
+      className={`relative overflow-hidden bg-black select-none touch-pan-y ${HERO_SLIDES[idx].full ? "min-h-[410px] sm:min-h-[440px]" : ""}`}
       style={HERO_SLIDES[idx].full ? { aspectRatio: "1660 / 491" } : undefined}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -204,7 +212,8 @@ function Hero() {
             fetchPriority={i === 0 ? "high" : "low"}
             loading={i === 0 ? "eager" : "lazy"}
             decoding={i === 0 ? "sync" : "async"}
-            className={`absolute inset-0 h-full w-full ${s.full ? "" : "object-cover"} transition-opacity duration-[1200ms] ease-in-out ${i === idx ? (s.full ? "opacity-100" : "opacity-70") : "opacity-0"} ${s.full ? "object-cover" : ""}`}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-in-out ${i === idx ? (s.full ? "opacity-100" : "opacity-70") : "opacity-0"}`}
+            style={s.full ? { clipPath: "inset(0 0 0 52%)", objectPosition: "center" } : undefined}
           />
         </picture>
       ))}
@@ -214,6 +223,27 @@ function Hero() {
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
       <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-[var(--pink-deep)]/25 blur-3xl" />
       </div>
+
+      {/* The reference banner has German lettering baked into its pixels. Show only
+          its photographic right-hand portion and render language-aware text in HTML. */}
+      {HERO_SLIDES[idx].full && (
+        <>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 z-[1] flex items-center">
+            <div className="container-app w-full py-10">
+              <div className="pointer-events-auto max-w-xl text-white">
+                <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.21em] text-white/80 sm:text-xs">{brandCopy.eyebrow}</p>
+                <h1 className="font-display text-[clamp(2.9rem,6vw,5.8rem)] leading-[0.94] tracking-tight">DREAMÈ</h1>
+                <p className="mt-1 font-display text-[clamp(1.5rem,3vw,3rem)] italic leading-tight">Beauty Cosmetics</p>
+                <p className="mt-4 text-sm leading-relaxed text-white/90 sm:text-base">{brandCopy.line1}<br />{brandCopy.line2}</p>
+                <Link to="/shop" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-[var(--pink-soft)]">
+                  {tr("shopNow")} <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Prev / next arrows — larger tap target on mobile */}
       <button
