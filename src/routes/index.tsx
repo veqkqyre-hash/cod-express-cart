@@ -10,12 +10,6 @@ import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail } fr
 import { useState } from "react";
 import { toast } from "sonner";
 import heroModel from "@/assets/dreame-home/hero-model.jpg";
-import categoryPhoto0 from "@/assets/dreame-home/cat-0.jpg";
-import categoryPhoto1 from "@/assets/dreame-home/cat-1.jpg";
-import categoryPhoto2 from "@/assets/dreame-home/cat-2.jpg";
-import categoryPhoto3 from "@/assets/dreame-home/cat-3.jpg";
-import categoryPhoto4 from "@/assets/dreame-home/cat-4.jpg";
-import categoryPhoto5 from "@/assets/dreame-home/cat-5.jpg";
 
 
 export const Route = createFileRoute("/")({
@@ -100,17 +94,16 @@ function Home() {
   });
 
   return (
-    <div className="home-storefront overflow-x-hidden bg-white text-[#211c20]">
+    <div className="overflow-x-hidden">
       <Hero />
-      <CategoryImageStrip categories={categories.data ?? []} lang={lang} />
+      <DreameHomeExtra />
+      <Marquee />
       <ProductSection
         eyebrow={tr("newArrivals")}
         title={tr("newArrivalsTitle")}
         subtitle={tr("newArrivalsSub")}
         products={newArrivals.data ?? []}
       />
-      <DreameHomeExtra />
-      <Marquee />
       <DreameHomePromos />
       <Newsletter />
     </div>
@@ -154,36 +147,49 @@ function Hero() {
     staleTime: 60_000,
   });
 
-  const chosenPhoto = savedBanners.find((slide) => Boolean(slide.image_url));
-  const heroPhoto = chosenPhoto?.image_url || heroModel;
+  // Use the original photographic composition: dark branding space on the
+  // left, model and DREAMÈ products on the right. Keep copy localized and the
+  // call-to-action clickable instead of relying on text baked into a JPG.
+  const chosenPhotos = savedBanners.filter((slide) => Boolean(slide.image_url)).slice(0, 2);
+  const heroPhoto = chosenPhotos[0]?.image_url || heroModel;
 
   return (
-    <section aria-label={tr("heroBadge")} className="relative isolate overflow-hidden bg-[#080708] text-white">
-      {/* Photo with its full, bright right side visible; dark space stays behind the copy. */}
+    <section
+      aria-label={tr("heroBadge")}
+      className="relative isolate overflow-hidden bg-[#080607] text-white"
+    >
+      {/* A real photograph fills the right-hand side on desktop, and the banner
+          on phones. No white washout, artificial photo masking, or separate panel. */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <img
           src={heroPhoto}
           alt=""
           loading="eager"
           fetchPriority="high"
-          className="absolute inset-y-0 right-0 h-full w-full object-cover object-[55%_center] sm:w-[72%] sm:object-center lg:w-[65%]"
+          className="absolute inset-0 h-full w-full object-cover object-[55%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-none sm:object-contain"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.97)_0%,rgba(0,0,0,.91)_27%,rgba(0,0,0,.60)_44%,rgba(0,0,0,.08)_70%,transparent_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/25 to-transparent sm:hidden" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(90deg, rgba(0,0,0,.89) 0%, rgba(0,0,0,.74) 30%, rgba(0,0,0,.28) 57%, rgba(0,0,0,0) 86%)",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent sm:hidden" />
       </div>
 
-      <div className="container-app relative z-10 flex min-h-[400px] items-center py-8 sm:min-h-[420px] sm:py-12 lg:min-h-[455px]">
-        <div className="w-full max-w-[350px] sm:max-w-[52%] lg:max-w-[560px]">
-          <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.14em] text-white/95 sm:text-xs">
+      {/* Recreate the white text and white pill from the reference banner. */}
+      <div className="container-app relative z-10 flex min-h-[390px] items-end py-8 sm:min-h-[410px] sm:items-center sm:py-10 lg:min-h-[460px]">
+        <div className="w-full max-w-[370px] sm:max-w-[46%] lg:max-w-[530px]">
+          <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.12em] text-white/95 sm:text-xs sm:tracking-[0.16em]">
             {brandCopy.eyebrow}
           </p>
-          <h1 className="font-display text-[clamp(3rem,7.5vw,6.4rem)] leading-[0.94] tracking-tight text-white">
+          <h1 className="font-display text-[clamp(3.1rem,8vw,6rem)] leading-[0.94] tracking-tight text-white">
             DREAMÈ
           </h1>
-          <p className="mt-1 font-display text-[clamp(1.6rem,3.7vw,3.35rem)] italic leading-tight text-white">
+          <p className="mt-1 font-display text-[clamp(1.65rem,4vw,3.2rem)] italic leading-tight text-white">
             Beauty Cosmetics
           </p>
-          <p className="mt-4 text-sm leading-relaxed text-white/95 sm:text-base">
+          <p className="mt-4 text-sm leading-snug text-white/95 sm:text-base">
             {brandCopy.line1}<br />{brandCopy.line2}
           </p>
           <Link
@@ -193,44 +199,6 @@ function Hero() {
             {tr("shopNow")} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-      </div>
-    </section>
-  );
-}
-
-const HOME_CATEGORY_TILES = [
-  { image: categoryPhoto0, slugs: ["nail-art", "tipsa-forma"], names: { sq: "Kujdes për thonj", en: "Nail Care", de: "Nagelpflege", fr: "Soin des ongles" } },
-  { image: categoryPhoto1, slugs: ["gel-lak"], names: { sq: "Gel Lak", en: "Gel Polish", de: "Gel Polish", fr: "Vernis gel" } },
-  { image: categoryPhoto2, slugs: ["gel-thonj", "akrilik-pluhur"], names: { sq: "Builder Gel", en: "Builder Gel", de: "Aufbaugel", fr: "Gel de construction" } },
-  { image: categoryPhoto3, slugs: ["lime-instrumente", "freza-aparate"], names: { sq: "Mjete & Aksesorë", en: "Tools & Accessories", de: "Werkzeug & Zubehör", fr: "Outils & Accessoires" } },
-  { image: categoryPhoto4, slugs: ["pedikyr"], names: { sq: "Kujdes për këmbë", en: "Foot Care", de: "Fußpflege", fr: "Soin des pieds" } },
-  { image: categoryPhoto5, slugs: ["higjena"], names: { sq: "Pastrues & Aceton", en: "Cleaner & Acetone", de: "Reiniger & Aceton", fr: "Nettoyant & Acétone" } },
-] as const;
-
-function CategoryImageStrip({ categories, lang }: { categories: any[]; lang: "sq" | "en" | "de" | "fr" }) {
-  return (
-    <section aria-label={lang === "sq" ? "Kategoritë kryesore" : "Main categories"} className="container-app py-4 sm:py-5">
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
-        {HOME_CATEGORY_TILES.map((tile) => {
-          const category = categories.find((c) => tile.slugs.some((slug) => slug === c.slug));
-          return (
-            <Link
-              key={tile.names.en}
-              to="/shop"
-              search={category ? { category: category.slug } : {}}
-              className="group relative aspect-[1.22] overflow-hidden rounded-lg bg-[#e9e4e5] sm:aspect-[0.98]"
-            >
-              <img src={tile.image} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 right-2 text-sm font-semibold leading-snug text-white [text-shadow:0_1px_3px_rgba(0,0,0,.6)]">
-                {tile.names[lang]}
-                <span className="mt-1 block text-[10px] font-medium text-white/90">
-                  {({ sq: "Shiko produktet", en: "Shop now", de: "Jetzt entdecken", fr: "Découvrir" } as const)[lang]} →
-                </span>
-              </span>
-            </Link>
-          );
-        })}
       </div>
     </section>
   );
