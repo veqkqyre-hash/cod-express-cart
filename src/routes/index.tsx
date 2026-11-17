@@ -153,9 +153,9 @@ function Hero() {
         {/* Outlined, textured triangle from the supplied reference replaces the model image. */}
         <div className="flex items-center justify-center py-2 sm:py-4 lg:py-0" aria-hidden="true">
           <img
-            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC0AAAA1CAMAAADiQZJeAAAAYFBMVEUkGyAkGyAkGyAkGyAkGyAkGyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAO3pUDAAAAIHRSTlMA9VKvbs8vkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKVdoQcAAAH4SURBVHjatVZJksNACGPn/z8eQXc5XmK7c5hUZTkoihACQvSvD9df0MxsP6Aj2WMZbSzMuYy2VGOOVXS4k7MuKnEh4ViiZyoQ8A4572jhgWaRdzMBSiXzDGJ/rbarzCkq05/NZCla9f6oKflI7/2q1SDWINPUBzPZqu/qMjgtotTbLTohu5Q0pwlSo3oXHVQJ5a0beQRY6pfu6FGlzirBzP2upDfRGf1T3eJuxZ3d2vyWkz2akBfKLpflSg+pkKE707Q5BbIoz9Fx9JJj6t7oYTzDzKKXkxKjA/eotjQEgnZM5qzSj78YXpwRGEPM7YfKpXt5aXaZGWUu+06OC+bywj3MnEHS3OiRb1O5ons0CuNZ2mXrpX1Rot1VhK2Z/aaXG3GTGQw+9IhHjg7oWhdZnsCSPKQdurEe9uhBlmCJsuOcb8My0Z0VOkQE06mT5eBBSRNXURg5uS4YP1Q5UqrJJHEh/jiYu3jUNEDet1lGL4HvjVL96M3lLt+IG41dVftnLAaESMPybkloaM/tHNtCP+xDjaEYZPWEKn3YnSqlWaRDgANnrA+bLaUGah4sxyqSp62ZXaUVqHL/cq5ybntMONLydkxyXpLE197PLEBlBRK0cpJTEPlEiJYOpgXSFr546zFJkbl66BGklOX/EBidH/6fRND/PP4ATGkIortw38gAAAAASUVORK5CYII="
+            src="/assets/dreame-symbol.png"
             alt=""
-            className="h-auto w-[120px] object-contain sm:w-[155px] lg:w-[175px]"
+            className="h-auto w-[120px] object-contain brightness-0 sm:w-[155px] lg:w-[175px]"
           />
         </div>
       </div>
