@@ -98,7 +98,7 @@ export function SiteHeader() {
           </Link>
 
           {/* Nav */}
-          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium">
+          <nav className="hidden xl:flex items-center gap-7 text-sm font-medium">
             <div
               onMouseEnter={openMega}
               onMouseLeave={closeMegaSoon}
@@ -148,14 +148,14 @@ export function SiteHeader() {
 
           {/* Icons */}
           <div className="ml-auto flex shrink-0 items-center gap-0 sm:gap-1 md:ml-0">
-            <div className="hidden lg:flex items-center gap-0.5 rounded-full border border-border px-1 py-0.5 text-[10px] mr-1">
+            <div className="hidden xl:flex items-center gap-0.5 rounded-full border border-border px-1 py-0.5 text-[10px] mr-1">
               <button onClick={() => setLang("sq")} className={`px-2 py-1 rounded-full transition ${lang === "sq" ? "bg-black text-white" : "text-muted-foreground"}`}>SQ</button>
               <button onClick={() => setLang("en")} className={`px-2 py-1 rounded-full transition ${lang === "en" ? "bg-black text-white" : "text-muted-foreground"}`}>EN</button>
               <button onClick={() => setLang("de")} className={`px-2 py-1 rounded-full transition ${lang === "de" ? "bg-black text-white" : "text-muted-foreground"}`}>DE</button>
               <button onClick={() => setLang("fr")} className={`px-2 py-1 rounded-full transition ${lang === "fr" ? "bg-black text-white" : "text-muted-foreground"}`}>FR</button>
             </div>
 
-            <Link to={signedIn ? "/account" : "/auth"} className="hidden lg:grid h-10 w-10 place-items-center rounded-full hover:bg-secondary transition" aria-label={tr("account")}>
+            <Link to={signedIn ? "/account" : "/auth"} className="hidden xl:grid h-10 w-10 place-items-center rounded-full hover:bg-secondary transition" aria-label={tr("account")}>
               <User className="h-5 w-5" />
             </Link>
 
@@ -177,7 +177,7 @@ export function SiteHeader() {
               )}
             </Link>
 
-            <button className="lg:hidden grid h-10 w-10 shrink-0 place-items-center rounded-full hover:bg-secondary" onClick={() => setOpen((o) => !o)} aria-label="Menu">
+            <button className="xl:hidden grid h-10 w-10 shrink-0 place-items-center rounded-full hover:bg-secondary" onClick={() => setOpen((o) => !o)} aria-label="Menu">
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
@@ -188,7 +188,7 @@ export function SiteHeader() {
           <div
             onMouseEnter={openMega}
             onMouseLeave={closeMegaSoon}
-            className="hidden lg:block absolute left-0 right-0 border-t border-border bg-background shadow-elev animate-in fade-in slide-in-from-top-2 duration-200"
+            className="hidden xl:block absolute left-0 right-0 border-t border-border bg-background shadow-elev animate-in fade-in slide-in-from-top-2 duration-200"
           >
             <div className="container-app grid grid-cols-4 gap-8 py-8">
               <div className="col-span-3 grid grid-cols-3 gap-x-8 gap-y-3">
@@ -223,7 +223,7 @@ export function SiteHeader() {
 
         {/* Mobile drawer */}
         {open && (
-          <div className="lg:hidden border-t border-border/60 bg-background">
+          <div className="xl:hidden border-t border-border/60 bg-background">
             <div className="container-app py-4 space-y-3">
               <form onSubmit={onSearchSubmit} className="flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-4 py-2">
                 <Search className="h-4 w-4 text-muted-foreground" />
