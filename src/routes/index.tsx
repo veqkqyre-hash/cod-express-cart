@@ -156,12 +156,48 @@ function Hero() {
   }];
 
   return (
-    <section aria-label={tr("heroBadge")} className="overflow-hidden bg-[#f7f0f3]">
-      <div className="grid lg:grid-cols-[minmax(320px,36%)_minmax(0,1fr)]">
-        {/* Keep all original text visible without putting black overlays on the photographs. */}
-        <div className="flex min-h-[330px] items-center bg-gradient-to-r from-[#f7f0f3] to-[#f4e7ec] px-6 py-10 sm:px-10 lg:min-h-[480px] lg:px-10 xl:px-14">
-          <div className="max-w-xl text-[#241b20]">
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.21em] text-[#614b56] sm:text-xs">
+    <section
+      aria-label={tr("heroBadge")}
+      className="relative isolate h-[520px] overflow-hidden bg-[#d6b5ab] sm:h-[570px] lg:h-[600px]"
+    >
+      {/* The photograph fills the entire banner; there is no separate text column. */}
+      <div className={`absolute inset-0 grid ${banners.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
+        {banners.map((banner) => {
+          const title = ((lang === "sq" ? banner.title_sq : banner.title_en) || banner.title_sq || banner.title_en).trim();
+          const url = banner.link_url || "/shop";
+          const safeUrl = ((url.startsWith("/") && !url.startsWith("//")) || url.startsWith("https://") || url.startsWith("http://")) ? url : "/shop";
+          const src = banner.image_url || heroModel;
+          return (
+            <a
+              key={banner.id}
+              href={safeUrl}
+              aria-label={title || tr("shopNow")}
+              className="group relative block h-full min-w-0 overflow-hidden"
+            >
+              {/* The actual photo, blurred only where there is spare space: no black bars. */}
+              <img
+                src={src}
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover blur-2xl"
+              />
+              <img
+                src={src}
+                alt={title || "DREAMÈ Beauty Cosmetics"}
+                loading="eager"
+                fetchPriority="high"
+                className="relative h-full w-full object-contain object-right transition-transform duration-500 group-hover:scale-[1.01]"
+              />
+            </a>
+          );
+        })}
+      </div>
+
+      {/* The original writing sits ON TOP of the photo; no panel or dark mask. */}
+      <div className="pointer-events-none absolute inset-0 z-10 flex items-center">
+        <div className="container-app w-full">
+          <div className="pointer-events-auto max-w-[min(88vw,530px)] text-[#241b20] [text-shadow:0_1px_2px_rgba(255,255,255,0.45)]">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.21em] sm:text-xs">
               {brandCopy.eyebrow}
             </p>
             <h1 className="font-display text-[clamp(2.9rem,5vw,5.8rem)] leading-[0.94] tracking-tight">
@@ -170,43 +206,16 @@ function Hero() {
             <p className="mt-1 font-display text-[clamp(1.5rem,2.8vw,3rem)] italic leading-tight">
               Beauty Cosmetics
             </p>
-            <p className="mt-4 text-sm leading-relaxed text-[#51434b] sm:text-base">
+            <p className="mt-4 text-sm leading-relaxed sm:text-base">
               {brandCopy.line1}<br />{brandCopy.line2}
             </p>
             <Link
               to="/shop"
-              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#241b20] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--pink-deep)]"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#241b20] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--pink-deep)] [text-shadow:none]"
             >
               {tr("shopNow")} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-        </div>
-
-        <div className={`grid min-w-0 ${banners.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
-          {banners.map((banner) => {
-            const title = ((lang === "sq" ? banner.title_sq : banner.title_en) || banner.title_sq || banner.title_en).trim();
-            const url = banner.link_url || "/shop";
-            const safeUrl = ((url.startsWith("/") && !url.startsWith("//")) || url.startsWith("https://") || url.startsWith("http://")) ? url : "/shop";
-            const src = banner.image_url || heroModel;
-            return (
-              <a
-                key={banner.id}
-                href={safeUrl}
-                aria-label={title || tr("shopNow")}
-                className="group relative block h-[300px] min-w-0 overflow-hidden bg-[#f7f0f3] sm:h-[420px] lg:h-[480px]"
-              >
-                {/* Fill spare space with the photo itself, not black bars or overlays. */}
-                <img src={src} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover opacity-75 blur-2xl" />
-                <img
-                  src={src}
-                  alt={title || "DREAMÈ Beauty Cosmetics"}
-                  loading="eager"
-                  fetchPriority="high"
-                  className="relative h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.015]"
-                />
-              </a>
-            );
-          })}
         </div>
       </div>
     </section>
