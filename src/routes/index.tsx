@@ -7,13 +7,9 @@ import { useI18n } from "@/lib/i18n";
 import { ProductCard, type Product } from "@/components/product-card";
 import { DreameHomeExtra, DreameHomePromos } from "@/components/dreame-home-extra";
 import { AppointmentBooking } from "@/components/appointment-booking";
-import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
-import heroNails1 from "@/assets/hero-nails-1.jpg";
-import heroNails2 from "@/assets/hero-nails-2.jpg";
-import heroNails3 from "@/assets/hero-nails-3.jpg";
-import heroNails4 from "@/assets/hero-nails-4.jpg";
 import heroDreame from "@/assets/hero-dreame-banner.jpg";
 
 export const Route = createFileRoute("/")({
@@ -124,26 +120,6 @@ const HERO_SLIDES: { src: string; mobile: string; alt: string; full?: boolean }[
     alt: "DREAMÈ Beauty Cosmetics — Gel Polish, Cleaner dhe Builder Gel",
     full: true,
   },
-  {
-    src: heroNails1,
-    mobile: heroNails1,
-    alt: "Manikyr me gel lak rozë të shkëlqyeshëm — produkte profesionale për thonj nga Dreame Beauty Cosmetics",
-  },
-  {
-    src: heroNails2,
-    mobile: heroNails2,
-    alt: "Set produktesh profesionale për thonj: gel lak, akrilik dhe gel ndërtues, shumicë dhe pakicë në Kosovë",
-  },
-  {
-    src: heroNails4,
-    mobile: heroNails4,
-    alt: "Nail art elegant në formë almond — tipsa, freza dhe dekorime për sallone thonjsh",
-  },
-  {
-    src: heroNails3,
-    mobile: heroNails3,
-    alt: "Lampë UV/LED profesionale për tharjen e gel lakut në sallon thonjsh",
-  },
 ];
 
 const BRAND_HERO_COPY = {
@@ -156,46 +132,12 @@ const BRAND_HERO_COPY = {
 function Hero() {
   const { tr, lang } = useI18n();
   const brandCopy = BRAND_HERO_COPY[lang];
-  const [idx, setIdx] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const touchStartX = useRef<number | null>(null);
-  const touchDeltaX = useRef(0);
-
-  useEffect(() => {
-    if (paused) return;
-    const id = setInterval(() => setIdx((i) => (i + 1) % HERO_SLIDES.length), 6000);
-    return () => clearInterval(id);
-  }, [paused]);
-
-  const prev = () => setIdx((i) => (i - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
-  const next = () => setIdx((i) => (i + 1) % HERO_SLIDES.length);
-
-  function onTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX;
-    touchDeltaX.current = 0;
-    setPaused(true);
-  }
-  function onTouchMove(e: React.TouchEvent) {
-    if (touchStartX.current == null) return;
-    touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
-  }
-  function onTouchEnd() {
-    const dx = touchDeltaX.current;
-    if (Math.abs(dx) > 50) {
-      if (dx < 0) next(); else prev();
-    }
-    touchStartX.current = null;
-    touchDeltaX.current = 0;
-    setTimeout(() => setPaused(false), 2000);
-  }
+  const idx = 0;
 
   return (
     <section
       className={`relative overflow-hidden bg-black select-none touch-pan-y ${HERO_SLIDES[idx].full ? "min-h-[410px] sm:min-h-[440px]" : ""}`}
       style={HERO_SLIDES[idx].full ? { aspectRatio: "1660 / 491" } : undefined}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
     >
       {/* Rotating background images (responsive via <picture>) */}
       {HERO_SLIDES.map((s, i) => (
@@ -243,22 +185,6 @@ function Hero() {
         </>
       )}
 
-      {/* Prev / next arrows — larger tap target on mobile */}
-      <button
-        onClick={prev}
-        aria-label="Previous slide"
-        className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-10 hidden sm:grid h-11 w-11 md:h-12 md:w-12 place-items-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-md active:scale-95 transition hover:bg-white/25"
-      >
-        <ChevronLeft className="h-6 w-6" />
-      </button>
-      <button
-        onClick={next}
-        aria-label="Next slide"
-        className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-10 hidden sm:grid h-11 w-11 md:h-12 md:w-12 place-items-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-md active:scale-95 transition hover:bg-white/25"
-      >
-        <ChevronRight className="h-6 w-6" />
-      </button>
-
       <div className={`container-app relative flex items-center ${HERO_SLIDES[idx].full ? "py-0" : "py-12 sm:py-24 md:py-32 lg:py-40 min-h-[68svh] sm:min-h-[600px]"}`}>
         <div className={`max-w-2xl space-y-5 sm:space-y-7 text-white transition-opacity duration-700 ${HERO_SLIDES[idx].full ? "opacity-0 pointer-events-none" : ""}`}>
           <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 sm:px-4 sm:py-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-white backdrop-blur">
@@ -296,17 +222,6 @@ function Hero() {
         </div>
       </div>
 
-      {/* Dots */}
-      <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-        {HERO_SLIDES.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setIdx(i)}
-            aria-label={`Go to slide ${i + 1}`}
-            className={`h-1.5 rounded-full transition-all ${i === idx ? "w-10 bg-[var(--pink-deep)]" : "w-5 bg-white/50 hover:bg-white/80"}`}
-          />
-        ))}
-      </div>
     </section>
   );
 }
