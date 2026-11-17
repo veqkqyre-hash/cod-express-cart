@@ -99,7 +99,6 @@ export function SiteHeader() {
 
           {/* Nav */}
           <nav className="hidden lg:flex items-center gap-7 text-sm font-medium">
-            <Link to="/" className="hover:text-[var(--pink-deep)] transition-colors">{tr("home")}</Link>
             <div
               onMouseEnter={openMega}
               onMouseLeave={closeMegaSoon}
@@ -110,7 +109,6 @@ export function SiteHeader() {
               </button>
             </div>
             <Link to="/shop" search={{}} className="hover:text-[var(--pink-deep)] transition-colors">{tr("newArrivals")}</Link>
-            <a href="#brands" className="hover:text-[var(--pink-deep)] transition-colors">{tr("brands")}</a>
             <Link to="/blog" className="hover:text-[var(--pink-deep)] transition-colors">Blog</Link>
             <Link to="/contact" className="hover:text-[var(--pink-deep)] transition-colors">{tr("contact")}</Link>
             <a href="/#rezervo-termin" className="whitespace-nowrap font-semibold text-[var(--pink-deep)] hover:underline">{bookingLabel}</a>
@@ -237,7 +235,6 @@ export function SiteHeader() {
                 />
               </form>
               <nav className="flex flex-col text-sm">
-                <Link to="/" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("home")}</Link>
                 <Link to="/shop" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("shop")}</Link>
                 <Link to="/wishlist" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("wishlist")}</Link>
                 <Link to="/blog" className="py-2 font-medium" onClick={() => setOpen(false)}>Blog</Link>

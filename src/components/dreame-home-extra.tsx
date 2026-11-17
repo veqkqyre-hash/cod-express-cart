@@ -200,7 +200,15 @@ export function DreameHomePromos() {
   }, []);
   const bookingLabel = ({ sq: "Cakto termin", en: "Book appointment", de: "Termin vereinbaren", fr: "Prendre rendez-vous" } as const)[lang];
   const promos = [
-    { img: p0, title: tr("promoStudiosTitle"), sub: tr("promoStudiosSub"), btn: tr("promoLearnMore"), href: "#rezervo-termin", photoLeft: true, external: false },
+    {
+      img: p0,
+      title: ({ sq: "Cakto Termin Online", en: "Book an Appointment Online", de: "Termin online buchen", fr: "Prendre rendez-vous en ligne" } as const)[lang],
+      sub: ({ sq: "Zgjedh datën dhe orën që të përshtatet.", en: "Choose the date and time that suits you.", de: "Wähle dein passendes Datum und deine Uhrzeit.", fr: "Choisissez la date et l'heure qui vous conviennent." } as const)[lang],
+      btn: ({ sq: "Cakto Termin Online", en: "Book Online", de: "Online buchen", fr: "Réserver en ligne" } as const)[lang],
+      href: "#rezervo-termin",
+      photoLeft: true,
+      external: false,
+    },
     { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), href: whatsappLink(info.academyMessage), photoLeft: false, external: true },
     { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: tr("promoLearnMore"), href: "#feet-info", photoLeft: true, external: false },
   ];
