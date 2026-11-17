@@ -54,7 +54,7 @@ const PROMO_INFO = {
     feetTitle: "Kujdes për këmbë dhe pedikyr",
     feetBody: "Produkte dhe aksesorë për pedikyr, higjienë dhe kujdes të këmbëve. Për trajtim ose termin, dërgo një kërkesë me datën dhe orën që preferon.",
     feetAction: "Kërko termin për pedikyr",
-    academyMessage: "Përshëndetje, dua të regjistrohem në DREAMÈ Beauty Academy.\\nEmri dhe mbiemri: ____\\nTelefoni: ____\\nTrajnimi që më intereson: ____\\nJu lutem më dërgoni informata për trajnimet.",
+    academyMessage: "Përshëndetje, dua të regjistrohem në DREAMÈ Beauty Academy.\nEmri dhe mbiemri: ____\nTelefoni: ____\nTrajnimi që më intereson: ____\nJu lutem më dërgoni informata për trajnimet.",
   },
   en: {
     studioTitle: "Professional nail studio supplies",
@@ -63,7 +63,7 @@ const PROMO_INFO = {
     feetTitle: "Foot care and pedicure",
     feetBody: "Products and accessories for pedicure, hygiene and foot care. For a treatment appointment, send your preferred date and time.",
     feetAction: "Request pedicure appointment",
-    academyMessage: "Hello, I would like to register for DREAMÈ Beauty Academy.\\nFull name: ____\\nPhone: ____\\nTraining of interest: ____\\nPlease send me information about courses.",
+    academyMessage: "Hello, I would like to register for DREAMÈ Beauty Academy.\nFull name: ____\nPhone: ____\nTraining of interest: ____\nPlease send me information about courses.",
   },
   de: {
     studioTitle: "Professioneller Nagelstudio-Bedarf",
@@ -72,7 +72,7 @@ const PROMO_INFO = {
     feetTitle: "Fußpflege und Pediküre",
     feetBody: "Produkte und Zubehör für Pediküre, Hygiene und Fußpflege. Für einen Behandlungstermin senden Sie uns Ihren Wunschtermin.",
     feetAction: "Pediküre-Termin anfragen",
-    academyMessage: "Hallo, ich möchte mich bei DREAMÈ Beauty Academy anmelden.\\nName: ____\\nTelefon: ____\\nGewünschte Schulung: ____\\nBitte senden Sie mir Informationen.",
+    academyMessage: "Hallo, ich möchte mich bei DREAMÈ Beauty Academy anmelden.\nName: ____\nTelefon: ____\nGewünschte Schulung: ____\nBitte senden Sie mir Informationen.",
   },
   fr: {
     studioTitle: "Fournitures professionnelles pour salons d'ongles",
@@ -81,7 +81,7 @@ const PROMO_INFO = {
     feetTitle: "Soins des pieds et pédicure",
     feetBody: "Produits et accessoires pour pédicure, hygiène et soins des pieds. Pour un rendez-vous, envoyez-nous vos préférences de date et d'heure.",
     feetAction: "Demander un rendez-vous pédicure",
-    academyMessage: "Bonjour, je souhaite m'inscrire à DREAMÈ Beauty Academy.\\nNom: ____\\nTéléphone: ____\\nFormation souhaitée: ____\\nMerci de m'envoyer des informations.",
+    academyMessage: "Bonjour, je souhaite m'inscrire à DREAMÈ Beauty Academy.\nNom: ____\nTéléphone: ____\nFormation souhaitée: ____\nMerci de m'envoyer des informations.",
   },
 } as const;
 
