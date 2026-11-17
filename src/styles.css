@@ -99,6 +99,32 @@
   --ring: oklch(0.75 0.14 355);
 }
 
+/* Home-only editorial storefront inspired by the supplied white layout.
+   Keep other pages, admin and checkout on their existing themes. */
+.home-storefront,
+.home-header {
+  --background: #ffffff;
+  --foreground: #211d1f;
+  --card: #ffffff;
+  --card-foreground: #211d1f;
+  --popover: #ffffff;
+  --popover-foreground: #211d1f;
+  --secondary: #f7f5f5;
+  --secondary-foreground: #211d1f;
+  --muted: #f7f5f5;
+  --muted-foreground: #655e61;
+  --accent: #f8eaf0;
+  --accent-foreground: #211d1f;
+  --border: #e7e1e4;
+  --input: #d7cfd2;
+}
+.home-storefront .group:focus-visible,
+.home-header a:focus-visible,
+.home-header button:focus-visible {
+  outline: 2px solid var(--pink-deep);
+  outline-offset: 2px;
+}
+
 .product-list-light {
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0 0);
