@@ -156,7 +156,7 @@ function Hero() {
         {banners.map((banner) => {
           const title = ((lang === "sq" ? banner.title_sq : banner.title_en) || banner.title_sq || banner.title_en).trim();
           const url = banner.link_url || "/shop";
-          const safeUrl = /^\\/(?!\\/)/.test(url) || /^https?:\\/\\//i.test(url) ? url : "/shop";
+          const safeUrl = ((url.startsWith("/") && !url.startsWith("//")) || url.startsWith("https://") || url.startsWith("http://")) ? url : "/shop";
           const src = banner.image_url || heroModel;
           return (
             <a
