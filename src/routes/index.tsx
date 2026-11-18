@@ -11,6 +11,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import heroModel from "@/assets/dreame-home/hero-model.jpg";
 import heroDreameBanner from "@/assets/hero-dreame-banner.jpg";
+import heroUserPhoto from "@/assets/hero-user-2026.avif";
 
 
 export const Route = createFileRoute("/")({
@@ -119,14 +120,15 @@ type HomepageBanner = {
   title_sq: string;
   title_en: string;
   link_url: string | null;
+  updated_at: string;
 };
 
 // Restore the original banner text in every supported language.
 const BRAND_HERO_COPY = {
-  sq: { eyebrow: "ZGJIDHJE PROFESIONALE PËR BUKURI", line1: "Cilësi. Elegancë. Përsosmëri.", line2: "Për bukurinë tënde — çdo ditë." },
-  en: { eyebrow: "PROFESSIONAL BEAUTY SOLUTIONS", line1: "Quality. Elegance. Perfection.", line2: "For your beauty — every day." },
-  de: { eyebrow: "PROFESSIONELLE BEAUTY-LÖSUNGEN", line1: "Qualität. Eleganz. Perfektion.", line2: "Für deine Schönheit — jeden Tag." },
-  fr: { eyebrow: "SOLUTIONS BEAUTÉ PROFESSIONNELLES", line1: "Qualité. Élégance. Perfection.", line2: "Pour votre beauté — chaque jour." },
+  sq: { eyebrow: "ZGJIDHJE PROFESIONALE PËR BUKURI", line1: "Butësi. Elegancë. Përsosmëri.", line2: "Për një lëkurë të shëndetshme dhe plot shkëlqim.", action: "Zbulo koleksionin" },
+  en: { eyebrow: "PROFESSIONAL BEAUTY SOLUTIONS", line1: "Softness. Elegance. Perfection.", line2: "For healthy, radiant skin.", action: "Discover the collection" },
+  de: { eyebrow: "PROFESSIONELLE BEAUTY-LÖSUNGEN", line1: "Sanftheit. Eleganz. Perfektion.", line2: "Für gesunde und strahlende Haut.", action: "Kollektion entdecken" },
+  fr: { eyebrow: "SOLUTIONS BEAUTÉ PROFESSIONNELLES", line1: "Douceur. Élégance. Perfection.", line2: "Pour une peau saine et éclatante.", action: "Découvrir la collection" },
 } as const;
 
 function Hero() {
@@ -137,7 +139,7 @@ function Hero() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("homepage_slides")
-        .select("id,image_url,title_sq,title_en,link_url")
+        .select("id,image_url,title_sq,title_en,link_url,updated_at")
         .eq("active", true)
         .not("image_url", "is", null)
         .order("sort_order", { ascending: true })
@@ -148,37 +150,42 @@ function Hero() {
     staleTime: 60_000,
   });
 
-  // One still photo: no carousel, pagination dots, arrows, or automatic rotation.
-  // The original composition is the default. Admin can replace it using the
-  // first active homepage slide without changing the language-aware text.
-  const activePhoto = savedBanners.find((slide) => Boolean(slide.image_url))?.image_url;
-  const desktopPhoto = activePhoto || heroDreameBanner;
-  const mobilePhoto = activePhoto || heroModel;
+  // Display the new customer-provided image now; a subsequent change saved
+  // in Admin > Ballina can replace it. Previously configured slides are not
+  // allowed to conceal the newly requested image.
+  const editedBanner = savedBanners.find(
+    (slide) => slide.image_url &&
+      Date.parse(slide.updated_at) > Date.parse("2026-11-18T07:15:00Z")
+  );
+  const heroPhoto = editedBanner?.image_url || heroUserPhoto;
 
   return (
     <section aria-label={tr("heroBadge")} className="relative isolate overflow-hidden bg-[#080607] text-white">
-      {/* Exact original DREAMÈ banner on wider screens; its text is masked on
-          the left so that every language uses accessible, translated HTML. */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <picture>
-          <source media="(min-width: 640px)" srcSet={desktopPhoto} />
-          <img
-            src={mobilePhoto}
-            alt=""
-            loading="eager"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover object-[59%_center] sm:object-center"
-          />
-        </picture>
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.93)_0%,rgba(0,0,0,0.77)_46%,rgba(0,0,0,0.32)_77%,transparent_100%)] sm:hidden" />
+      {/* Photo is extracted from the exact uploaded design without its baked-in
+          Albanian wording, so the copy appears once and follows the language. */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <img
+          src={heroPhoto}
+          alt=""
+          loading="eager"
+          fetchPriority="high"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = heroDreameBanner;
+          }}
+          className="absolute inset-0 h-full w-full object-cover object-[53%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-none sm:object-contain"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent sm:hidden" />
         <div
           className="absolute inset-0 hidden sm:block"
-          style={{ background: "linear-gradient(90deg, #080607 0%, #080607 42%, rgba(8,6,7,.90) 46%, rgba(8,6,7,.45) 54%, rgba(8,6,7,.05) 70%, transparent 84%)" }}
+          style={{
+            background: "linear-gradient(90deg, #080607 0%, #080607 25%, rgba(8,6,7,.94) 34%, rgba(8,6,7,.63) 45%, rgba(8,6,7,.10) 61%, transparent 79%)",
+          }}
         />
       </div>
 
-      <div className="container-app relative z-10 flex min-h-[390px] items-center py-8 sm:min-h-[390px] sm:py-9 lg:min-h-[435px]">
-        <div className="w-full max-w-[335px] sm:max-w-[43%] lg:max-w-[540px]">
+      <div className="container-app relative z-10 flex min-h-[390px] items-center py-8 sm:min-h-[410px] sm:py-10 lg:min-h-[450px]">
+        <div className="w-full max-w-[335px] sm:max-w-[47%] lg:max-w-[540px]">
           <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.13em] text-white/95 sm:text-xs">
             {brandCopy.eyebrow}
           </p>
@@ -195,7 +202,7 @@ function Hero() {
             to="/shop"
             className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-[#151015] transition hover:bg-[#f8e6ec]"
           >
-            {tr("shopNow")} <ArrowRight className="h-4 w-4" />
+            {brandCopy.action} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>
