@@ -10,7 +10,6 @@ import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail } fr
 import { useState } from "react";
 import { toast } from "sonner";
 import heroModel from "@/assets/dreame-home/hero-model.jpg";
-import heroDreameBanner from "@/assets/hero-dreame-banner.jpg";
 import heroUserPhoto from "@/assets/hero-user-2026.avif";
 
 
@@ -171,7 +170,7 @@ function Hero() {
           fetchPriority="high"
           onError={(e) => {
             e.currentTarget.onerror = null;
-            e.currentTarget.src = heroDreameBanner;
+            e.currentTarget.src = heroModel;
           }}
           className="absolute inset-0 h-full w-full object-cover object-[53%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-none sm:object-contain"
         />
