@@ -172,34 +172,34 @@ function Hero() {
             e.currentTarget.onerror = null;
             e.currentTarget.src = heroModel;
           }}
-          className="absolute inset-0 h-full w-full object-cover object-[53%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-none sm:object-contain"
+          className="absolute inset-0 h-full w-full object-cover object-[56%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-none sm:object-contain"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent sm:hidden" />
         <div
           className="absolute inset-0 hidden sm:block"
           style={{
-            background: "linear-gradient(90deg, #080607 0%, #080607 25%, rgba(8,6,7,.94) 34%, rgba(8,6,7,.63) 45%, rgba(8,6,7,.10) 61%, transparent 79%)",
+            background: "linear-gradient(90deg, #080607 0%, #080607 22%, rgba(8,6,7,.92) 32%, rgba(8,6,7,.32) 44%, transparent 64%)",
           }}
         />
       </div>
 
-      <div className="container-app relative z-10 flex min-h-[390px] items-center py-8 sm:min-h-[410px] sm:py-10 lg:min-h-[450px]">
-        <div className="w-full max-w-[335px] sm:max-w-[47%] lg:max-w-[540px]">
-          <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.13em] text-white/95 sm:text-xs">
+      <div className="container-app relative z-10 flex min-h-[390px] items-center py-8 sm:min-h-[380px] sm:py-8 lg:aspect-[3/1] lg:min-h-0 lg:py-0">
+        <div className="w-full max-w-[335px] sm:max-w-[47%] lg:max-w-[590px]">
+          <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.13em] text-white/95 sm:text-xs lg:text-sm">
             {brandCopy.eyebrow}
           </p>
-          <h1 className="font-display text-[clamp(3.1rem,7vw,6.2rem)] leading-[0.94] tracking-tight text-white">
+          <h1 className="font-display text-[clamp(3.1rem,8vw,7.5rem)] leading-[0.92] tracking-tight text-white">
             DREAMÈ
           </h1>
-          <p className="mt-1 font-display text-[clamp(1.55rem,3.75vw,3.2rem)] italic leading-tight text-white">
+          <p className="mt-1 font-display text-[clamp(1.55rem,4vw,3.85rem)] italic leading-tight text-white">
             Beauty Cosmetics
           </p>
-          <p className="mt-4 text-sm leading-snug text-white/95 sm:text-base">
+          <p className="mt-3 text-sm leading-snug text-white/95 sm:text-base lg:mt-4 lg:text-lg">
             {brandCopy.line1}<br />{brandCopy.line2}
           </p>
           <Link
             to="/shop"
-            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-[#151015] transition hover:bg-[#f8e6ec]"
+            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold !text-[#141014] transition hover:bg-[#f8e6ec]"
           >
             {brandCopy.action} <ArrowRight className="h-4 w-4" />
           </Link>
