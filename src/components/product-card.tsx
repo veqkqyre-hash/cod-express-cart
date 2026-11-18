@@ -1,6 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  actionPointStyle, DEFAULT_PRODUCT_CARD_ICON_LAYOUT,
+  PRODUCT_CARD_ICON_QUERY_KEY, PRODUCT_CARD_ICON_SETTINGS_KEY,
+  parseProductCardIconLayout,
+} from "@/lib/product-card-icon-layout";
 import { useI18n } from "@/lib/i18n";
 import { useCart, formatEur } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
@@ -33,6 +39,16 @@ export function ProductCard({ p, compact = false }: { p: Product; compact?: bool
   const { add } = useCart();
   const { has, toggle } = useWishlist();
   const [quickOpen, setQuickOpen] = useState(false);
+  const { data: iconPositions = DEFAULT_PRODUCT_CARD_ICON_LAYOUT } = useQuery({
+    queryKey: PRODUCT_CARD_ICON_QUERY_KEY,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_settings")
+        .select("value").eq("key", PRODUCT_CARD_ICON_SETTINGS_KEY).maybeSingle();
+      if (error) throw error;
+      return parseProductCardIconLayout(data?.value);
+    },
+    staleTime: 5 * 60_000,
+  });
 
   const name = lang === "sq" ? p.name_sq : p.name_en;
   const s = useMemo(() => seed(p.id), [p.id]);
@@ -93,8 +109,12 @@ export function ProductCard({ p, compact = false }: { p: Product; compact?: bool
             )}
           </div>
 
-          {/* Side actions — slide in on hover (desktop), always visible on touch */}
-          <div className="absolute right-3 top-3 flex flex-col gap-2 opacity-100 translate-x-0 md:opacity-0 md:translate-x-3 transition duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+          {/* Position set by Admin > Produkte, with all actions still hidden
+              until hover on desktop and visible on touch devices. */}
+          <div
+            style={actionPointStyle(iconPositions.wishlist)}
+            className="absolute z-20 -translate-x-1/2 -translate-y-1/2 transition duration-300 md:pointer-events-none md:translate-x-0 md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:-translate-x-1/2 md:group-hover:opacity-100"
+          >
             <button
               onClick={(e) => { e.preventDefault(); toggle(p.id); }}
               aria-label={tr("wishlist")}
@@ -102,6 +122,12 @@ export function ProductCard({ p, compact = false }: { p: Product; compact?: bool
             >
               <Heart className={`h-4 w-4 ${wished ? "fill-current" : ""}`} />
             </button>
+          </div>
+
+          <div
+            style={actionPointStyle(iconPositions.quickView)}
+            className="absolute z-20 -translate-x-1/2 -translate-y-1/2 transition duration-300 md:pointer-events-none md:translate-x-0 md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:-translate-x-1/2 md:group-hover:opacity-100"
+          >
             <button
               onClick={(e) => { e.preventDefault(); setQuickOpen(true); }}
               aria-label={tr("quickView")}
@@ -111,14 +137,21 @@ export function ProductCard({ p, compact = false }: { p: Product; compact?: bool
             </button>
           </div>
 
-          {/* Add to cart bar — slides up on hover */}
-          <div className={compact ? "absolute inset-x-2 bottom-2 translate-y-0 opacity-100 transition duration-300 md:inset-x-3 md:bottom-3 md:translate-y-3 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100" : "absolute inset-x-3 bottom-3 translate-y-3 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100"}>
+          {/* Add to cart stays inside the photo, even after re-positioning. */}
+          <div
+            style={actionPointStyle(iconPositions.addToCart)}
+            className={compact
+              ? "absolute z-20 w-max max-w-[calc(100%-16px)] -translate-x-1/2 -translate-y-1/2 transition duration-300 md:pointer-events-none md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:opacity-100"
+              : "absolute z-20 w-max max-w-[calc(100%-16px)] -translate-x-1/2 -translate-y-1/2 transition duration-300 md:pointer-events-none md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:opacity-100"}
+          >
             <button
               disabled={p.stock === 0}
               onClick={(e) => { e.preventDefault(); handleAdd(); }}
-              className={compact ? "flex min-h-9 w-full items-center justify-center gap-1 rounded-full bg-black px-1.5 py-2 text-[10px] font-semibold uppercase leading-tight tracking-tight text-white shadow-elev transition hover:bg-[var(--pink-deep)] disabled:opacity-40 sm:gap-2 sm:px-3 sm:text-xs" : "flex w-full items-center justify-center gap-2 rounded-full bg-black px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-elev transition hover:bg-[var(--pink-deep)] disabled:opacity-40"}
+              className={compact
+                ? "flex min-h-9 max-w-full items-center justify-center gap-1 rounded-full bg-black px-2 py-2 text-[10px] font-semibold uppercase leading-tight tracking-tight text-white shadow-elev transition hover:bg-[var(--pink-deep)] disabled:opacity-40 sm:gap-2 sm:px-3 sm:text-xs"
+                : "flex min-h-9 max-w-full items-center justify-center gap-2 rounded-full bg-black px-4 py-2.5 text-xs font-semibold uppercase text-white shadow-elev transition hover:bg-[var(--pink-deep)] disabled:opacity-40"}
             >
-              <ShoppingBag className="h-3.5 w-3.5" /> {tr("addToCart")}
+              <ShoppingBag className="h-3.5 w-3.5 shrink-0" /> <span>{tr("addToCart")}</span>
             </button>
           </div>
         </Link>

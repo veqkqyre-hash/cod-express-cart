@@ -12,6 +12,7 @@ import type { Json } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, X, ImagePlus, Loader2, Sparkles } from "lucide-react";
 import { useAdminOrderedProducts, ProductOrderContext, SortableProductRow } from "@/components/admin-product-order";
+import { AdminProductCardIconLayout } from "@/components/admin-product-card-icon-layout";
 
 type ProductRow = {
   id: string;
@@ -59,6 +60,7 @@ export function ProductsPanel() {
 
   return (
     <div>
+      <AdminProductCardIconLayout sampleImage={(products ?? []).find(p => p.image_url)?.image_url} />
       <div className="mb-4 flex justify-end">
         <button
           onClick={() => setEditing("new")}
