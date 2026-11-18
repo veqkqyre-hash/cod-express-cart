@@ -312,6 +312,7 @@ export function HomepagePanel() {
       link_url: String(fd.get("link_url") || "") || null,
       sort_order: Number(fd.get("sort_order") || 0),
       active: fd.get("active") === "on",
+      updated_at: new Date().toISOString(),
     };
     const { error } = editing && editing !== "new"
       ? await supabase.from("homepage_slides").update(payload).eq("id", editing.id)
@@ -330,8 +331,8 @@ export function HomepagePanel() {
         <p className="font-semibold">{L("Fotoja kryesore e ballinës", "Homepage banner photo")}</p>
         <p className="mt-1">
           {L(
-            "Fotoja e parë aktive, sipas radhitjes, shfaqet në bannerin kryesor. Mund ta ngarkosh ose ta ndërrrosh këtu. Banneri nuk ndërron automatikisht foto dhe shkrimi ndryshon sipas gjuhës së zgjedhur. Nëse nuk ka foto aktive, përdoret fotografia rezervë.",
-            "The first active photo, in sort order, appears in the homepage banner. Upload or replace it here. The banner does not rotate photos and the text follows the selected language. If there is no active photo, the fallback is shown."
+            "Fotografia e re DREAMÈ është vendosur në banner. Nëse dëshiron ta ndryshosh më vonë, modifiko dhe ruaj foton e parë aktive këtu. Banneri nuk ndërron automatikisht foto dhe shkrimi ndryshon sipas gjuhës së zgjedhur.",
+            "The new DREAMÈ photo is set as the banner. To replace it later, edit and save the first active photo here. The banner does not rotate photos and the text follows the selected language."
           )}
         </p>
         <p className="mt-2 text-neutral-500">
