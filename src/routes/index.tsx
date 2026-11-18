@@ -5,6 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ProductCard, type Product } from "@/components/product-card";
+import {
+  HOME_ARRIVALS_ORDER_KEY, HOME_ARRIVALS_ORDER_QUERY_KEY,
+  orderHomeArrivals, readHomeArrivalsOrder,
+} from "@/lib/home-arrivals-order";
 import { DreameHomeExtra, DreameHomePromos } from "@/components/dreame-home-extra";
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail } from "lucide-react";
 import { useState } from "react";
@@ -94,6 +98,19 @@ function Home() {
     },
   });
 
+  // Public read-only homepage card order, set by admins under Admin > Ballina.
+  // The current six products remain the same; only their display positions move.
+  const homeArrivalsOrder = useQuery({
+    queryKey: HOME_ARRIVALS_ORDER_QUERY_KEY,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_settings")
+        .select("value").eq("key", HOME_ARRIVALS_ORDER_KEY).maybeSingle();
+      if (error) throw error;
+      return readHomeArrivalsOrder(data?.value);
+    },
+    staleTime: 30_000,
+  });
+
   return (
     <div className="overflow-x-hidden">
       <Hero />
@@ -103,7 +120,7 @@ function Home() {
         eyebrow={tr("newArrivals")}
         title={tr("newArrivalsTitle")}
         subtitle={tr("newArrivalsSub")}
-        products={newArrivals.data ?? []}
+        products={orderHomeArrivals(newArrivals.data ?? [], homeArrivalsOrder.data ?? [])}
       />
       <DreameHomePromos />
       <Newsletter />
