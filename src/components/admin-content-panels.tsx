@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Pencil, Trash2, Mail, MailOpen } from "lucide-react";
 import { AddButton, Check, Empty, Field, FormActions, Modal, Panel, TextArea } from "@/components/admin-ui";
 import { ImageUploadField } from "@/components/admin-image-field";
+import { AdminHomeArrivalsOrder } from "@/components/admin-home-arrivals-order";
 import { loadBusinessInfo } from "@/lib/store-info";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
@@ -327,6 +328,7 @@ export function HomepagePanel() {
 
   return (
     <div>
+      <AdminHomeArrivalsOrder />
       <div className="mb-5 rounded-2xl border border-neutral-200 bg-white p-4 text-sm text-neutral-700">
         <p className="font-semibold">{L("Fotoja kryesore e ballinës", "Homepage banner photo")}</p>
         <p className="mt-1">
