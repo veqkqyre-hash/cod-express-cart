@@ -210,7 +210,7 @@ export function DreameHomePromos() {
       external: false,
     },
     { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), href: whatsappLink(info.academyMessage), photoLeft: false, external: true },
-    { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: tr("promoLearnMore"), href: "#feet-info", photoLeft: true, external: false },
+    { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: tr("promoLearnMore"), href: "#rezervo-termin", photoLeft: true, external: false },
   ];
   const benefits = [
     {
@@ -289,25 +289,6 @@ export function DreameHomePromos() {
       </section>
 
       <section className="container-app pb-12 pt-6">
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <article id="studio-info" className="scroll-mt-28 rounded-2xl border border-border bg-card p-5 text-foreground">
-            <h3 className="font-display text-xl">{info.studioTitle}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{info.studioBody}</p>
-            <a href="#rezervo-termin" onClick={revealBooking} className="mt-4 mr-5 inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-[var(--pink-deep)] hover:underline">
-              {bookingLabel} <ArrowRight className="h-4 w-4" />
-            </a>
-            <Link to="/shop" search={{}} className="mt-4 inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-[var(--pink-deep)] hover:underline">
-              {info.studioAction} <ArrowRight className="h-4 w-4" />
-            </Link>
-          </article>
-          <article id="feet-info" className="scroll-mt-28 rounded-2xl border border-border bg-card p-5 text-foreground">
-            <h3 className="font-display text-xl">{info.feetTitle}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{info.feetBody}</p>
-            <a href="/#rezervo-termin" onClick={revealBooking} className="mt-4 inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-[var(--pink-deep)] hover:underline">
-              {info.feetAction} <ArrowRight className="h-4 w-4" />
-            </a>
-          </article>
-        </div>
         <details id="rezervo-termin" ref={bookingRef} className="mt-5 scroll-mt-28 rounded-2xl border border-border bg-card p-5 text-foreground sm:p-8">
           <summary className="cursor-pointer text-base font-semibold text-[var(--pink-deep)] marker:text-[var(--pink-deep)]">{bookingLabel}</summary>
           <AppointmentBooking embedded />
