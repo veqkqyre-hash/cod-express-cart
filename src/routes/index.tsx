@@ -172,7 +172,7 @@ function Hero() {
             e.currentTarget.onerror = null;
             e.currentTarget.src = heroModel;
           }}
-          className="absolute inset-0 h-full w-full object-cover object-[56%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-none sm:object-contain"
+          className="absolute inset-0 h-full w-full object-cover object-[56%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-[52%] sm:object-contain sm:object-right lg:max-w-none"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent sm:hidden" />
         <div
