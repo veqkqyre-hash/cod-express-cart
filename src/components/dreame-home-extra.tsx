@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Gem, Truck, ShieldCheck, Headphones } from "lucide-react";
+import { ArrowRight, Gem, Truck, ShieldCheck, Headphones, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whatsappLink } from "@/lib/business-whatsapp";
 import { AppointmentBooking } from "@/components/appointment-booking";
@@ -183,21 +183,33 @@ const PROMO_INFO = {
 export function DreameHomePromos() {
   const { tr, lang } = useI18n();
   const info = PROMO_INFO[lang];
-  const bookingRef = useRef<HTMLDetailsElement>(null);
+  const [bookingOpen, setBookingOpen] = useState(false);
   function revealBooking() {
-    if (bookingRef.current) bookingRef.current.open = true;
+    setBookingOpen(true);
   }
   useEffect(() => {
     function revealFromHash() {
       if (window.location.hash === "#rezervo-termin") {
         revealBooking();
-        document.getElementById("rezervo-termin")?.scrollIntoView({ block: "start" });
       }
     }
     revealFromHash();
     window.addEventListener("hashchange", revealFromHash);
     return () => window.removeEventListener("hashchange", revealFromHash);
   }, []);
+  useEffect(() => {
+    if (!bookingOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setBookingOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [bookingOpen]);
   const bookingLabel = ({ sq: "Cakto termin", en: "Book appointment", de: "Termin vereinbaren", fr: "Prendre rendez-vous" } as const)[lang];
   const promos = [
     {
@@ -259,7 +271,7 @@ export function DreameHomePromos() {
             <a
               key={p.title}
               href={p.href}
-              onClick={p.href === "#rezervo-termin" ? revealBooking : undefined}
+              onClick={p.href === "#rezervo-termin" ? (event) => { event.preventDefault(); revealBooking(); } : undefined}
               target={p.external ? "_blank" : undefined}
               rel={p.external ? "noopener noreferrer" : undefined}
               className="group relative flex min-h-[175px] items-center overflow-hidden rounded-lg bg-[#20191c] text-white sm:min-h-[185px]"
@@ -288,12 +300,34 @@ export function DreameHomePromos() {
         </div>
       </section>
 
-      <section className="container-app pb-12 pt-6">
-        <details id="rezervo-termin" ref={bookingRef} className="mt-5 scroll-mt-28 rounded-2xl border border-border bg-card p-5 text-foreground sm:p-8">
-          <summary className="cursor-pointer text-base font-semibold text-[var(--pink-deep)] marker:text-[var(--pink-deep)]">{bookingLabel}</summary>
-          <AppointmentBooking embedded />
-        </details>
-      </section>
+      {/* Booking is shown only when requested; no Cakto termin box at the bottom. */}
+      {bookingOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-3 sm:p-6"
+          onMouseDown={(event) => { if (event.target === event.currentTarget) setBookingOpen(false); }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-label={bookingLabel}
+            id="rezervo-termin"
+            className="relative max-h-[92dvh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-background p-5 text-foreground shadow-2xl sm:p-8"
+          >
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <h2 className="font-display text-2xl">{bookingLabel}</h2>
+              <button
+                type="button"
+                aria-label={({ sq: "Mbyll", en: "Close", de: "Schließen", fr: "Fermer" } as const)[lang]}
+                onClick={() => setBookingOpen(false)}
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-border hover:bg-secondary"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <AppointmentBooking embedded />
+          </section>
+        </div>
+      )}
     </div>
   );
 }
