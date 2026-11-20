@@ -115,6 +115,45 @@ const MANICURE_SERVICES = [
   },
 ] as const;
 
+// PEDICURE options provided by the salon for the "Për Këmbët e Tua" booking card.
+const PEDICURE_SERVICES = [
+  {
+    id: "classic-gel-pedicure",
+    sq: "Classic Gel Pedicure — Pastrim i thonjve + kutikulat + Llak Gel",
+    en: "Classic Gel Pedicure — Nail and cuticle cleaning + gel polish",
+    de: "Classic Gel Pedicure — Nagel- und Nagelhautpflege + Gel-Lack",
+    fr: "Classic Gel Pedicure — Nettoyage des ongles et cuticules + vernis gel",
+  },
+  {
+    id: "velvet-gel-spa",
+    sq: "Velvet Gel Spa — Pedikyr + pastrim i thembrave + skrab + Llak Gel",
+    en: "Velvet Gel Spa — Pedicure + heel care + scrub + gel polish",
+    de: "Velvet Gel Spa — Pediküre + Fersenpflege + Peeling + Gel-Lack",
+    fr: "Velvet Gel Spa — Pédicure + soin des talons + gommage + vernis gel",
+  },
+  {
+    id: "flex-perfect-toes",
+    sq: "Flex Perfect Toes — Pedikyr + përforcim i thonjve me Flex Base",
+    en: "Flex Perfect Toes — Pedicure + nail reinforcement with Flex Base",
+    de: "Flex Perfect Toes — Pediküre + Nagelverstärkung mit Flex Base",
+    fr: "Flex Perfect Toes — Pédicure + renforcement des ongles avec Flex Base",
+  },
+  {
+    id: "dream-flex-spa",
+    sq: "Dream Flex Spa — Pedikyr + pastrim i shputave + skrab + Flex Base-m",
+    en: "Dream Flex Spa — Pedicure + sole care + scrub + Flex Base",
+    de: "Dream Flex Spa — Pediküre + Fußsohlenpflege + Peeling + Flex Base",
+    fr: "Dream Flex Spa — Pédicure + soin de la plante des pieds + gommage + Flex Base",
+  },
+  {
+    id: "royal-dream-pedicure",
+    sq: "Royal Dream Pedicure — Pedikyr komplet + skrab + maskë + masazh + Flex Base dhe ngjyre sipas dëshires",
+    en: "Royal Dream Pedicure — Full pedicure + scrub + mask + massage + Flex Base and chosen colour",
+    de: "Royal Dream Pedicure — Komplette Pediküre + Peeling + Maske + Massage + Flex Base und Wunschfarbe",
+    fr: "Royal Dream Pedicure — Pédicure complète + gommage + masque + massage + Flex Base et couleur au choix",
+  },
+] as const;
+
 const OTHER_SERVICES = [
   { id: "manicure", sq: "Manikyr", en: "Manicure", de: "Maniküre", fr: "Manucure" },
   { id: "gel-polish", sq: "Gel lak", en: "Gel polish", de: "Gel-Lack", fr: "Vernis gel" },
@@ -125,7 +164,26 @@ const OTHER_SERVICES = [
   { id: "other", sq: "Shërbim tjetër (shkruaj te shënimet)", en: "Other service (describe in notes)", de: "Andere Behandlung (in Anmerkungen beschreiben)", fr: "Autre soin (précisez en remarques)" },
 ] as const;
 
-const SERVICES = [...MANICURE_SERVICES, ...OTHER_SERVICES];
+const SERVICES = [...MANICURE_SERVICES, ...PEDICURE_SERVICES, ...OTHER_SERVICES];
+export type AppointmentMode = "all" | "manicure" | "pedicure";
+const BOOKING_MODE_WORDS = {
+  sq: {
+    manicure: { eyebrow: "MANICURE", title: "Rezervo termin për manikyr" },
+    pedicure: { eyebrow: "PEDICURE", title: "Rezervo termin për pedikyr" },
+  },
+  en: {
+    manicure: { eyebrow: "MANICURE", title: "Book a manicure appointment" },
+    pedicure: { eyebrow: "PEDICURE", title: "Book a pedicure appointment" },
+  },
+  de: {
+    manicure: { eyebrow: "MANIKÜRE", title: "Maniküre-Termin buchen" },
+    pedicure: { eyebrow: "PEDIKÜRE", title: "Pediküre-Termin buchen" },
+  },
+  fr: {
+    manicure: { eyebrow: "MANUCURE", title: "Prendre rendez-vous pour une manucure" },
+    pedicure: { eyebrow: "PÉDICURE", title: "Prendre rendez-vous pour une pédicure" },
+  },
+} as const;
 const OTHER_GROUP = {
   sq: "Shërbime tjera",
   en: "Other services",
@@ -144,9 +202,12 @@ function todayLocal() {
   return local.toISOString().slice(0, 10);
 }
 
-export function AppointmentBooking({ embedded = false }: { embedded?: boolean }) {
+export function AppointmentBooking({ embedded = false, mode = "all" }: { embedded?: boolean; mode?: AppointmentMode }) {
   const { lang } = useI18n();
   const w = WORDS[lang];
+  const heading = mode === "all" ? { eyebrow: w.eyebrow, title: w.title } : BOOKING_MODE_WORDS[lang][mode];
+  const availableServices = mode === "manicure" ? MANICURE_SERVICES
+    : mode === "pedicure" ? PEDICURE_SERVICES : SERVICES;
   const [warning, setWarning] = useState("");
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -158,7 +219,7 @@ export function AppointmentBooking({ embedded = false }: { embedded?: boolean })
     const date = String(form.get("date") || "");
     const time = String(form.get("time") || "");
     const notes = String(form.get("notes") || "").trim();
-    const service = SERVICES.find(item => item.id === serviceId);
+    const service = availableServices.find(item => item.id === serviceId);
     if (!service || !name || !phone || !date || !time) return;
     if (date < todayLocal()) { setWarning(w.invalidDate); return; }
     setWarning("");
@@ -180,24 +241,35 @@ export function AppointmentBooking({ embedded = false }: { embedded?: boolean })
     <section id={embedded ? undefined : "rezervo-termin"} className={embedded ? "w-full py-4 sm:py-5" : "container-app scroll-mt-28 py-10 sm:py-14"}>
       <div className={embedded ? "w-full" : "rounded-3xl border border-border bg-card p-5 shadow-soft sm:p-8"}>
         <div className="max-w-3xl">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--pink-deep)]">{w.eyebrow}</p>
-          <h2 className="mt-2 font-display text-3xl sm:text-4xl">{w.title}</h2>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--pink-deep)]">{heading.eyebrow}</p>
+          <h2 className="mt-2 font-display text-3xl sm:text-4xl">{heading.title}</h2>
           <p className="mt-3 text-sm text-muted-foreground">{w.intro}</p>
         </div>
         <form className="mt-7 grid gap-4 sm:grid-cols-2" onSubmit={onSubmit}>
           <label className="sm:col-span-2 text-sm font-medium">{w.service} *
             <select required name="service" defaultValue="" className={`mt-1.5 ${field}`}>
               <option value="" disabled>{w.selectService}</option>
-              <optgroup label="MANICURE">
-                {MANICURE_SERVICES.map(service => (
-                  <option key={service.id} value={service.id}>{service[lang]}</option>
-                ))}
-              </optgroup>
-              <optgroup label={OTHER_GROUP[lang]}>
-                {OTHER_SERVICES.map(service => (
-                  <option key={service.id} value={service.id}>{service[lang]}</option>
-                ))}
-              </optgroup>
+              {mode !== "pedicure" && (
+                <optgroup label="MANICURE">
+                  {MANICURE_SERVICES.map(service => (
+                    <option key={service.id} value={service.id}>{service[lang]}</option>
+                  ))}
+                </optgroup>
+              )}
+              {mode !== "manicure" && (
+                <optgroup label="PEDICURE">
+                  {PEDICURE_SERVICES.map(service => (
+                    <option key={service.id} value={service.id}>{service[lang]}</option>
+                  ))}
+                </optgroup>
+              )}
+              {mode === "all" && (
+                <optgroup label={OTHER_GROUP[lang]}>
+                  {OTHER_SERVICES.map(service => (
+                    <option key={service.id} value={service.id}>{service[lang]}</option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           </label>
           <label className="text-sm font-medium">{w.name} *
