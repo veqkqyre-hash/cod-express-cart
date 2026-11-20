@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Gem, Truck, ShieldCheck, Headphones, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whatsappLink } from "@/lib/business-whatsapp";
-import { AppointmentBooking } from "@/components/appointment-booking";
+import { AppointmentBooking, type AppointmentMode } from "@/components/appointment-booking";
 import p0 from "@/assets/dreame-home/promo-0-photo.jpg";
 import p1 from "@/assets/dreame-home/promo-1-photo.jpg";
 import p2 from "@/assets/dreame-home/promo-2-photo.jpg";
@@ -184,7 +184,9 @@ export function DreameHomePromos() {
   const { tr, lang } = useI18n();
   const info = PROMO_INFO[lang];
   const [bookingOpen, setBookingOpen] = useState(false);
-  function revealBooking() {
+  const [bookingMode, setBookingMode] = useState<AppointmentMode>("all");
+  function revealBooking(mode: AppointmentMode = "all") {
+    setBookingMode(mode);
     setBookingOpen(true);
   }
   useEffect(() => {
@@ -218,11 +220,12 @@ export function DreameHomePromos() {
       sub: ({ sq: "Zgjedh datën dhe orën që të përshtatet.", en: "Choose the date and time that suits you.", de: "Wähle dein passendes Datum und deine Uhrzeit.", fr: "Choisissez la date et l'heure qui vous conviennent." } as const)[lang],
       btn: ({ sq: "Cakto Termin Online", en: "Book Online", de: "Online buchen", fr: "Réserver en ligne" } as const)[lang],
       href: "#rezervo-termin",
+      bookingMode: "manicure" as const,
       photoLeft: true,
       external: false,
     },
-    { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), href: whatsappLink(info.academyMessage), photoLeft: false, external: true },
-    { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: tr("promoLearnMore"), href: "#rezervo-termin", photoLeft: true, external: false },
+    { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), href: whatsappLink(info.academyMessage), bookingMode: undefined, photoLeft: false, external: true },
+    { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: ({ sq: "Cakto termin për pedikyr", en: "Book a pedicure", de: "Pediküre-Termin buchen", fr: "Réserver une pédicure" } as const)[lang], href: "#rezervo-termin", bookingMode: "pedicure" as const, photoLeft: true, external: false },
   ];
   const benefits = [
     {
@@ -271,7 +274,7 @@ export function DreameHomePromos() {
             <a
               key={p.title}
               href={p.href}
-              onClick={p.href === "#rezervo-termin" ? (event) => { event.preventDefault(); revealBooking(); } : undefined}
+              onClick={p.bookingMode ? (event) => { event.preventDefault(); revealBooking(p.bookingMode); } : undefined}
               target={p.external ? "_blank" : undefined}
               rel={p.external ? "noopener noreferrer" : undefined}
               className="group relative flex min-h-[175px] items-center overflow-hidden rounded-lg bg-[#20191c] text-white sm:min-h-[185px]"
@@ -324,7 +327,7 @@ export function DreameHomePromos() {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <AppointmentBooking embedded />
+            <AppointmentBooking embedded mode={bookingMode} />
           </section>
         </div>
       )}
