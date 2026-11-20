@@ -216,16 +216,16 @@ export function DreameHomePromos() {
   const promos = [
     {
       img: p0,
-      title: ({ sq: "Cakto Termin Online", en: "Book an Appointment Online", de: "Termin online buchen", fr: "Prendre rendez-vous en ligne" } as const)[lang],
+      title: "MANICURE",
       sub: ({ sq: "Zgjedh datën dhe orën që të përshtatet.", en: "Choose the date and time that suits you.", de: "Wähle dein passendes Datum und deine Uhrzeit.", fr: "Choisissez la date et l'heure qui vous conviennent." } as const)[lang],
-      btn: ({ sq: "Cakto Termin Online", en: "Book Online", de: "Online buchen", fr: "Réserver en ligne" } as const)[lang],
+      btn: ({ sq: "Cakto Termin për MANICURE", en: "Book MANICURE", de: "MANIKÜRE buchen", fr: "Réserver MANUCURE" } as const)[lang],
       href: "#rezervo-termin",
       bookingMode: "manicure" as const,
       photoLeft: true,
       external: false,
     },
     { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), href: whatsappLink(info.academyMessage), bookingMode: undefined, photoLeft: false, external: true },
-    { img: p2, title: tr("promoFeetTitle"), sub: tr("promoFeetSub"), btn: ({ sq: "Cakto termin për pedikyr", en: "Book a pedicure", de: "Pediküre-Termin buchen", fr: "Réserver une pédicure" } as const)[lang], href: "#rezervo-termin", bookingMode: "pedicure" as const, photoLeft: true, external: false },
+    { img: p2, title: "PEDICURE", sub: tr("promoFeetSub"), btn: ({ sq: "Cakto Termin për PEDICURE", en: "Book PEDICURE", de: "PEDIKÜRE buchen", fr: "Réserver PÉDICURE" } as const)[lang], href: "#rezervo-termin", bookingMode: "pedicure" as const, photoLeft: true, external: false },
   ];
   const benefits = [
     {
