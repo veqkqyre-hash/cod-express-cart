@@ -51,6 +51,8 @@ export function DreameHomeExtra() {
   const { lang } = useI18n();
   const scrollRef = useRef<HTMLDivElement>(null);
   const pauseRef = useRef(false);
+  const visibleRef = useRef(true);
+  const resumeAfterRef = useRef(0);
   const { data: products = [] } = useQuery({
     queryKey: ["home-real-products-strip"],
     queryFn: async (): Promise<StripProduct[]> => {
@@ -89,23 +91,51 @@ export function DreameHomeExtra() {
 
   useEffect(() => {
     const viewport = scrollRef.current;
-    if (!viewport || products.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!viewport || products.length < 2) return;
+
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // Respect the device's Reduce Motion setting on iOS, Android and desktop.
+    if (motionPreference.matches) return;
+
+    const observer = "IntersectionObserver" in window
+      ? new IntersectionObserver(([entry]) => {
+          visibleRef.current = entry.isIntersecting;
+        }, { rootMargin: "100px" })
+      : null;
+    observer?.observe(viewport);
     let frame = 0;
     let previous = 0;
+    // Retain sub-pixel progress: assigning scrollLeft += 0.4px directly can
+    // round to 0 in mobile Safari and leave the product strip looking frozen.
+    let position = viewport.scrollLeft;
     const animate = (timestamp: number) => {
       const elapsed = previous ? Math.min(timestamp - previous, 50) : 0;
       previous = timestamp;
-      if (!pauseRef.current && !document.hidden) {
-        const distance = viewport.scrollWidth / 2;
-        if (distance > viewport.clientWidth) {
-          viewport.scrollLeft += elapsed * 0.028;
-          if (viewport.scrollLeft >= distance) viewport.scrollLeft -= distance;
+
+      const distance = viewport.scrollWidth / 2;
+      if (distance > viewport.clientWidth &&
+          !pauseRef.current &&
+          timestamp >= resumeAfterRef.current &&
+          visibleRef.current &&
+          !document.hidden) {
+        position = (position + elapsed * 0.035) % distance;
+        viewport.scrollLeft = position;
+      } else {
+        // Follow native finger swipes / momentum rather than fighting them.
+        position = viewport.scrollLeft;
+        if (distance > 0 && position >= distance && !pauseRef.current) {
+          position %= distance;
+          viewport.scrollLeft = position;
         }
       }
       frame = window.requestAnimationFrame(animate);
     };
     frame = window.requestAnimationFrame(animate);
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer?.disconnect();
+      visibleRef.current = true;
+    };
   }, [products.length]);
 
   // If no existing, photographed products are available, don't show fake categories.
@@ -116,13 +146,34 @@ export function DreameHomeExtra() {
       <section className="container-app pt-7 pb-7 sm:pt-12 sm:pb-8" aria-label={({ sq: "Produkte nga dyqani", en: "Products from our shop", de: "Produkte aus unserem Shop", fr: "Produits de notre boutique" } as const)[lang]}>
         <div
           ref={scrollRef}
-          className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          onMouseEnter={() => { pauseRef.current = true; }}
-          onMouseLeave={() => { pauseRef.current = false; }}
-          onFocus={() => { pauseRef.current = true; }}
+          className="overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+          onPointerEnter={(event) => {
+            // Touchscreens emulate mouse-hover on tap, which used to pause the
+            // strip forever. Only real mouse hover should pause its motion.
+            if (event.pointerType === "mouse") pauseRef.current = true;
+          }}
+          onPointerLeave={(event) => {
+            if (event.pointerType === "mouse") pauseRef.current = false;
+          }}
+          onFocus={(event) => {
+            // Keyboard focus pauses motion for accessibility; tapping a card
+            // on a phone should not leave the marquee permanently paused.
+            if (event.target instanceof HTMLElement && event.target.matches(":focus-visible")) {
+              pauseRef.current = true;
+            }
+          }}
           onBlur={() => { pauseRef.current = false; }}
           onTouchStart={() => { pauseRef.current = true; }}
-          onTouchEnd={() => { pauseRef.current = false; }}
+          onTouchEnd={() => {
+            pauseRef.current = false;
+            // Give iOS/Android momentum scrolling time to settle before
+            // resuming continuous auto-scroll.
+            resumeAfterRef.current = performance.now() + 1800;
+          }}
+          onTouchCancel={() => {
+            pauseRef.current = false;
+            resumeAfterRef.current = performance.now() + 1800;
+          }}
         >
           <div className="flex w-max">
             <div className="flex shrink-0 gap-3 pr-3">
