@@ -54,7 +54,68 @@ const WORDS = {
   },
 } as const;
 
-const SERVICES = [
+// The MANICURE services are the exact treatments supplied for the
+// "Cakto Termin Online" card. The original general services remain available.
+const MANICURE_SERVICES = [
+  {
+    id: "classic-nail-extensions",
+    sq: "Classic Nail Extensions — Mbjellje me tipsa klasike",
+    en: "Classic Nail Extensions — Classic tip extensions",
+    de: "Classic Nail Extensions — Verlängerung mit klassischen Tips",
+    fr: "Classic Nail Extensions — Pose avec capsules classiques",
+  },
+  {
+    id: "c-curve-perfection",
+    sq: "C-Curve Perfection — Mbjellje me tipsa C-Curve",
+    en: "C-Curve Perfection — C-Curve tip extensions",
+    de: "C-Curve Perfection — Verlängerung mit C-Curve-Tips",
+    fr: "C-Curve Perfection — Pose avec capsules C-Curve",
+  },
+  {
+    id: "sculpted-nails",
+    sq: "Sculpted Nails — Zgjatje me letër dhe gel ndërtues",
+    en: "Sculpted Nails — Form extensions with builder gel",
+    de: "Sculpted Nails — Schablonenverlängerung mit Aufbaugel",
+    fr: "Sculpted Nails — Extensions au chablon et gel de construction",
+  },
+  {
+    id: "builder-gel-overlay",
+    sq: "Builder Gel Overlay — Përforcim i thonjve natyralë me Builder Gel",
+    en: "Builder Gel Overlay — Natural nail strengthening with builder gel",
+    de: "Builder Gel Overlay — Naturnagelverstärkung mit Aufbaugel",
+    fr: "Builder Gel Overlay — Renforcement des ongles naturels au gel",
+  },
+  {
+    id: "dream-nail-refill",
+    sq: "Dream Nail Refill — Mirëmbajtje dhe rimbushje e gelit",
+    en: "Dream Nail Refill — Gel maintenance and refill",
+    de: "Dream Nail Refill — Gel-Auffüllen und Pflege",
+    fr: "Dream Nail Refill — Entretien et remplissage du gel",
+  },
+  {
+    id: "nail-repair",
+    sq: "Nail Repair — Riparim i thoit të dëmtuar ose të there",
+    en: "Nail Repair — Damaged or broken nail repair",
+    de: "Nail Repair — Reparatur beschädigter oder gebrochener Nägel",
+    fr: "Nail Repair — Réparation d'un ongle abîmé ou cassé",
+  },
+  {
+    id: "nail-correction-refill",
+    sq: "Nail Correction & Refill — Korrigjim dhe riparim i thonjve të punuar nga një sallon tjetër",
+    en: "Nail Correction & Refill — Correction of nails done at another salon",
+    de: "Nail Correction & Refill — Korrektur von Nägeln aus einem anderen Studio",
+    fr: "Nail Correction & Refill — Correction d'ongles réalisés dans un autre salon",
+  },
+  {
+    id: "complete-nail-removal",
+    sq: "Complete Nail Removal — Largim i plotë i materialit dhe pastrim i thonjve natyralë",
+    en: "Complete Nail Removal — Complete product removal and natural nail cleaning",
+    de: "Complete Nail Removal — Vollständige Materialentfernung und Naturnagelreinigung",
+    fr: "Complete Nail Removal — Dépose complète et nettoyage des ongles naturels",
+  },
+] as const;
+
+const OTHER_SERVICES = [
   { id: "manicure", sq: "Manikyr", en: "Manicure", de: "Maniküre", fr: "Manucure" },
   { id: "gel-polish", sq: "Gel lak", en: "Gel polish", de: "Gel-Lack", fr: "Vernis gel" },
   { id: "nail-extensions", sq: "Ndërtim / zgjatje thonjsh", en: "Nail extensions / builder gel", de: "Nagelverlängerung / Aufbaugel", fr: "Extensions / gel de construction" },
@@ -63,6 +124,14 @@ const SERVICES = [
   { id: "nail-care", sq: "Trajtim / kujdes për thonj", en: "Nail treatment / care", de: "Nagelpflege / Behandlung", fr: "Soin des ongles" },
   { id: "other", sq: "Shërbim tjetër (shkruaj te shënimet)", en: "Other service (describe in notes)", de: "Andere Behandlung (in Anmerkungen beschreiben)", fr: "Autre soin (précisez en remarques)" },
 ] as const;
+
+const SERVICES = [...MANICURE_SERVICES, ...OTHER_SERVICES];
+const OTHER_GROUP = {
+  sq: "Shërbime tjera",
+  en: "Other services",
+  de: "Weitere Behandlungen",
+  fr: "Autres soins",
+} as const;
 
 const TIMES = Array.from({ length: 21 }, (_, i) => {
   const h = 9 + Math.floor(i / 2);
@@ -119,7 +188,16 @@ export function AppointmentBooking({ embedded = false }: { embedded?: boolean })
           <label className="sm:col-span-2 text-sm font-medium">{w.service} *
             <select required name="service" defaultValue="" className={`mt-1.5 ${field}`}>
               <option value="" disabled>{w.selectService}</option>
-              {SERVICES.map(service => <option key={service.id} value={service.id}>{service[lang]}</option>)}
+              <optgroup label="MANICURE">
+                {MANICURE_SERVICES.map(service => (
+                  <option key={service.id} value={service.id}>{service[lang]}</option>
+                ))}
+              </optgroup>
+              <optgroup label={OTHER_GROUP[lang]}>
+                {OTHER_SERVICES.map(service => (
+                  <option key={service.id} value={service.id}>{service[lang]}</option>
+                ))}
+              </optgroup>
             </select>
           </label>
           <label className="text-sm font-medium">{w.name} *
