@@ -6,6 +6,10 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { ProductCard, type Product } from "@/components/product-card";
+import {
+  categoryProductOrderKey, categoryProductOrderQueryKey,
+  readCategoryProductOrder, sortCategoryProducts,
+} from "@/lib/category-product-order";
 
 const searchSchema = z.object({
   category: z.string().optional(),
@@ -41,6 +45,26 @@ function Shop() {
       const { data } = await supabase.from("categories").select("*").order("sort_order");
       return data ?? [];
     },
+  });
+
+  const selectedCategoryId = category
+    ? categories.data?.find((c) => c.slug === category)?.id
+    : undefined;
+
+  // The order applies only within the currently selected category.
+  // "All products" and every other category keep their existing order.
+  const categoryOrder = useQuery({
+    queryKey: categoryProductOrderQueryKey(selectedCategoryId ?? ""),
+    enabled: Boolean(selectedCategoryId),
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_settings")
+        .select("value")
+        .eq("key", categoryProductOrderKey(selectedCategoryId!))
+        .maybeSingle();
+      if (error) throw error;
+      return readCategoryProductOrder(data?.value);
+    },
+    staleTime: 30_000,
   });
 
   const products = useQuery({
@@ -104,7 +128,7 @@ function Shop() {
         <div className="py-20 text-center text-muted-foreground">…</div>
       ) : products.data && products.data.length > 0 ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {products.data.map((p) => <ProductCard key={p.id} p={p} />)}
+          {sortCategoryProducts(products.data, selectedCategoryId ? (categoryOrder.data ?? []) : []).map((p) => <ProductCard key={p.id} p={p} />)}
         </div>
       ) : (
         <div className="py-20 text-center text-muted-foreground">{tr("noProducts")}</div>

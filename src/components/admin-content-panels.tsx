@@ -8,6 +8,7 @@ import { Pencil, Trash2, Mail, MailOpen } from "lucide-react";
 import { AddButton, Check, Empty, Field, FormActions, Modal, Panel, TextArea } from "@/components/admin-ui";
 import { ImageUploadField } from "@/components/admin-image-field";
 import { AdminHomeArrivalsOrder } from "@/components/admin-home-arrivals-order";
+import { AdminCategoryProductOrder } from "@/components/admin-category-product-order";
 import { loadBusinessInfo } from "@/lib/store-info";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
@@ -123,6 +124,7 @@ export function CatalogPanel() {
 
   return (
     <div>
+      <AdminCategoryProductOrder categories={categories ?? []} />
       <AddButton label={L("Shto kategori", "Add category")} onClick={() => setEditing("new")} />
       <p className="mb-3 text-xs text-neutral-500">{L("Kap ikonën ⠿ dhe tërhiqe kategorinë për ta ndryshuar renditjen. Ruhet automatikisht.", "Grab the ⠿ handle and drag to reorder. Saves automatically.")}</p>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
