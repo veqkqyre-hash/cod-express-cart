@@ -66,7 +66,17 @@ export function SiteFooter() {
 
         <div className="border-t border-white/10">
           <div className="container-app flex flex-col gap-3 py-5 text-xs text-white/50 md:flex-row md:items-center md:justify-between">
-            <div>© {new Date().getFullYear()} Dreame Beauty Cosmetics {lang === "sq" ? "Të gjitha të drejtat e rezervuara." : "All rights reserved."}</div>
+            <div className="flex items-center gap-2.5">
+              <img
+                src="/assets/dreame-symbol.svg"
+                alt=""
+                aria-hidden="true"
+                width={25}
+                height={25}
+                className="h-6 w-6 shrink-0 object-contain brightness-0 invert"
+              />
+              <span>© {new Date().getFullYear()} Dreame Beauty Cosmetics {lang === "sq" ? "Të gjitha të drejtat e rezervuara." : "All rights reserved."}</span>
+            </div>
             <div className="flex items-center gap-4">
               <Link to="/privacy" className="hover:text-white transition">{lang === "sq" ? "Privatësia" : "Privacy"}</Link>
               <Link to="/terms" className="hover:text-white transition">{lang === "sq" ? "Kushtet" : "Terms"}</Link>
