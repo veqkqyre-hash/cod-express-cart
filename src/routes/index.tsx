@@ -349,16 +349,17 @@ function Newsletter() {
   const { tr, lang } = useI18n();
   const [email, setEmail] = useState("");
   return (
-    <section className="container-app py-20">
-      <div className="relative overflow-hidden rounded-[2rem] bg-black p-10 md:p-16 text-white text-center shadow-elev">
+    <section className="container-app py-12 sm:py-14">
+      <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] bg-black px-6 py-9 text-center text-white shadow-elev sm:px-10 sm:py-10 md:px-12 md:py-11">
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_0%,var(--pink-deep),transparent_60%)]" />
+        <img src="/assets/dreame-symbol.svg" width={32} height={38} alt="" aria-hidden="true" className="pointer-events-none absolute right-5 top-5 h-9 w-8 object-contain brightness-0 invert opacity-75 sm:right-8 sm:top-7" />
         <div className="relative mx-auto max-w-xl">
-          <Mail className="mx-auto h-8 w-8 text-[var(--pink)]" />
-          <h2 className="mt-4 font-display text-4xl md:text-5xl leading-tight">{tr("newsletterTitle")}</h2>
+          <Mail className="mx-auto h-7 w-7 text-[var(--pink)]" />
+          <h2 className="mt-3 font-display text-3xl leading-tight sm:text-4xl">{tr("newsletterTitle")}</h2>
           <p className="mt-3 text-sm md:text-base text-white/70">{tr("newsletterSub")}</p>
           <form
             onSubmit={(e) => { e.preventDefault(); if (!email.includes("@")) return; toast.success(lang === "sq" ? "Faleminderit që u regjistruat!" : "Thanks for subscribing!"); setEmail(""); }}
-            className="mt-8 flex flex-col sm:flex-row gap-2 rounded-full bg-white/10 backdrop-blur border border-white/15 p-1.5"
+            className="mt-6 flex flex-col sm:flex-row gap-2 rounded-full bg-white/10 backdrop-blur border border-white/15 p-1.5"
           >
             <input
               value={email}
@@ -372,7 +373,7 @@ function Newsletter() {
               {tr("subscribe")}
             </button>
           </form>
-          <p className="mt-4 text-[11px] text-white/50">{tr("newsletterFine")}</p>
+          <p className="mt-3 text-[11px] text-white/50">{tr("newsletterFine")}</p>
         </div>
       </div>
     </section>
