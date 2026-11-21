@@ -26,17 +26,14 @@ export const logVisit = createServerFn({ method: "POST" })
     const req = getRequest();
     const h = req.headers;
     const ip =
-      (h.get("cf-connecting-ip") ||
-        h.get("x-real-ip") ||
-        (h.get("x-forwarded-for") ?? "").split(",")[0] ||
-        "").trim() || null;
+      (h.get("cf-connecting-ip") ?? "").trim() || null;
 
     let country = h.get("cf-ipcountry-name") || null;
     let countryCode = h.get("cf-ipcountry") || h.get("x-vercel-ip-country") || null;
     let city = h.get("cf-ipcity") || h.get("x-vercel-ip-city") || null;
     let region = h.get("cf-region") || h.get("x-vercel-ip-country-region") || null;
 
-    if (ip && (!countryCode || countryCode === "XX" || !city)) {
+    if (ip && /^[0-9a-fA-F:.]{3,45}$/.test(ip) && (!countryCode || countryCode === "XX" || !city)) {
       try {
         const res = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`);
         if (res.ok) {
