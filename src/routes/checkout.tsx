@@ -8,7 +8,8 @@ import { useI18n } from "@/lib/i18n";
 import { useCart, formatEur, cartKey } from "@/lib/cart";
 import { toast } from "sonner";
 import { Banknote, Tag, X as XIcon, Truck } from "lucide-react";
-import { useShipping, validateCoupon } from "@/lib/checkout-extras";
+import { validateCoupon } from "@/lib/checkout-extras";
+import { DELIVERY_COUNTRIES, shippingForCountry, type DeliveryCountry } from "@/lib/country-shipping";
 
 export const Route = createFileRoute("/checkout")({
   loader: () => loadSeo("/checkout"),
@@ -32,6 +33,7 @@ const schema = z.object({
   phone: z.string().trim().min(6).max(30),
   email: z.string().trim().email().max(255).optional().or(z.literal("")),
   city: z.string().trim().min(2).max(100),
+  country: z.enum(["XK", "AL", "MK"]),
   address: z.string().trim().min(3).max(300),
   postal_code: z.string().trim().max(20).optional().or(z.literal("")),
   notes: z.string().trim().max(500).optional().or(z.literal("")),
@@ -44,12 +46,13 @@ function Checkout() {
   const [submitting, setSubmitting] = useState(false);
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
   const [userEmail, setUserEmail] = useState<string>("");
-  const [city, setCity] = useState("");
+  const [country, setCountry] = useState<DeliveryCountry>("XK");
   const [code, setCode] = useState("");
   const [checking, setChecking] = useState(false);
   const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
 
-  const { fee: shippingFee, zone, freeOver, isFree } = useShipping(city, subtotal);
+  const { fee: shippingFee, freeOver, isFree } = shippingForCountry(country, subtotal);
+  const countryLabel = DELIVERY_COUNTRIES.find(c => c.code === country)?.[lang] ?? "Kosovë";
   const discount = coupon ? Math.min(coupon.discount, subtotal) : 0;
   const total = Math.max(0, subtotal - discount) + shippingFee;
 
@@ -109,6 +112,17 @@ function Checkout() {
     }
     setSubmitting(true);
     try {
+      // Do not submit to an old checkout RPC which might save an incorrect
+      // shipping fee. This read-only quote RPC is installed alongside the
+      // authoritative checkout SQL migration and acts as a compatibility check.
+      const { data: quotedFee, error: quoteError } = await supabase.rpc(
+        "shipping_fee_by_country" as any,
+        { _country: parsed.data.country, _subtotal: subtotal } as any,
+      );
+      if (quoteError || quotedFee == null || !Number.isFinite(Number(quotedFee)) ||
+          Math.abs(Number(quotedFee) - shippingFee) > 0.001) {
+        throw new Error("DELIVERY_SETUP_REQUIRED");
+      }
       // One authenticated database transaction: prices, stock, order and items.
       // Works through the Data API on static cPanel; no TanStack server endpoint.
       const { data: result, error } = await supabase.rpc("checkout_product_options", {
@@ -137,6 +151,8 @@ function Checkout() {
         ["PRICE_MISMATCH", "Çmimi ka ndryshuar. Hiqeni produktin dhe shtojeni përsëri nga dyqani.", "A price changed. Remove the product and add it again from the shop."],
         ["COUPON_INVALID", "Kuponi nuk është më i vlefshëm.", "The coupon is no longer valid."],
         ["PRODUCT_UNAVAILABLE", "Një produkt nuk është më i disponueshëm.", "A product is no longer available."],
+        ["DELIVERY_SETUP_REQUIRED", "Tarifat e transportit nuk janë aktivizuar ende në server. Ju lutem kontaktoni dyqanin.", "Delivery rates are not yet active on the server. Please contact the shop."],
+        ["INVALID_COUNTRY", "Zgjidhni shtetin e dërgesës.", "Choose a delivery country."],
       ].find(([code]) => m.includes(code));
       toast.error(messages ? messages[lang === "sq" ? 1 : 2] : lang === "sq" ? "Ndodhi një gabim. Provoni përsëri." : "Something went wrong.");
       setSubmitting(false);
@@ -155,16 +171,22 @@ function Checkout() {
               <Field label={tr("email")} name="email" type="email" defaultValue={userEmail} />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium">{tr("city")}<span className="text-destructive"> *</span></label>
-              <input
-                name="city"
+              <label htmlFor="shipping-country" className="mb-1.5 block text-sm font-medium">
+                {({ sq: "Shteti i dërgesës", en: "Delivery country", de: "Lieferland", fr: "Pays de livraison" } as const)[lang]}
+                <span className="text-destructive"> *</span>
+              </label>
+              <select
+                id="shipping-country"
+                name="country"
                 required
-                maxLength={100}
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              />
+                value={country}
+                onChange={(e) => setCountry(e.target.value as DeliveryCountry)}
+                className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                {DELIVERY_COUNTRIES.map(c => <option key={c.code} value={c.code}>{c[lang]}</option>)}
+              </select>
             </div>
+            <Field label={tr("city")} name="city" required />
             <Field label={tr("address")} name="address" required />
             <Field label={tr("postalCode")} name="postal_code" />
             <div>
@@ -229,15 +251,20 @@ function Checkout() {
               <div className="flex justify-between text-green-600"><span>{lang === "sq" ? "Zbritja" : "Discount"}</span><span>-{formatEur(discount)}</span></div>
             )}
             <div className="flex justify-between">
-              <span className="inline-flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> {tr("shipping")}{zone ? ` · ${zone}` : ""}</span>
+              <span className="inline-flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> {tr("shipping")} · {countryLabel}</span>
               <span>{shippingFee === 0 ? tr("freeShipping") : formatEur(shippingFee)}</span>
             </div>
-            {!isFree && (
+            {country === "XK" && !isFree && freeOver !== null && (
               <div className="text-xs text-muted-foreground">
                 {lang === "sq"
-                  ? `Shto ${formatEur(Math.max(0, freeOver - subtotal))} për transport falas`
-                  : `Add ${formatEur(Math.max(0, freeOver - subtotal))} for free shipping`}
+                  ? `Shto ${formatEur(Math.max(0, freeOver - subtotal))} për transport falas në Kosovë`
+                  : `Add ${formatEur(Math.max(0, freeOver - subtotal))} for free shipping in Kosovo`}
               </div>
+            )}
+            {country !== "XK" && (
+              <p className="text-xs text-muted-foreground">
+                {({ sq: "Posta për Shqipëri dhe Maqedoni të Veriut është 5 € për çdo porosi.", en: "Delivery to Albania and North Macedonia is €5 for every order.", de: "Versand nach Albanien und Nordmazedonien kostet 5 € pro Bestellung.", fr: "Livraison vers l'Albanie et la Macédoine du Nord : 5 € par commande." } as const)[lang]}
+              </p>
             )}
             <div className="flex justify-between font-display text-xl pt-2 border-t border-border">
               <span>{tr("total")}</span><span>{formatEur(total)}</span>
