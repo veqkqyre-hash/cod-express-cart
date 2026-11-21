@@ -2,9 +2,39 @@ import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Youtube, Mail, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { NewsletterSignup } from "@/components/newsletter-signup";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+// Fallback keeps the existing official Instagram link working until Admin
+// settings have been saved and loaded on this visitor's device.
+const DEFAULT_INSTAGRAM_URL = "https://www.instagram.com/dreamebeautycosmetics/";
+
+function instagramProfileUrl(value: unknown): string {
+  if (typeof value !== "string" || !value.trim()) return DEFAULT_INSTAGRAM_URL;
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol === "https:" && (url.hostname === "instagram.com" || url.hostname === "www.instagram.com")) {
+      return url.href;
+    }
+  } catch {
+    // Invalid links must never turn into broken or unsafe links.
+  }
+  return DEFAULT_INSTAGRAM_URL;
+}
 
 export function SiteFooter() {
   const { tr, lang } = useI18n();
+  const { data: socialSettings } = useQuery({
+    queryKey: ["footer-social-links"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_settings")
+        .select("value").eq("key", "store").maybeSingle();
+      if (error) throw error;
+      return (data?.value ?? {}) as { instagram?: string; facebook?: string };
+    },
+    staleTime: 60_000,
+  });
+  const instagramUrl = instagramProfileUrl(socialSettings?.instagram);
   return (
     <footer className="mt-24">
       <div className="bg-black text-white">
@@ -30,9 +60,16 @@ export function SiteFooter() {
             </p>
 
             <div className="flex gap-2">
-              {[Instagram, Facebook, Youtube].map((I, i) => (
-                <a key={i} href="#" aria-label="social" className="grid h-10 w-10 place-items-center rounded-full border border-white/15 hover:border-[var(--pink)] hover:bg-[var(--pink-deep)] transition">
-                  <I className="h-4 w-4" />
+              {[Instagram, Facebook, Youtube].map((Icon, i) => (
+                <a
+                  key={i}
+                  href={i === 0 ? instagramUrl : "#"}
+                  aria-label={["Instagram", "Facebook", "YouTube"][i]}
+                  target={i === 0 ? "_blank" : undefined}
+                  rel={i === 0 ? "noopener noreferrer" : undefined}
+                  className="grid h-10 w-10 place-items-center rounded-full border border-white/15 hover:border-[var(--pink)] hover:bg-[var(--pink-deep)] transition"
+                >
+                  <Icon className="h-4 w-4" />
                 </a>
               ))}
             </div>
