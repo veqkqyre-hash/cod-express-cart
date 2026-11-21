@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, Youtube, Mail, MapPin } from "lucide-react";
+import { Instagram, Facebook, Youtube, Mail, MapPin, Phone } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { NewsletterSignup } from "@/components/newsletter-signup";
 import { useQuery } from "@tanstack/react-query";
@@ -8,6 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 // Fallback keeps the existing official Instagram link working until Admin
 // settings have been saved and loaded on this visitor's device.
 const DEFAULT_INSTAGRAM_URL = "https://www.instagram.com/dreamebeautycosmetics/";
+
+// Public customer-contact number; separate from any staff booking number.
+const CUSTOMER_PHONE = "+38344208883";
+const CUSTOMER_PHONE_DISPLAY = "+383 44 208 883";
+const CUSTOMER_WHATSAPP = "https://wa.me/38344208883";
 
 function instagramProfileUrl(value: unknown): string {
   if (typeof value !== "string" || !value.trim()) return DEFAULT_INSTAGRAM_URL;
@@ -105,6 +110,12 @@ export function SiteFooter() {
             <ul className="space-y-3 text-sm text-white/80">
               <li className="flex items-start gap-2.5"><MapPin className="mt-0.5 h-4 w-4 text-[var(--pink)] shrink-0" /> Rr. Nëna Terezë, Fushë Kosovë 12000, Kosovë</li>
               <li className="flex items-center gap-2.5"><Mail className="h-4 w-4 text-[var(--pink)] shrink-0" /> info@dreamebeautycosmetics.com</li>
+              <li className="flex items-center gap-2.5">
+                <Phone className="h-4 w-4 shrink-0 text-[var(--pink)]" />
+                <a href={`tel:${CUSTOMER_PHONE}`} className="hover:text-white hover:underline">
+                  {CUSTOMER_PHONE_DISPLAY}
+                </a>
+              </li>
             </ul>
             <div className="mt-6"><NewsletterSignup dark /></div>
           </div>
@@ -131,6 +142,18 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
+      <a
+        href={CUSTOMER_WHATSAPP}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={lang === "sq" ? "Na kontakto në WhatsApp" : "Contact us on WhatsApp"}
+        title={lang === "sq" ? "Na shkruaj në WhatsApp" : "Chat on WhatsApp"}
+        className="fixed bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] right-4 z-[60] flex h-14 w-14 items-center justify-center rounded-full border-2 border-white bg-[#25D366] text-white shadow-[0_6px_22px_rgba(0,0,0,0.30)] transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] sm:bottom-6 sm:right-6"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" className="h-8 w-8">
+          <path d="M20.52 3.48A11.92 11.92 0 0 0 12.06 0C5.5 0 .15 5.35 .15 11.93c0 2.1.55 4.15 1.59 5.97L.05 24l6.24-1.64a11.9 11.9 0 0 0 5.77 1.47h.01c6.57 0 11.92-5.35 11.92-11.93a11.83 11.83 0 0 0-3.47-8.42zM12.06 21.8c-1.81 0-3.59-.49-5.13-1.4l-.37-.22-3.7.97.99-3.6-.24-.38a9.88 9.88 0 0 1-1.52-5.24c0-5.47 4.45-9.92 9.93-9.92a9.87 9.87 0 0 1 7.01 2.91 9.87 9.87 0 0 1 2.9 7.02c0 5.47-4.45 9.92-9.87 9.92zm5.44-7.41c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.23-.64.08-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.57-.48-.49-.67-.5h-.57c-.2 0-.52.07-.79.37s-1.04 1.02-1.04 2.49 1.07 2.89 1.22 3.09c.15.2 2.1 3.21 5.09 4.5.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35z" />
+        </svg>
+      </a>
     </footer>
   );
 }
