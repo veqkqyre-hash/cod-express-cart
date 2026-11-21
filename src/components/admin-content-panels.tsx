@@ -653,6 +653,7 @@ const SETTINGS_KEY = "store";
 
 export function SettingsPanel() {
   const { L } = useL();
+  const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
 
   const { data, refetch } = useQuery({
@@ -689,6 +690,7 @@ export function SettingsPanel() {
     setSaving(false);
     if (error) return toast.error(error.message);
     await loadBusinessInfo();
+    await queryClient.invalidateQueries({ queryKey: ["footer-social-links"] });
     toast.success(L("Cilësimet u ruajtën", "Settings saved"));
     refetch();
   }
