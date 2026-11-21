@@ -100,7 +100,7 @@ export const t: Dict = {
   myWishlist: { sq: "Lista Ime", en: "My Wishlist" },
   quickView: { sq: "Shikim i Shpejtë", en: "Quick View" },
   searchProducts: { sq: "Kërko produkte…", en: "Search products…" },
-  announcementBar: { sq: "Transport falas për porosi mbi 50€ · Pagesë në dorëzim me postë", en: "Free shipping over €50 · Cash on Delivery via post" },
+  announcementBar: { sq: "Kosovë: transport falas nga 50€ · Pagesë në dorëzim", en: "Kosovo: free delivery from €50 · Cash on delivery" },
   newArrivals: { sq: "Të Rejat", en: "New Arrivals" },
   bestSellers: { sq: "Më të Shiturat", en: "Best Sellers" },
   brands: { sq: "Markat", en: "Brands" },
@@ -114,7 +114,7 @@ export const t: Dict = {
   shopCategories: { sq: "Shiko Kategoritë", en: "Shop Categories" },
   
   exploreCategories: { sq: "Zbulo Kategoritë", en: "Explore Categories" },
-  freeShippingBanner: { sq: "Transport falas mbi 50€", en: "Free shipping over €50" },
+  freeShippingBanner: { sq: "Në Kosovë transport falas nga 50€", en: "Free shipping in Kosovo from €50" },
   codShort: { sq: "Paguaj në derë", en: "Pay at the door" },
   qualityBadge: { sq: "100% origjinale", en: "100% authentic" },
   limitedOffer: { sq: "Ofertë e Kufizuar", en: "Limited Offer" },
