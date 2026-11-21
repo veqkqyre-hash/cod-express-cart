@@ -13,7 +13,6 @@ import { DreameHomeExtra, DreameHomePromos } from "@/components/dreame-home-extr
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import heroModel from "@/assets/dreame-home/hero-model.jpg";
 import heroUserPhoto from "@/assets/hero-user-2026.avif";
 
 
@@ -131,97 +130,44 @@ function Home() {
 /* ------------------------------ Sections ------------------------------ */
 
 type HomepageBanner = {
-  id: string;
   image_url: string | null;
-  title_sq: string;
-  title_en: string;
-  link_url: string | null;
-  updated_at: string;
 };
 
-// Restore the original banner text in every supported language.
-const BRAND_HERO_COPY = {
-  sq: { eyebrow: "ZGJIDHJE PROFESIONALE PËR BUKURI", line1: "Butësi. Elegancë. Përsosmëri.", line2: "Për një lëkurë të shëndetshme dhe plot shkëlqim.", action: "Zbulo koleksionin" },
-  en: { eyebrow: "PROFESSIONAL BEAUTY SOLUTIONS", line1: "Softness. Elegance. Perfection.", line2: "For healthy, radiant skin.", action: "Discover the collection" },
-  de: { eyebrow: "PROFESSIONELLE BEAUTY-LÖSUNGEN", line1: "Sanftheit. Eleganz. Perfektion.", line2: "Für gesunde und strahlende Haut.", action: "Kollektion entdecken" },
-  fr: { eyebrow: "SOLUTIONS BEAUTÉ PROFESSIONNELLES", line1: "Douceur. Élégance. Perfection.", line2: "Pour une peau saine et éclatante.", action: "Découvrir la collection" },
-} as const;
-
 function Hero() {
-  const { lang, tr } = useI18n();
-  const brandCopy = BRAND_HERO_COPY[lang];
+  const { tr } = useI18n();
   const { data: savedBanners = [] } = useQuery({
     queryKey: ["homepage-visible-slides"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("homepage_slides")
-        .select("id,image_url,title_sq,title_en,link_url,updated_at")
+        .select("image_url")
         .eq("active", true)
         .not("image_url", "is", null)
-        .order("sort_order", { ascending: true })
-        .limit(2);
+        .order("updated_at", { ascending: false })
+        .limit(1);
       if (error) throw error;
       return (data ?? []) as HomepageBanner[];
     },
     staleTime: 60_000,
   });
 
-  // Display the new customer-provided image now; a subsequent change saved
-  // in Admin > Ballina can replace it. Previously configured slides are not
-  // allowed to conceal the newly requested image.
-  const editedBanner = savedBanners.find(
-    (slide) => slide.image_url &&
-      Date.parse(slide.updated_at) > Date.parse("2026-11-18T07:15:00Z")
-  );
-  const heroPhoto = editedBanner?.image_url || heroUserPhoto;
+  // The uploaded banner already has its own artwork and lettering.
+  // Show that single photograph unchanged: no old logo, headings, button,
+  // overlay gradients, second photo or image cropping.
+  const heroPhoto = savedBanners[0]?.image_url || heroUserPhoto;
 
   return (
-    <section aria-label={tr("heroBadge")} className="relative isolate overflow-hidden bg-[#080607] text-white">
-      {/* Photo is extracted from the exact uploaded design without its baked-in
-          Albanian wording, so the copy appears once and follows the language. */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <img
-          src={heroPhoto}
-          alt=""
-          loading="eager"
-          fetchPriority="high"
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            e.currentTarget.src = heroModel;
-          }}
-          className="absolute inset-0 h-full w-full object-cover object-[56%_center] sm:left-auto sm:right-0 sm:w-auto sm:max-w-[52%] sm:object-contain sm:object-right lg:max-w-none"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent sm:hidden" />
-        <div
-          className="absolute inset-0 hidden sm:block"
-          style={{
-            background: "linear-gradient(90deg, #080607 0%, #080607 22%, rgba(8,6,7,.92) 32%, rgba(8,6,7,.32) 44%, transparent 64%)",
-          }}
-        />
-      </div>
-
-      <div className="container-app relative z-10 flex min-h-[390px] items-center py-8 sm:min-h-[380px] sm:py-8 lg:aspect-[3/1] lg:min-h-0 lg:py-0">
-        <div className="w-full max-w-[335px] sm:max-w-[47%] lg:max-w-[590px]">
-          <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.13em] text-white/95 sm:text-xs lg:text-sm">
-            {brandCopy.eyebrow}
-          </p>
-          <h1 className="font-display text-[clamp(3.1rem,8vw,7.5rem)] leading-[0.92] tracking-tight text-white">
-            DREAMÈ
-          </h1>
-          <p className="mt-1 font-display text-[clamp(1.55rem,4vw,3.85rem)] italic leading-tight text-white">
-            Beauty Cosmetics
-          </p>
-          <p className="mt-3 text-sm leading-snug text-white/95 sm:text-base lg:mt-4 lg:text-lg">
-            {brandCopy.line1}<br />{brandCopy.line2}
-          </p>
-          <Link
-            to="/shop"
-            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold !text-[#141014] transition hover:bg-[#f8e6ec]"
-          >
-            {brandCopy.action} <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </div>
+    <section
+      aria-label={tr("heroBadge")}
+      className="w-full overflow-hidden bg-[#080607]"
+    >
+      <img
+        src={heroPhoto}
+        alt="DREAMÈ Beauty Cosmetics — koleksioni i bukurisë"
+        loading="eager"
+        fetchPriority="high"
+        className="block h-auto w-full object-contain"
+      />
     </section>
   );
 }
