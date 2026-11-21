@@ -275,8 +275,8 @@ export function DreameHomePromos() {
       photoLeft: true,
       external: false,
     },
-    { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), href: whatsappLink(info.academyMessage), bookingMode: undefined, photoLeft: false, external: true },
     { img: p2, title: "PEDICURE", sub: tr("promoFeetSub"), btn: ({ sq: "Cakto Termin për PEDICURE", en: "Book PEDICURE", de: "PEDIKÜRE buchen", fr: "Réserver PÉDICURE" } as const)[lang], href: "#rezervo-termin", bookingMode: "pedicure" as const, photoLeft: true, external: false },
+    { img: p1, title: tr("promoAcademyTitle"), sub: tr("promoAcademySub"), btn: tr("promoAcademyBtn"), href: whatsappLink(info.academyMessage), bookingMode: undefined, photoLeft: false, external: true },
   ];
   const benefits = [
     {
