@@ -120,6 +120,13 @@
       "when": 1795030470082,
       "tag": "0016_harden_create_db_backup",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1795289287816,
+      "tag": "0017_close_privilege_and_insert_gaps",
+      "breakpoints": true
     }
   ]
 }
