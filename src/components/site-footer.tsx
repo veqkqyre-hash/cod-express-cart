@@ -56,7 +56,7 @@ export function SiteFooter() {
                   className="h-[38px] w-8 object-contain brightness-0 invert"
                 />
               </span>
-              <span className="font-display text-3xl tracking-tight">Dreame Beauty Cosmetics</span>
+              <span className="font-display text-3xl tracking-tight">Dreamè Beauty Cosmetics</span>
             </Link>
             <p className="text-sm text-white/70 max-w-xs">
               {lang === "sq"
