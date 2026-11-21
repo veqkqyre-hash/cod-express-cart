@@ -177,7 +177,7 @@ export function SiteHeader() {
               )}
             </Link>
 
-            <button className="xl:hidden grid h-10 w-10 shrink-0 place-items-center rounded-full hover:bg-secondary" onClick={() => setOpen((o) => !o)} aria-label="Menu">
+            <button type="button" className="xl:hidden grid h-10 w-10 shrink-0 place-items-center rounded-full hover:bg-secondary" onClick={() => setOpen((o) => !o)} aria-label="Menu" aria-expanded={open} aria-controls="mobile-site-menu">
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
@@ -223,9 +223,9 @@ export function SiteHeader() {
 
         {/* Mobile drawer */}
         {open && (
-          <div className="xl:hidden border-t border-border/60 bg-background">
-            <div className="container-app py-4 space-y-3">
-              <form onSubmit={onSearchSubmit} className="flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-4 py-2">
+          <div id="mobile-site-menu" className="xl:hidden max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain border-t border-border/60 bg-background [-webkit-overflow-scrolling:touch]">
+            <div className="container-app space-y-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+5rem)]">
+              <form onSubmit={(event) => { onSearchSubmit(event); setOpen(false); }} className="flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-4 py-2">
                 <Search className="h-4 w-4 text-muted-foreground" />
                 <input
                   value={q}
@@ -247,6 +247,26 @@ export function SiteHeader() {
                   </button>
                 ))}
               </div>
+              {/* Categories belong at the TOP of the mobile menu, not below
+                  the long navigation list where iPhone Safari obscures them. */}
+              <section className="border-b border-border/60 pb-4" aria-label={tr("categories")}>
+                <div className="mb-3 text-xs font-bold uppercase tracking-widest text-[var(--pink-deep)]">
+                  {tr("categories")}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {categories?.map((c) => (
+                    <Link
+                      key={c.id}
+                      to="/shop"
+                      search={{ category: c.slug }}
+                      onClick={() => setOpen(false)}
+                      className="flex min-h-12 min-w-0 items-center rounded-xl bg-secondary/80 px-3 py-2.5 text-[13px] font-medium leading-snug text-foreground break-words transition hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--pink-deep)]"
+                    >
+                      {lang === "sq" ? c.name_sq : c.name_en}
+                    </Link>
+                  ))}
+                </div>
+              </section>
               <nav className="flex flex-col text-sm">
                 <Link to="/shop" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("shop")}</Link>
                 <Link to="/wishlist" className="py-2 font-medium" onClick={() => setOpen(false)}>{tr("wishlist")}</Link>
@@ -268,22 +288,7 @@ export function SiteHeader() {
                 )}
               </nav>
 
-              <div className="pt-2 border-t border-border">
-                <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">{tr("categories")}</div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {categories?.map((c) => (
-                    <Link
-                      key={c.id}
-                      to="/shop"
-                      search={{ category: c.slug }}
-                      onClick={() => setOpen(false)}
-                      className="rounded-lg bg-secondary/60 px-3 py-2 text-xs font-medium hover:bg-secondary"
-                    >
-                      {lang === "sq" ? c.name_sq : c.name_en}
-                    </Link>
-                  ))}
-                </div>
-              </div>
+
             </div>
           </div>
         )}
