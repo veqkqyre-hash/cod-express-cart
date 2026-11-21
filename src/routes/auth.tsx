@@ -30,6 +30,8 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -45,12 +47,19 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       } else {
-        const { error } = await supabase.auth.signUp({
-          email,
+        const { data, error } = await supabase.auth.signUp({
+          email: email.trim(),
           password,
           options: { emailRedirectTo: window.location.origin + "/account" },
         });
         if (error) throw error;
+        if (!data.session) {
+          setAwaitingConfirmation(true);
+          toast.message(lang === "sq"
+            ? "Nëse regjistrimi u pranua, kontrollo emailin për konfirmim."
+            : "If signup was accepted, check your email for a confirmation link.");
+          return;
+        }
         toast.success(lang === "sq" ? "Llogaria u krijua!" : "Account created!");
       }
       navigate({ to: "/account" });
@@ -58,6 +67,31 @@ function AuthPage() {
       toast.error(err.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function resendConfirmation() {
+    const address = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) {
+      toast.error(lang === "sq" ? "Shkruaj një email të vlefshëm" : "Enter a valid email");
+      return;
+    }
+    setResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: address,
+        options: { emailRedirectTo: window.location.origin + "/account" },
+      });
+      if (error) throw error;
+      setAwaitingConfirmation(true);
+      toast.success(lang === "sq"
+        ? "Kërkesa për ridërgim u pranua. Kontrollo Inbox dhe Spam."
+        : "Resend request accepted. Check your Inbox and Spam.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not request confirmation email");
+    } finally {
+      setResending(false);
     }
   }
 
@@ -80,6 +114,21 @@ function AuthPage() {
         </div>
         <button disabled={loading} className="w-full rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
           {loading ? "…" : mode === "signin" ? tr("login") : (lang === "sq" ? "Regjistrohu" : "Sign Up")}
+        </button>
+        {awaitingConfirmation && (
+          <p role="status" className="rounded-xl border border-border bg-secondary/60 px-4 py-3 text-sm">
+            {lang === "sq"
+              ? "Llogaria pret konfirmimin. Kontrollo Inbox, Spam/Junk dhe adresën e shkruar."
+              : "Your account awaits confirmation. Check Inbox, Spam/Junk, and the entered address."}
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={resendConfirmation}
+          disabled={resending || loading}
+          className="w-full rounded-full border border-border px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-secondary disabled:opacity-50"
+        >
+          {resending ? "…" : (lang === "sq" ? "Ridërgo emailin e konfirmimit" : "Resend confirmation email")}
         </button>
         <button type="button" onClick={() => setMode((m) => (m === "signin" ? "signup" : "signin"))} className="w-full text-sm text-muted-foreground hover:text-primary">
           {mode === "signin"
