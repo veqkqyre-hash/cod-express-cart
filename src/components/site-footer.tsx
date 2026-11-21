@@ -11,14 +11,14 @@ export function SiteFooter() {
         <div className="container-app grid gap-10 py-16 md:grid-cols-12">
           <div className="md:col-span-4 space-y-5">
             <Link to="/" className="flex items-center gap-2">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--pink-deep)]">
+              <span className="grid h-11 w-11 shrink-0 place-items-center">
                 <img
                   src="/assets/dreame-symbol.svg"
                   alt=""
                   aria-hidden="true"
-                  width={25}
-                  height={30}
-                  className="h-[30px] w-[25px] object-contain brightness-0 invert"
+                  width={32}
+                  height={38}
+                  className="h-[38px] w-8 object-contain brightness-0 invert"
                 />
               </span>
               <span className="font-display text-3xl tracking-tight">Dreame Beauty Cosmetics</span>
