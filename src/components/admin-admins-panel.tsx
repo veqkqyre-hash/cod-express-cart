@@ -116,12 +116,6 @@ export function AdminsPanel() {
         })}
       </div>
 
-      <div className="rounded-xl border border-pink-100 bg-pink-50/60 px-4 py-3 text-sm text-neutral-700">
-        {L(
-          "Miratimi bëhet nga Admin i DREAMÈ, jo në Lovable. Nëse personi ende s'e ka verifikuar emailin, miratimi ruhet si 'Në pritje' dhe aktivizohet vetëm kur ai/ajo e konfirmon emailin dhe kyçet në website. Ftesa këtu nuk dërgon email automatik.",
-          "Approval happens in the DREAMÈ website Admin, not Lovable. If the person's email isn't verified, approval stays pending and activates after they verify their email and sign in. This approval does not send an invitation email."
-        )}
-      </div>
       <form onSubmit={addStaff} className="flex flex-wrap gap-3 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
         <input
           type="email"
