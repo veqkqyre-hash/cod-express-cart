@@ -2,7 +2,7 @@ import { loadSeo } from "@/lib/seo-loader";
 import { applySeoHead } from "@/lib/seo";
 import { createFileRoute, useNavigate, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { useCart, formatEur } from "@/lib/cart";
@@ -34,6 +34,20 @@ export const Route = createFileRoute("/product/$slug")({
 function ProductPage() {
   const { slug } = Route.useParams();
   const navigate = useNavigate();
+  const backPressed = useRef(false);
+
+  // Only one history step per press, even with a rapid double tap on mobile.
+  useEffect(() => { backPressed.current = false; }, [slug]);
+
+  function goBackOnce() {
+    if (backPressed.current) return;
+    backPressed.current = true;
+    if (window.history.length > 1) {
+      window.history.go(-1);
+    } else {
+      navigate({ to: "/shop" });
+    }
+  }
   const { tr, lang } = useI18n();
   const { add } = useCart();
   const [qty, setQty] = useState(1);
@@ -79,7 +93,7 @@ function ProductPage() {
 
   return (
     <div className="container-app py-10">
-      <button type="button" onClick={() => { if (window.history.length > 1) window.history.back(); else navigate({ to: "/shop" }); }} className="text-sm text-muted-foreground hover:text-primary">← {({ sq: "Kthehu mbrapa", en: "Go back", de: "Zurück", fr: "Retour" } as const)[lang]}</button>
+      <button type="button" onClick={goBackOnce} className="text-sm text-muted-foreground hover:text-primary">← {({ sq: "Kthehu mbrapa", en: "Go back", de: "Zurück", fr: "Retour" } as const)[lang]}</button>
       <div className="mt-6 grid gap-10 lg:grid-cols-2">
         <ProductGallery key={`${product.id}:${selected?.id ?? "base"}`} images={optionImages} name={name} />
         <div>
