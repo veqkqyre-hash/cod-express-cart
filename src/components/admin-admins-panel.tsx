@@ -7,6 +7,7 @@ import { UserPlus, Trash2, ShieldCheck, ClipboardList, PenLine } from "lucide-re
 
 type StaffRole = "admin" | "manager" | "editor";
 type StaffRow = { user_id: string; email: string; role: StaffRole; created_at: string };
+type StaffInviteRow = { email: string; role: StaffRole; created_at: string };
 
 const ROLE_META: Record<StaffRole, { icon: any; tone: string }> = {
   admin: { icon: ShieldCheck, tone: "bg-pink-50 text-pink-700" },
@@ -36,16 +37,42 @@ export function AdminsPanel() {
     },
   });
 
+  const { data: pendingInvites, refetch: refetchInvites } = useQuery({
+    queryKey: ["pending-staff-invites"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("list_staff_invites" as any);
+      if (error) throw error;
+      return (data ?? []) as StaffInviteRow[];
+    },
+  });
+
+  async function cancelInvite(invite: StaffInviteRow) {
+    if (!confirm(L("Ta anulosh ftesën për këtë adresë?", "Cancel the pending approval for this address?"))) return;
+    setBusy(true);
+    const { error } = await supabase.rpc("cancel_staff_invite" as any, { _email: invite.email });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(L("Miratimi në pritje u anulua", "Pending approval cancelled"));
+    refetchInvites();
+  }
+
   async function addStaff(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
     setBusy(true);
-    const { error } = await supabase.rpc("grant_role_by_email", { _email: email.trim(), _role: role });
+    const { data, error } = await supabase.rpc(
+      "invite_staff_by_email" as any,
+      { _email: email.trim(), _role: role }
+    );
     setBusy(false);
     if (error) return toast.error(error.message);
-    toast.success(L("Roli u caktua", "Role granted"));
+    const pending = (data as { status?: string } | null)?.status === "pending";
+    toast.success(pending
+      ? L("U miratua nga Admin. Roli aktivizohet pasi personi verifikon emailin dhe kyçet në website.", "Admin approved. Access activates after the person verifies their email and signs in to the website.")
+      : L("Roli u caktua", "Role granted"));
     setEmail("");
     refetch();
+    refetchInvites();
   }
 
   async function changeRole(row: StaffRow, newRole: StaffRole) {
@@ -89,6 +116,12 @@ export function AdminsPanel() {
         })}
       </div>
 
+      <div className="rounded-xl border border-pink-100 bg-pink-50/60 px-4 py-3 text-sm text-neutral-700">
+        {L(
+          "Miratimi bëhet nga Admin i DREAMÈ, jo në Lovable. Nëse personi ende s'e ka verifikuar emailin, miratimi ruhet si 'Në pritje' dhe aktivizohet vetëm kur ai/ajo e konfirmon emailin dhe kyçet në website. Ftesa këtu nuk dërgon email automatik.",
+          "Approval happens in the DREAMÈ website Admin, not Lovable. If the person's email isn't verified, approval stays pending and activates after they verify their email and sign in. This approval does not send an invitation email."
+        )}
+      </div>
       <form onSubmit={addStaff} className="flex flex-wrap gap-3 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
         <input
           type="email"
@@ -111,6 +144,27 @@ export function AdminsPanel() {
         </button>
       </form>
 
+      {(pendingInvites?.length ?? 0) > 0 && (
+        <section className="overflow-hidden rounded-2xl border border-amber-200 bg-white shadow-sm" aria-label={L("Miratimet në pritje", "Pending staff approvals")}>
+          <h3 className="border-b border-amber-100 px-4 py-3 text-sm font-semibold">
+            {L("Miratimet në pritje", "Pending staff approvals")} ({pendingInvites?.length})
+          </h3>
+          <div className="divide-y divide-neutral-100">
+            {pendingInvites?.map(invite => (
+              <div key={invite.email} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
+                <span className="min-w-0 flex-1 break-all font-medium">{invite.email}</span>
+                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs text-amber-800">
+                  {invite.role} · {L("Në pritje të verifikimit", "Awaiting verification")}
+                </span>
+                <button type="button" onClick={() => cancelInvite(invite)} disabled={busy}
+                  className="rounded-full border border-neutral-200 px-3 py-1.5 text-xs text-red-700 hover:bg-red-50 disabled:opacity-50">
+                  {L("Anulo", "Cancel")}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
         <table className="w-full text-sm">
           <thead className="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">

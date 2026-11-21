@@ -38,12 +38,27 @@ function Account() {
   const { tr, lang } = useI18n();
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
   const [email, setEmail] = useState("");
+  const [newStaffRole, setNewStaffRole] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    let mounted = true;
+    async function loadAccount() {
+      const { data } = await supabase.auth.getUser();
+      if (!mounted) return;
       setUserId(data.user?.id ?? null);
       setEmail(data.user?.email ?? "");
-    });
+
+      if (data.user?.id) {
+        // Activated only after Supabase verifies the recipient's identity.
+        // The invitation can only have been created by an existing admin.
+        const { data: claimedRole, error } = await supabase.rpc("claim_staff_invite" as any);
+        if (mounted && !error && typeof claimedRole === "string") {
+          setNewStaffRole(claimedRole);
+        }
+      }
+    }
+    loadAccount();
+    return () => { mounted = false; };
   }, []);
 
   const { data: orders } = useQuery({
@@ -87,6 +102,20 @@ function Account() {
           {tr("logout")}
         </button>
       </div>
+
+      {newStaffRole && (
+        <div role="status" className="mb-6 rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-900">
+          <p className="font-semibold">
+            {lang === "sq" ? "Miratimi nga administratori i DREAMÈ u aktivizua!" : "DREAMÈ administrator approval is now active!"}
+          </p>
+          <p className="mt-1">
+            {lang === "sq" ? `Roli yt: ${newStaffRole}. Tash mundesh me hy në panel.` : `Your role: ${newStaffRole}. You can access the management panel now.`}
+          </p>
+          <Link to="/admin" className="mt-3 inline-flex rounded-full bg-green-800 px-4 py-2 font-semibold text-white hover:bg-green-900">
+            {lang === "sq" ? "Hyr te paneli i administrimit" : "Open admin panel"}
+          </Link>
+        </div>
+      )}
 
       {orders && orders.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-10 text-center">
