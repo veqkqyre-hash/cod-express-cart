@@ -23,7 +23,7 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { tr } = useI18n();
+  const { tr, lang } = useI18n();
   const { items, remove, setQty, subtotal } = useCart();
 
   if (items.length === 0) {
@@ -74,9 +74,9 @@ function CartPage() {
         <aside className="h-fit rounded-2xl border border-border bg-card p-6 shadow-soft">
           <div className="space-y-3 text-sm">
             <div className="flex justify-between"><span>{tr("subtotal")}</span><span className="font-medium">{formatEur(subtotal)}</span></div>
-            <div className="flex justify-between"><span>{tr("shipping")}</span><span className="font-medium">{tr("freeShipping")}</span></div>
+            <div className="flex justify-between gap-3"><span>{tr("shipping")}</span><span className="font-medium text-right">{({ sq: "Llogaritet sipas shtetit te porosia", en: "Calculated at checkout by country", de: "Beim Checkout nach Lieferland", fr: "Calculée à la commande selon le pays" } as const)[lang]}</span></div>
             <div className="border-t border-border pt-3 flex justify-between font-display text-xl">
-              <span>{tr("total")}</span><span>{formatEur(subtotal)}</span>
+              <span>{tr("subtotal")}</span><span>{formatEur(subtotal)}</span>
             </div>
           </div>
           <Link to="/checkout" className="mt-6 block rounded-full bg-primary px-6 py-3 text-center text-sm font-medium text-primary-foreground hover:bg-primary/90">
