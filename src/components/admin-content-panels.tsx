@@ -664,6 +664,12 @@ export function ShippingPanel() {
 
   return (
     <div>
+      <p className="mb-4 rounded-xl border border-neutral-200 bg-white p-4 text-sm text-neutral-700">
+        {L(
+          "Për porositë online vlen tarifa sipas shtetit: Kosovë 2 € nën 50 €, falas nga 50 €; Shqipëri dhe Maqedoni e Veriut 5 €. Tabela e vjetër e zonave më poshtë nuk e ndryshon tarifën e checkout-it.",
+          "Online checkout uses country rates: Kosovo €2 below €50, free from €50; Albania and North Macedonia €5. The legacy zone rates below do not change checkout pricing."
+        )}
+      </p>
       <AddButton label={L("Shto tarifë", "Add rate")} onClick={() => setEditing("new")} />
       <Panel>
         <table className="w-full text-sm">
