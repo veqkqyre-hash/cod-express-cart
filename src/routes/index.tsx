@@ -14,6 +14,7 @@ import { ArrowRight, Sparkles, Truck, ShieldCheck, Award, Heart, Star, Mail } fr
 import { useState } from "react";
 import { toast } from "sonner";
 import heroUserPhoto from "@/assets/hero-user-2026.avif";
+import { HOMEPAGE_PREFERRED_BANNER_KEY, HOMEPAGE_PREFERRED_BANNER_QUERY_KEY, readPreferredBannerId } from "@/lib/homepage-banner-preference";
 
 
 export const Route = createFileRoute("/")({
@@ -130,6 +131,7 @@ function Home() {
 /* ------------------------------ Sections ------------------------------ */
 
 type HomepageBanner = {
+  id: string;
   image_url: string | null;
 };
 
@@ -140,21 +142,32 @@ function Hero() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("homepage_slides")
-        .select("image_url")
+        .select("id,image_url")
         .eq("active", true)
         .not("image_url", "is", null)
-        .order("updated_at", { ascending: false })
-        .limit(1);
+        .order("updated_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as HomepageBanner[];
     },
     staleTime: 60_000,
   });
+  const { data: preferredBannerId = null } = useQuery({
+    queryKey: HOMEPAGE_PREFERRED_BANNER_QUERY_KEY,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_settings")
+        .select("value")
+        .eq("key", HOMEPAGE_PREFERRED_BANNER_KEY)
+        .maybeSingle();
+      if (error) throw error;
+      return readPreferredBannerId(data?.value);
+    },
+    staleTime: 60_000,
+  });
 
-  // The uploaded banner already has its own artwork and lettering.
-  // Show that single photograph unchanged: no old logo, headings, button,
-  // overlay gradients, second photo or image cropping.
-  const heroPhoto = savedBanners[0]?.image_url || heroUserPhoto;
+  // Exactly ONE photo is displayed. The selected, active Admin preference wins;
+  // if it was deleted or hidden, fall back to the latest active photo.
+  const selectedBanner = savedBanners.find(slide => slide.id === preferredBannerId) ?? savedBanners[0];
+  const heroPhoto = selectedBanner?.image_url || heroUserPhoto;
 
   return (
     <section
