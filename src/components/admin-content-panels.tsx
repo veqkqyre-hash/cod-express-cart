@@ -10,6 +10,7 @@ import { ImageUploadField } from "@/components/admin-image-field";
 import { AdminHomeArrivalsOrder } from "@/components/admin-home-arrivals-order";
 import { AdminCategoryProductOrder } from "@/components/admin-category-product-order";
 import { loadBusinessInfo } from "@/lib/store-info";
+import { HOMEPAGE_PREFERRED_BANNER_KEY, HOMEPAGE_PREFERRED_BANNER_QUERY_KEY, readPreferredBannerId } from "@/lib/homepage-banner-preference";
 import { DndContext, closestCenter, PointerSensor, TouchSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -285,7 +286,9 @@ export function MarketingPanel() {
 
 export function HomepagePanel() {
   const { lang, L } = useL();
+  const queryClient = useQueryClient();
   const [editing, setEditing] = useState<any | "new" | null>(null);
+  const [preferredSaving, setPreferredSaving] = useState<string | null>(null);
 
   const { data: slides, refetch } = useQuery({
     queryKey: ["admin-slides"],
@@ -295,6 +298,48 @@ export function HomepagePanel() {
       return data ?? [];
     },
   });
+
+  // The preferred slide is independent of slide order and activation.
+  // Choosing one photo never deletes or modifies the other uploaded photos.
+  const { data: preferredSlideId = null } = useQuery({
+    queryKey: HOMEPAGE_PREFERRED_BANNER_QUERY_KEY,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("site_settings")
+        .select("value")
+        .eq("key", HOMEPAGE_PREFERRED_BANNER_KEY)
+        .maybeSingle();
+      if (error) throw error;
+      return readPreferredBannerId(data?.value);
+    },
+    staleTime: 30_000,
+  });
+
+  const activeSlides = (slides ?? []).filter(slide => slide.active && slide.image_url);
+  const mostRecentActiveSlide = [...activeSlides].sort(
+    (a, b) => Date.parse(b.updated_at ?? "") - Date.parse(a.updated_at ?? "")
+  )[0];
+  const mainSlideId = activeSlides.some(slide => slide.id === preferredSlideId)
+    ? preferredSlideId : mostRecentActiveSlide?.id ?? null;
+
+  async function setAsMainPhoto(slide: { id: string; active: boolean; image_url: string | null }) {
+    if (!slide.active || !slide.image_url || preferredSaving) return;
+    setPreferredSaving(slide.id);
+    try {
+      const { error } = await supabase.from("site_settings").upsert({
+        key: HOMEPAGE_PREFERRED_BANNER_KEY,
+        value: { slide_id: slide.id },
+      }, { onConflict: "key" });
+      if (error) throw error;
+      queryClient.setQueryData(HOMEPAGE_PREFERRED_BANNER_QUERY_KEY, slide.id);
+      await queryClient.invalidateQueries({ queryKey: HOMEPAGE_PREFERRED_BANNER_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: ["homepage-visible-slides"] });
+      toast.success(L("Fotoja kryesore u ndryshua", "Main photo updated"));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : L("Nuk u ruajt", "Could not save"));
+    } finally {
+      setPreferredSaving(null);
+    }
+  }
 
   async function onDelete(id: string) {
     if (!confirm(L("Fshij sllajdin?", "Delete slide?"))) return;
@@ -335,8 +380,8 @@ export function HomepagePanel() {
         <p className="font-semibold">{L("Fotoja kryesore e ballinës", "Homepage banner photo")}</p>
         <p className="mt-1">
           {L(
-            "Fotografia e re DREAMÈ është vendosur në banner. Nëse dëshiron ta ndryshosh më vonë, modifiko dhe ruaj foton e parë aktive këtu. Banneri nuk ndërron automatikisht foto dhe shkrimi ndryshon sipas gjuhës së zgjedhur.",
-            "The new DREAMÈ photo is set as the banner. To replace it later, edit and save the first active photo here. The banner does not rotate photos and the text follows the selected language."
+            "Zgjidhe vetë fotografinë kryesore duke shtypur «Vendose si foto kryesore» te fotoja që dëshiron. Në ballinë shfaqet vetëm ajo foto, pa ndërrim automatik e pa shkrim shtesë mbi të. Fotot tjera mbeten të ruajtura.",
+            "Choose the homepage photo by pressing «Set as main photo» on the image you prefer. Only that photo appears on the homepage, with no automatic rotation or extra overlay text. Other photos stay saved."
           )}
         </p>
         <p className="mt-2 text-neutral-500">
@@ -346,19 +391,38 @@ export function HomepagePanel() {
       <AddButton label={L("Shto sllajd", "Add slide")} onClick={() => setEditing("new")} />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {(slides ?? []).map((x: any) => (
-          <div key={x.id} className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+          <div key={x.id} className={`overflow-hidden rounded-2xl border bg-white shadow-sm ${mainSlideId === x.id ? "border-[var(--pink-deep)] ring-1 ring-[var(--pink-deep)]" : "border-neutral-200"}`}>
             {x.image_url
               ? <img src={x.image_url} alt="" className="h-32 w-full object-cover" />
               : <div className="h-32 w-full bg-neutral-100" />}
-            <div className="flex items-start justify-between gap-2 p-4">
-              <div>
+            <div className="flex items-start justify-between gap-2 p-4 pb-2">
+              <div className="min-w-0">
                 <div className="font-medium">{lang === "sq" ? x.title_sq : x.title_en}</div>
                 <div className="text-xs text-neutral-500">#{x.sort_order} · {x.active ? L("aktiv", "active") : L("fshehur", "hidden")}</div>
               </div>
               <div className="flex shrink-0">
-                <button onClick={() => setEditing(x)} className="grid h-8 w-8 place-items-center rounded-full hover:bg-neutral-100"><Pencil className="h-4 w-4" /></button>
-                <button onClick={() => onDelete(x.id)} className="grid h-8 w-8 place-items-center rounded-full text-red-600 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
+                <button type="button" aria-label={L("Modifiko foton", "Edit photo")} onClick={() => setEditing(x)} className="grid h-8 w-8 place-items-center rounded-full hover:bg-neutral-100"><Pencil className="h-4 w-4" /></button>
+                <button type="button" aria-label={L("Fshij foton", "Delete photo")} onClick={() => onDelete(x.id)} className="grid h-8 w-8 place-items-center rounded-full text-red-600 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button>
               </div>
+            </div>
+            <div className="px-4 pb-4">
+              <button
+                type="button"
+                onClick={() => setAsMainPhoto(x)}
+                disabled={!x.active || !x.image_url || preferredSaving !== null || mainSlideId === x.id}
+                aria-pressed={mainSlideId === x.id}
+                className={`w-full rounded-full px-4 py-2.5 text-xs font-semibold transition ${mainSlideId === x.id
+                  ? "bg-[var(--pink-deep)] text-white"
+                  : "bg-neutral-900 text-white hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-50"}`}
+              >
+                {preferredSaving === x.id
+                  ? L("Duke ruajtur…", "Saving…")
+                  : mainSlideId === x.id
+                    ? L("✓ Fotoja kryesore", "✓ Main photo")
+                    : !x.active || !x.image_url
+                      ? L("Aktivizo foton për ta zgjedhur", "Activate image to select")
+                      : L("Vendose si foto kryesore", "Set as main photo")}
+              </button>
             </div>
           </div>
         ))}
