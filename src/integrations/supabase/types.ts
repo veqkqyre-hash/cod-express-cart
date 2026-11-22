@@ -1047,6 +1047,27 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_invites: {
+        Row: {
+          created_at: string
+          email: string
+          invited_by: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          invited_by: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          invited_by?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       stock_alerts: {
         Row: {
           created_at: string
@@ -1193,11 +1214,13 @@ export type Database = {
     }
     Functions: {
       backup_tables: { Args: never; Returns: string[] }
+      cancel_staff_invite: { Args: { _email: string }; Returns: undefined }
       checkout_product_options: {
         Args: { _coupon?: string; _customer: Json; _items: Json }
         Returns: Json
       }
       claim_admin_if_none: { Args: never; Returns: Json }
+      claim_staff_invite: { Args: never; Returns: string }
       close_pos_shift: {
         Args: { _counted_cash?: number; _note?: string }
         Returns: Json
@@ -1243,6 +1266,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      invite_staff_by_email: {
+        Args: { _email: string; _role: Database["public"]["Enums"]["app_role"] }
+        Returns: Json
+      }
       list_admins: {
         Args: never
         Returns: {
@@ -1258,6 +1285,14 @@ export type Database = {
           email: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
+        }[]
+      }
+      list_staff_invites: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          role: Database["public"]["Enums"]["app_role"]
         }[]
       }
       log_action: {
